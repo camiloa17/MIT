@@ -323,7 +323,7 @@ h3{
 /*-----------Contenedro de la imagen estatica--------------------------------------------------------------------------------*/
 
 .image-container{
-    background-image: url(images/home-1.jpg);
+    background-image: url(../../images/Front/home-1.jpg);
     height: 694px;
     width:100%;
     background-repeat: no-repeat;
