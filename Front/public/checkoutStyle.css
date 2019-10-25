@@ -1,0 +1,413 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;
+    color:#085796;
+}
+h1,
+h2,
+h3{
+    font-family: 'Roboto Slab', serif;
+}
+
+
+.secondary-menu-list,
+.primary-menu-logo,
+.upper-part-header,
+.secondary-menu-logo,
+.primary-menu-list,
+.right-side-menu,
+#team-wrapper{
+    display: flex;
+}
+
+
+
+.brand-logo{
+    font-size: 40px;
+    line-height: 53px;
+    font-weight: bold;
+    color:#085796;
+}
+.brand-logo.logo-lower-part{
+        display: none;
+}
+
+.upper-part-header{
+    justify-content: space-between;
+    padding-left:30px;
+    padding-right:42px;
+    margin-top:20px;
+}
+
+
+
+
+.lower-part-header{
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 118px;
+    left:0;
+    right:0;
+    width:251px;
+}
+
+
+/*Menu Secundario--------------------------------------------*/
+
+.right-side-menu{
+    width: 0;
+    height: 100%;
+    top:0;
+    position: fixed;
+    z-index: 100;
+    overflow-x: hidden;
+}
+
+.secondary-menu-list{
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+.secondary-menu-list a{
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.secondary-menu-logo{
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.secondary-menu-logo span{
+    font-weight: bold;
+    font-size: 20px;
+    margin-right:10%;
+    cursor: pointer;
+}
+
+/*Se agrega estilado al icono de hamburguesa*/
+.mobile-logo-ham i{
+    font-size: 40px;
+    font-weight: 200;
+    line-height: 60px;
+    color:#065494;
+}
+/*Se asigna la direccion derecha al side menu*/
+.right-side-menu{
+    background-color: #F7F7F7;
+    left:auto;
+    right:0;
+}
+
+/*Se agregan margen y la direccion del flex al menu secundario*/
+.secondary-menu-list{
+    width: 100%;
+    margin-top:22px;
+    margin-left: 28px;
+    padding:0;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+/*Se agrega el color a los textos del menu secundario*/
+.secondary-menu-list a{
+    color:#085796;  
+}
+
+/*Se agrega espacio al logo para separarlo del contenidon*/
+.secondary-menu-logo{
+    margin-bottom: 37px;
+}
+
+/*Se agrega espacio entre los items del menu secundario*/
+
+.secondary-menu-item{
+    margin-bottom: 23px;
+}
+
+/*Clase que  agrega el estilo de overflow cuando sale el menu*/
+.overflow-menu{
+    top:0;
+    background-color: rgba(0,0,0,0.5);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 99;
+}
+
+/*Clase para mostrar el menu*/
+.active{
+    width:294px;
+    transition: 0.2s;
+}
+
+/*Final Menu secundario*/
+
+
+
+
+
+
+/*-----------------------Seccion Checkout----------------------------------------------------------------*/
+
+#progress-bar-outer{
+    width: 100%;
+    height: 7px;
+    margin-top:50px;
+}
+
+#progress-bar-inner{
+    width:25%;
+    height: 7px;
+    background-color: #72C6EF;
+}
+
+#steps{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top:28px;
+}
+#stepss ul{
+    width:400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#steps ul .step-number{
+    display: inline-block;
+    font-weight: 300;
+    font-size: 20px;
+    color:#BBBBBB;
+    list-style-type: none;
+    width:20px;
+}
+
+#steps ul .step-number.ongoing{
+    color:#262626;
+}
+
+
+#information h3{
+    font-size: 20px;
+    margin-top:49px;
+}
+
+#information h1{
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+#information h3,
+#information h1{
+    width: 100%;
+    text-align: center;
+    color:#000000;
+    font-weight: bold;
+}
+
+.exam-wrapper{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.exam-picture{
+    max-width: 500px;
+    max-height: 400px;
+}
+
+.exam-picture img{
+    width: 100%;
+    height: 100%;
+}
+
+.exam-text{
+    margin-top: 20px;
+    text-align: center;
+}
+.exam-text h4{
+    margin-bottom:10px;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 23px;
+    color: #4F4F4F;
+}
+
+.exam-text>p{
+    color: #4F4F4F;
+    font-size: 15px;
+    line-height: 200%;
+}
+
+.exam-text>span{
+    display: block;
+    color: #085796;
+    font-size: 30px;
+    margin-top:20px;
+}
+
+.exam-text>a,
+.button-checkout{
+    display: block;
+    border: 1px solid #085796;
+    width: 280px;
+    height: 50px;
+    margin:10px auto;
+    padding-top:10px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+}
+
+
+.exam-text>a{
+    color:#085796;
+    font-weight: bold;
+}
+
+.exam-text>a:hover{
+    color: #04467c;
+    border: 1px solid #085796;
+
+}
+
+
+.button-checkout{
+    background: #085796;
+    color:#ffffff;
+}
+.button-checkout:hover{
+    background-color: #08497e;
+}
+
+.button-checkout:active{
+    background-color: #073f6d;
+}
+
+/*---------------------End Seccion Checkout----------------------------------------------------------------*/
+
+
+
+/*--------------------Estilos para desktop----------------------------------------------------*/
+
+
+@media only screen and (min-width:991px){
+
+     /*-----------------------Seccion menu desktop--------------------------------------------------*/
+    /*Se esconde el logo superior, los logos de el menu lateral*/
+    .mobile-logo-ham,
+    .secondary-menu-logo,
+    .brand-logo{
+        display:none;
+    }
+    /*Se quita el overflow en caso que se quede el side menu abierto y se agrande la pantalla*/
+    .overflow-menu{
+     background-color: transparent;
+    }
+
+    .brand-logo.logo-lower-part{
+        display: inline-block;
+        margin-left: 115px;
+    }
+
+    .lower-part-header{
+        position: relative;
+        width: 100%;
+        height:103px;
+        top:0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        /*-------------------------Menu Secundario Desktop---------------------------------------------*/
+
+     /*Se mueve agrega el color al header azul y se quita el margen superior de mobile*/
+    .upper-part-header{
+        background-color: #004E8F;
+        margin-top:0;
+    }
+
+     /*El area superior del header se vuelve del tamaño para desktop*/
+    .upper-part-header,
+    .right-side-menu{
+        height:41px;
+    }
+
+    /*se le da el mismo ancho al menu que su contenedor, se agregar la posicion relativa para incluirlo en el markup y se quita la transicion*/
+    .right-side-menu{
+        width: 100%;
+        position: relative;
+        margin-left:115px;
+        background-color: transparent;
+    }
+
+    /*Make the text go to the center of the row*/
+    .secondary-menu-list{
+        margin:0;
+        flex-direction: row;
+        align-items: center;
+    }
+    /*Makes the items of the menu move away from each other */
+    .secondary-menu-item{
+        margin:0;
+        margin-right:36px;
+    }
+    /*Gives the white color to the text*/
+    .right-side-menu li>a{
+        color:white;
+    }
+
+    /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
+/*Checkout*/
+
+#progress-bar-outer{
+    margin-top:0;
+}
+    #steps ul .step-number{
+        margin-left:48px;
+    }
+
+    #information>h1{
+        margin-bottom: 50px;
+    }
+
+   .exam-wrapper{
+       flex-direction: row;
+       margin-bottom: 50px;
+   }
+
+   .exam-picture{
+       margin-right: 54px;
+   }
+
+    .exam-text{
+        width: 396px;
+        text-align: left;
+    }
+   /*Fin Checkou*/
+    .exam-text>a{
+        margin: 0;
+    }
+
+    .exam-text>span{
+        margin-bottom: 52px;
+    }
+    .button-checkout{
+        margin-bottom: 41px;
+    }
+
+}
