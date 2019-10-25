@@ -32,6 +32,7 @@ h3{
     line-height: 53px;
     font-weight: bold;
     color:#085796;
+    text-decoration: none;
 }
 .brand-logo.logo-lower-part{
         display: none;
@@ -251,6 +252,9 @@ h3{
     line-height: 200%;
 }
 
+
+
+
 .exam-text>span{
     display: block;
     color: #085796;
@@ -258,6 +262,10 @@ h3{
     margin-top:20px;
 }
 
+#button-wrap{
+    display: flex;
+    justify-content: flex-end;
+}
 .exam-text>a,
 .button-checkout{
     display: block;

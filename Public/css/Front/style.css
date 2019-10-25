@@ -54,7 +54,11 @@ h3{
     line-height: 53px;
     font-weight: bold;
     color:#085796;
+    text-decoration: none;
+    
 }
+
+
 .brand-logo.logo-lower-part{
         display: none;
     }
