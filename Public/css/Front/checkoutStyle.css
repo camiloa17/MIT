@@ -7,6 +7,7 @@
 body{
     font-family: 'Roboto', sans-serif;
     color:#085796;
+
 }
 h1,
 h2,
@@ -218,6 +219,7 @@ h3{
     font-weight: bold;
 }
 
+/*Exam information*/
 .exam-wrapper{
     display: flex;
     flex-direction: column;
@@ -253,8 +255,6 @@ h3{
 }
 
 
-
-
 .exam-text>span{
     display: block;
     color: #085796;
@@ -262,10 +262,168 @@ h3{
     margin-top:20px;
 }
 
+
+/*Seccion Disponibilidad*/
+#horario{
+    display:flex;
+    
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top:48px;
+}
+
+#horario h2{
+    font-weight: bold;
+    font-size: 30px;
+    color:#000000;
+}
+
+#horario p{
+    margin-top:10px;
+    font-size: 15px;
+    padding: 0 10px;
+    color: #4F4F4F;
+    text-align: center;
+}
+
+input[name="horario-selector"]{
+    display: none;
+}
+
+.horario-wrapper{
+    margin-top:40px;
+    margin-bottom: 40px;
+}
+.horario-wrapper label{
+    display: block;
+    height: 40px;
+    width: 300px;
+    text-align: center;
+    padding-top:10px;
+    color:#4F4F4F;
+    margin-top:10px;
+}
+
+/*Selecciona el input con el id designado y mira si esta chequeado, luego busca un sibling con el id designado*/
+input[id="h1"]:checked ~ #l1,
+input[id="h2"]:checked ~ #l2,
+input[id="h3"]:checked ~ #l3,
+input[id="h4"]:checked ~ #l4,
+input[id="h5"]:checked ~ #l5,
+input[id="h6"]:checked ~ #l6{
+    font-weight: bold;
+    border: 1px solid #085796;
+}
+
+/*Fin Seccion Disponibilidad */
+
+#pago{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#pago h2{
+    color: #000000;
+    font-weight: bold;
+    font-size: 20px;
+    width: 300px;
+    text-align: center;
+}
+#pago p{
+    width:250px;
+    color:#4F4F4F;
+    font-size: 15px;
+    text-align: center;
+    margin:0 auto;
+}
+
+#information-wrapper{
+    display: block;
+    width: 250px;
+    margin:10px auto;
+    padding-left:30px;
+}
+
+
+#information-wrapper input,
+#information-wrapper label,
+#information-wrapper span{
+    display: block;
+}
+
+#information-wrapper input{
+    margin-bottom:15px;
+}
+
+
+#information-wrapper .genero-inp{
+    display:inline-block;
+}
+
+#information-wrapper label,
+#information-wrapper span{
+    color:rgba(0, 0, 0, 0.534);
+    font-size: 16px;
+}
+
+/*Seccion pago con stripe*/
+
+#pago-stripe{
+    display: block;
+}
+
+#pago-stripe h2{
+    margin-top:20px;
+}
+
+#pago-stripe p{
+    margin-bottom:20px; 
+}
+
+/*inicio de estilos tarjeta stripe*/
+.StripeElement {
+    box-sizing: border-box;
+  
+    height: 40px;
+  
+    padding: 10px 12px;
+  
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-color: white;
+  
+    box-shadow: 0 1px 3px 0 #e6ebf1;
+    -webkit-transition: box-shadow 150ms ease;
+    transition: box-shadow 150ms ease;
+  }
+  
+  .StripeElement--focus {
+    box-shadow: 0 1px 3px 0 #cfd7df;
+  }
+  
+  .StripeElement--invalid {
+    border-color: #ff7357f3;
+  }
+  
+  .StripeElement--webkit-autofill {
+    background-color: #fefde5 !important;
+  }
+
+/*fin de estilos tarjeta stripe*/
+
+
+/*Fin de pago con strips*/
+
+
+/*botones siguiente y atras*/
 #button-wrap{
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
 }
+
 .exam-text>a,
 .button-checkout{
     display: block;
@@ -304,6 +462,22 @@ h3{
 .button-checkout:active{
     background-color: #073f6d;
 }
+
+#backwards{
+    opacity:0;
+    visibility: hidden;
+    transition: all 1s;
+    transform: scale(0.6);
+}
+
+#backwards.showup{
+    opacity:1;
+    visibility: visible;
+    transition: all 1s;
+    transform: scale(1);
+}
+
+/*botones siguiente y atras fin*/
 
 /*---------------------End Seccion Checkout----------------------------------------------------------------*/
 
@@ -417,5 +591,47 @@ h3{
     .button-checkout{
         margin-bottom: 41px;
     }
+
+    #pago{
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    #pago h2{
+        text-align: left; 
+    }
+
+    #pago p{
+        
+        text-align: left;
+        margin-top:10px;
+        margin-bottom:30px;
+    }
+
+    #information-wrapper{
+        margin:10px auto;
+        padding-left:0;
+        
+    }
+
+    /*button checkout*/
+    #button-wrap{
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    #pago-stripe{
+        margin-left:60px;
+    }
+
+    #pago-stripe h2{
+        margin-top:0;
+    }
+
+    #pago-stripe p{
+        margin-top:10px;
+        margin-bottom:30px; 
+    }
+    
 
 }
