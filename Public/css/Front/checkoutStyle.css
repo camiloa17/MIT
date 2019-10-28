@@ -7,6 +7,7 @@
 body{
     font-family: 'Roboto', sans-serif;
     color:#085796;
+    height: 100%;
 
 }
 h1,
@@ -203,7 +204,7 @@ h3{
 
 #information h3{
     font-size: 20px;
-    margin-top:49px;
+    margin-top:30px;
 }
 
 #information h1{
@@ -229,6 +230,7 @@ h3{
 .exam-picture{
     max-width: 500px;
     max-height: 400px;
+    margin: 0 auto;
 }
 
 .exam-picture img{
@@ -264,22 +266,22 @@ h3{
 
 
 /*Seccion Disponibilidad*/
-#horario{
+
+.horario{
     display:flex;
-    
     justify-content: center;
     align-items: center;
     flex-direction: column;
     margin-top:48px;
 }
 
-#horario h2{
+.horario h2{
     font-weight: bold;
     font-size: 30px;
     color:#000000;
 }
 
-#horario p{
+.horario p{
     margin-top:10px;
     font-size: 15px;
     padding: 0 10px;
@@ -318,21 +320,21 @@ input[id="h6"]:checked ~ #l6{
 
 /*Fin Seccion Disponibilidad */
 
-#pago{
+.pago{
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 
-#pago h2{
+.pago h2{
     color: #000000;
     font-weight: bold;
     font-size: 20px;
     width: 300px;
     text-align: center;
 }
-#pago p{
+.pago p{
     width:250px;
     color:#4F4F4F;
     font-size: 15px;
@@ -414,8 +416,6 @@ input[id="h6"]:checked ~ #l6{
 
 /*fin de estilos tarjeta stripe*/
 
-
-/*Fin de pago con strips*/
 
 
 /*botones siguiente y atras*/
@@ -570,9 +570,12 @@ input[id="h6"]:checked ~ #l6{
    .exam-wrapper{
        flex-direction: row;
        margin-bottom: 50px;
+       justify-content: center;
+       width: 100%;
    }
 
    .exam-picture{
+       margin:0;
        margin-right: 54px;
    }
 
@@ -592,16 +595,16 @@ input[id="h6"]:checked ~ #l6{
         margin-bottom: 41px;
     }
 
-    #pago{
+    .pago{
         flex-direction: row;
         align-items: flex-start;
     }
 
-    #pago h2{
+    .pago h2{
         text-align: left; 
     }
 
-    #pago p{
+    .pago p{
         
         text-align: left;
         margin-top:10px;

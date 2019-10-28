@@ -24,6 +24,14 @@ function closeNav(item) {
 document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
 
+
+function next(item){
+  
+}
+
+
+
+/*Codigo Stripe */
 // Create a Stripe client.
 var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
@@ -63,4 +71,7 @@ card.addEventListener('change', function(event) {
     displayError.textContent = '';
   }
 });
+
+
+/*Codigo Stripe */
 
