@@ -1,0 +1,172 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+/*---------------------Uso General---------------------*/
+.hidden {
+  display: none;
+}
+
+/*---------------------PRELOADER---------------------*/
+.progress {
+  background-color: #d4ecff;
+}
+.progress .indeterminate {
+  background-color: #085796;
+}
+
+.progress .indeterminate:before {
+  background-color: inherit;
+}
+
+/*---------------------COLORES TEXTO / BACK---------------------*/
+.background-azul {
+  /*  ex .color-azul  */
+  background-color: #085796 !important;
+}
+
+.azul-texto {
+  color: #085796 !important;
+}
+
+.gris-texto {
+  color: #5a5a5a !important;
+}
+
+/*---------------------Tamaños Texto ---------------------*/
+.weight400 {
+  font-weight: 400 !important;
+}
+
+.weight500 {
+  font-weight: 500 !important;
+}
+
+.weight700 {
+  font-weight: 700 !important;
+}
+
+.text-1-4rem {
+  font-size: 1.4rem !important;
+}
+
+/*---------------------SIDE NAV ---------------------*/
+.width-sidenav {
+  width: 16rem;
+}
+
+/*---------------------COLLAPSIBLE ---------------------*/
+.collapsible-no-shadow {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #fff;
+}
+
+.flecha-movimiento::after {
+  font-family: "Material Icons";
+  position: absolute;
+  font-size: 1.6rem;
+  content: "chevron_right";
+  transition: transform 0.3s ease-in-out, opacity 0.25s ease-in-out 0.1s,
+    -webkit-transform 0.3s ease-in-out;
+  margin-top: -0.4rem;
+}
+
+li.active div::after {
+  transform: rotate(90deg);
+}
+
+/*---------------------INPUT FORMS---------------------*/
+input {
+  background-color: transparent;
+  border: 0px solid;
+  color: #085796;  
+}
+
+
+
+input:hover {
+  text-decoration: underline !important;
+}
+
+input:focus {
+  background-color: transparent !important;
+  border: 0px solid !important;
+}
+
+.inputInactivo {
+  color: grey;
+  text-decoration: line-through !important;
+}
+
+.input-field input[type=text]:focus, .materialize-textarea:focus:not([readonly]) {
+  border-bottom: 1px solid #085796 !important;
+  box-shadow: 0 1px 0 0 #085796 !important;
+ }
+
+
+/*---------------------BUTTONS---------------------*/
+
+.button-opacity {
+  opacity: 0.3;
+}
+
+.button-opacity:hover {
+  opacity: 1;
+}
+
+/*---------------------MARGIN/PADDING---------------------*/
+.margin0 {
+  margin: 0 !important;
+}
+
+.margin-bottom-0 {
+  margin-bottom: 0 !important;
+}
+
+.clear-top-1 {
+  margin-top: 1rem !important;
+}
+
+.clear-top-2 {
+  margin-top: 2rem !important;
+}
+
+.clear-top-3 {
+  margin-top: 3rem !important;
+}
+
+.clear-bottom-1 {
+  margin-bottom: 1rem !important;
+}
+
+.clear-bottom-2 {
+  margin-bottom: 2rem;
+}
+
+.clear-bottom-3 {
+  margin-bottom: 3rem;
+}
+
+.padding0 {
+  padding: 0 !important;
+}
+
+.padding0-7rem {
+  padding: 0.7rem !important;
+}
+
+.padding-left2-4 {
+  padding-left: 2.4rem !important;
+}
+
+.padding-left3 {
+  padding-left: 3rem !important;
+}

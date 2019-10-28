@@ -1,0 +1,505 @@
+<h4 class="weight700 azul-texto clear-top-3 col xl10 l10 m10 offset-m1 s10 offset-s1">Exámenes</h4>
+
+<div class="row clear-top-2">
+    <div class="col xl8 l8 m10 offset-m1 s10 offset-s1">
+        <ul id="collapsibleExamenes" class="collapsible collapsible-no-shadow" data-collapsible="accordion">
+           
+            <li id="collapsibleMateria" class="weight500">
+
+                <div class="collapsible-header flecha-movimiento grey lighten-3 azul-texto padding0-7rem">
+                    <div class="name padding-left2-4">Materia</div>
+                </div>
+
+                <div class="collapsible-body padding0 white">
+
+                    <div class="row margin-bottom-0">
+                        <div class="col s6 offset-s1 ">
+                            <div class="input-field ">
+                                <input id="agregarMateria" type="text" placeholder="Agregar Materia Nueva">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12 m10 l10 offset-l1 xl8 offset-xl1">
+                            <ul id="lista-materia" class="collection todos use-border ">
+                                <div class="progress ">
+                                    <div class="indeterminate"></div>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row clear-bottom-3">
+                        <div class="col s10 offset-s1">
+                            <a id="guardarMateria" class="waves-effect waves-light btn btn-medium weight400 background-azul">Gurdar</a>
+                            <a id="resetMateria" class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li id="collapsibleTipo" class="weight500">
+                <div class="collapsible-header flecha-movimiento grey lighten-3 azul-texto padding0-7rem">
+                    <div class="padding-left2-4">Tipo</div>
+                </div>
+
+                <div class="collapsible-body padding0 white">
+
+                    <div class="row margin-bottom-0">
+                        <div class="col s9 offset-s1 left">
+                            <h6 class="title-seleccionar clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
+
+                            <div id="chipis">
+                                <div id="chipa" class="chip ui-selected">Inglés</div>
+                                <div id="chipb" class="chip ">Instrumento</div>
+                                <div id="chipd" class="chip ">Teatro</div>
+                                <div id="chipc" class="chip ">Danza</div>
+                                <div id="chipc" class="chip ">Todas</div>
+                            </div>
+
+                            <form id="todo-form ">
+                                <div class="input-field">
+                                    <input type="text" placeholder="Agregar Tipo Nuevo">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row">
+                        <div class="col s8 offset-s1">
+                            <ul id="lista-tipo" class="collection todos use-border">
+
+                                <li class="collection-item grey lighten-4 margin-bottom-0-4">
+
+                                    <a href="#!" class="secondary-content left">
+                                        <i class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
+                                    </a>
+                                    <input class="browser-default" type="text" value="GESE">
+
+                                    <a href="#!" class="secondary-content delete red-hover">
+                                        <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                    </a>
+
+                                    <a href="#!" class="secondary-content check">
+                                        <i class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                    </a>
+                                </li>
+
+                                <li class="collection-item grey lighten-4 margin-bottom-0-4">
+
+                                    <a href="#!" class="secondary-content left">
+                                        <i
+                                            class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
+                                    </a>
+
+                                    <input class="browser-default " type="text" value="ISE">
+
+                                    <a href="#!" class="secondary-content delete">
+                                        <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                    </a>
+
+                                    <a href="#!" class="secondary-content check">
+                                        <i
+                                            class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                    </a>
+
+
+                                </li>
+
+                                <li class="collection-item grey lighten-4 margin-bottom-0-4">
+
+                                    <a href="#!" class="secondary-content left">
+                                        <i
+                                            class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
+                                    </a>
+
+                                    <a href="#!" class="secondary-content left">
+
+                                    </a>
+
+                                    <input class="browser-default" type="text" value="RESIT GESE">
+
+                                    <a href="#!" class="secondary-content delete">
+                                        <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                    </a>
+
+                                    <a href="#!" class="secondary-content check">
+                                        <i
+                                            class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                    </a>
+
+                                </li>
+
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row clear-bottom-3">
+                        <div class="col s10 offset-s1">
+                            <a class="waves-effect waves-light btn btn-medium weight400 background-azul">Gurdar</a>
+                            <a
+                                class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400">Reset</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </li>
+
+
+            <li id="collapsibleNivel" class="weight500">
+                <div class="collapsible-header flecha-movimiento grey lighten-3 azul-texto padding0-7rem">
+                    <div class="padding-left2-4">Nivel</div>
+                </div>
+
+                <div class="collapsible-body padding0 white">
+
+                    <div class="row ">
+                        <div class="col s9 offset-s1 left">
+                            <h6 class="title-seleccionar clear-top-2 ">Seleccione una Materia:</h6>
+
+                            <div id="chipis">
+                                <div id="chipa" class="chip waves-effect waves-light ui-selected">
+                                    Inglés
+                                </div>
+                                <div id="chipb" class="chip waves-effect waves-light grey lighten-4">
+                                    Instrumento
+                                </div>
+                                <div id="chipd" class="chip waves-effect waves-light grey lighten-4">
+                                    Teatro
+                                </div>
+                                <div id="chipc" class="chip waves-effect waves-light grey lighten-4">
+                                    Danza
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col s9 offset-s1 left">
+                            <h6 class="title-seleccionar">Seleccione un Tipo:</h6>
+
+                            <div id="chipis">
+                                <div id="chipa" class="chip waves-effect waves-light grey lighten-4">
+                                    GESE
+                                </div>
+                                <div id="chipb" class="chip waves-effect waves-light ui-selected">ISE
+                                </div>
+                                <div id="chipd" class="chip waves-effect waves-light grey lighten-4">
+                                    RESIT GESE
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row ">
+                        <div class="col s9 offset-s1 left">
+                            <h6 class="title-seleccionar">Elegir Nivel para editar:</h6>
+
+
+                            <ul id="lista-modalidad">
+                                <a class="btn-floating btn-small waves-effect waves-light background-azul marginRBL0-7">
+                                    <i class="material-icons">add</i>
+                                </a>
+
+                                <li id="chipa" class="chip waves-effect waves-light grey lighten-4">
+                                    A2 - ISE Fundation
+                                    <i
+                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
+
+                                </li>
+
+                                <li id="chipb" class="chip waves-effect waves-light  ui-selected  active">
+                                    B1 - ISE I
+                                    <i
+                                        class=" move-chip material-icons-outlined text-white button-opacity move-button">import_export</i>
+                                </li>
+
+                                <li id="chipc" class="chip waves-effect waves-light grey lighten-4">
+                                    B2 - ISE II
+                                    <i
+                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
+                                </li>
+
+                                <li id="chipd" class="chip waves-effect waves-light grey lighten-4">
+                                    C1 - ISE III
+                                    <i
+                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
+                                </li>
+
+                                <li id="chipe" class="chip waves-effect waves-light grey lighten-4">
+                                    C2 - ISE IV
+                                    <i
+                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
+                                </li>
+
+                            </ul>
+
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div class="container width80">
+                        <div class="">
+                            <div class="  grey lighten-4 ">
+
+                                <div class=" white-text padding2">
+
+                                    <div class="container right">
+                                        <a href="#!" class="secondary-content delete">
+                                            <i
+                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                        </a>
+
+                                        <a href="#!" class="secondary-content check ">
+                                            <i
+                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                        </a>
+                                    </div>
+
+                                    <div class="row padding0 margin0">
+                                        <form class="col s12 padding0 margin0">
+
+                                            <div class="input-field col s12 padding0 margin0 ">
+                                                <input class="titulo-bold" placeholder="Tíulo" id="titulo" type="text"
+                                                    value="B1 ISE I">
+
+                                            </div>
+
+                                        </form>
+                                    </div>
+
+
+                                    <form class="input-field">
+                                        <div class="input-field padding0 margin0">
+                                            <textarea id="textarea1" class="materialize-textarea"
+                                                placeholder="Descripción del examen">Aquí va la descripción del examen.</textarea>
+                                        </div>
+
+
+                                    </form>
+
+
+
+                                    <div class=" l12 ">
+                                        <form class="col l12">
+
+                                            <div class="input-field col l5">
+                                                <input id="first_name" type="text" class="">
+                                                <label for="first_name">Modalidad</label>
+                                            </div>
+                                            <div class="input-field col l5 ">
+                                                <input id="last_name" type="text" class="">
+                                                <label for="last_name">Precio</label>
+
+                                            </div>
+                                            <div class="col l1 clear-top-2 ">
+                                                <a
+                                                    class="btn-floating btn-small waves-effect waves-light background-azul ">
+                                                    <i class="material-icons">add</i>
+                                                </a>
+                                            </div>
+
+
+                                        </form>
+
+
+                                        <div class="row margin-left1">
+                                            <div class="col margin-left1">
+                                                <ul id="modalidadNivel" class="collection todos center use-border ">
+                                                    <li class="collection-item grey lighten-4 margin-bottom-0-4">
+                                                        <a href="#!" class="secondary-content left">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
+                                                        </a>
+
+                                                        <input class="browser-default" type="text"
+                                                            value="Listening and Speaking">
+
+                                                        <input class="browser-default precio" type="text" value="€ 37">
+
+
+
+                                                        <a href="#!" class="secondary-content delete red-hover">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                        </a>
+
+
+
+                                                        <a href="#!" class="secondary-content check">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                        </a>
+
+                                                        <a href="#!" class="secondary-content unclear-top ">
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>RW</span>
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>LS</span>
+                                                            </label>
+                                                        </a>
+                                                    </li>
+
+                                                    <li class="collection-item grey lighten-4 margin-bottom-0-4">
+                                                        <a href="#!" class="secondary-content left">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
+                                                        </a>
+
+                                                        <input class="browser-default" type="text"
+                                                            value="Reading and Writing">
+
+                                                        <input class="browser-default precio" type="text" value="€ 50">
+
+                                                        <a href="#!" class="secondary-content delete red-hover">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                        </a>
+
+                                                        <a href="#!" class="secondary-content check">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                        </a>
+
+                                                        <a href="#!" class="secondary-content unclear-top ">
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>RW</span>
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>LS</span>
+                                                            </label>
+                                                        </a>
+                                                    </li>
+
+                                                    <li class="collection-item grey lighten-4 margin-bottom-0-4">
+                                                        <a href="#!" class="secondary-content left">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
+                                                        </a>
+
+                                                        <input class="browser-default" type="text" value="Complete">
+                                                        <input class="browser-default precio" type="text" value="€ 69">
+
+                                                        <a href="#!" class="secondary-content delete red-hover">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                        </a>
+                                                        <a href="#!" class="secondary-content check">
+                                                            <i
+                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                        </a>
+
+                                                        <a href="#!" class="secondary-content unclear-top ">
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>RW</span>
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" />
+                                                                <span>LS</span>
+                                                            </label>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <form action="#">
+                                            <div class="file-field input-field">
+                                                <div class="btn-small btn background-azul">
+                                                    <span><i class="material-icons">add</i></span>
+                                                    <input type="file">
+                                                </div>
+                                                <div class="file-path-wrapper">
+                                                    <input class="file-path validate" type="text"
+                                                        placeholder="Ingrese una imagen 1000x1000">
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <form action="#">
+                                            <div class="file-field input-field ">
+                                                <div class="btn-small btn background-azul">
+                                                    <span><i class="material-icons">add</i></span>
+                                                    <input type="file">
+                                                </div>
+                                                <div class="file-path-wrapper">
+                                                    <input class="file-path validate" type="text"
+                                                        placeholder="Importar PDF">
+                                                </div>
+                                            </div>
+                                        </form>
+
+
+
+
+                                    </div>
+
+
+
+                                </div>
+
+
+
+
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                    <div class="row margin3">
+                        <div class="col s10 offset-s1">
+                            <a class="waves-effect waves-light btn btn-medium weight400 background-azul">Gurdar</a>
+                            <a
+                                class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400">Reset</a>
+                        </div>
+                    </div>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script src="./examenes/examenes_materia.js"></script>
+<script src="./examenes/examenes_tipo.js"></script>
