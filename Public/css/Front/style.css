@@ -183,24 +183,29 @@ h3{
 .materia-tipo>a,
 .sub-item-tipo>a{
     width: 100%;
-    display:inline-block;
 }
 
 
 .materia-tipo>a::after{
     display:inline-block;
     font-family: "Material Icons";
-    content: "chevron_right";
+    content: "\e5cc";
     margin-left:20px;
     transform: rotate(-90deg);
     transition:0.2s;
 }
 
+.chevron{
+    display:inline-block;
+    width:15px;
+    height: 15px;
+}
 .sub-item-tipo>a::after{
+    display: inline-block;
     width: 15px;
     height: 15px;
     font-family: "Material Icons";
-    content: "chevron_right";
+    content: "\e5cc";
     transform: rotate(-90deg);
     transition:0.2s;
 }

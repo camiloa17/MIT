@@ -33,7 +33,6 @@ function openMenuItem(item){
         parent.classList.add('tipo-activa');
         if(container.classList.contains('materia-tipo')){
         item.target.parentElement.parentElement.style.height =`${item.target.parentElement.parentElement.scrollHeight + height}px`;
-        
         }
         menuList.dataset.state = 'open';
         menuList.style.height = `${height}px`;
