@@ -24,6 +24,12 @@ body {
   background-color: inherit;
 }
 
+/*---------------------UI/SELECTED---------------------*/
+.ui-selected {
+  background-color: #085796 !important;
+  color: white !important;
+}
+
 /*---------------------COLORES TEXTO / BACK---------------------*/
 .background-azul {
   /*  ex .color-azul  */
@@ -87,10 +93,8 @@ li.active div::after {
 input {
   background-color: transparent;
   border: 0px solid;
-  color: #085796;  
+  color: #085796;
 }
-
-
 
 input:hover {
   text-decoration: underline !important;
@@ -106,11 +110,11 @@ input:focus {
   text-decoration: line-through !important;
 }
 
-.input-field input[type=text]:focus, .materialize-textarea:focus:not([readonly]) {
+.input-field input[type="text"]:focus,
+.materialize-textarea:focus:not([readonly]) {
   border-bottom: 1px solid #085796 !important;
   box-shadow: 0 1px 0 0 #085796 !important;
- }
-
+}
 
 /*---------------------BUTTONS---------------------*/
 
@@ -122,6 +126,19 @@ input:focus {
   opacity: 1;
 }
 
+.collection-item{
+  border: 0px solid #e0e0e0 !important;
+}
+
+.collection{
+  border: 0px solid #e0e0e0 !important;
+}
+
+/*---------------------CHIPS---------------------*/
+.chip:hover {
+  cursor: pointer !important;
+}
+
 /*---------------------MARGIN/PADDING---------------------*/
 .margin0 {
   margin: 0 !important;
@@ -129,6 +146,10 @@ input:focus {
 
 .margin-bottom-0 {
   margin-bottom: 0 !important;
+}
+
+.margin-bottom-0-4 {
+  margin-bottom: 0.4rem !important;
 }
 
 .clear-top-1 {

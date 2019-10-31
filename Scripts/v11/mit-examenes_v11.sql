@@ -1,10 +1,10 @@
-CREATE DATABASE mit;
-use mit;
+-- Created by Vertabelo (http://vertabelo.com)
+-- Last modification date: 2019-10-31 12:45:27.736
 
 -- tables
 -- Table: alumno
 CREATE TABLE alumno (
-    uuid int NOT NULL AUTO_INCREMENT,
+    uuid binary(16) NOT NULL,
     fecha_inscripcion timestamp NOT NULL,
     candidate_number varchar(30) NOT NULL,
     nombre varchar(30) NOT NULL,
@@ -18,14 +18,14 @@ CREATE TABLE alumno (
     observaciones text NOT NULL,
     activo boolean NOT NULL,
     edita_user_secundario boolean NOT NULL,
-    alumno_pk PRIMARY KEY (uuid)
+    CONSTRAINT alumno_pk PRIMARY KEY (uuid)
 );
 
 -- Table: dia_LS
 CREATE TABLE dia_LS (
-    uuid int NOT NULL AUTO_INCREMENT,
+    uuid binary(16) NOT NULL,
     fecha_examenLS datetime NOT NULL,
-    cupo_maximo INT NOT NULL,
+    cupo_maximo int NOT NULL,
     finaliza_inscripcion datetime NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
@@ -34,9 +34,9 @@ CREATE TABLE dia_LS (
 
 -- Table: dia_RW
 CREATE TABLE dia_RW (
-    uuid int NOT NULL AUTO_INCREMENT,
+    uuid binary(16) NOT NULL,
     fecha_examenRW datetime NOT NULL,
-    cupo_maximo INT NOT NULL,
+    cupo_maximo int NOT NULL,
     finaliza_inscripcion datetime NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
@@ -45,49 +45,47 @@ CREATE TABLE dia_RW (
 
 -- Table: examen_en_dia_LS
 CREATE TABLE examen_en_dia_LS (
-    uuid int NOT NULL AUTO_INCREMENT,
-    dia_LS_uuid int NOT NULL,
-    modalidad_uuid int NOT NULL,
+    uuid binary(16) NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
+    dia_LS_uuid binary(16) NOT NULL,
+    modalidad_uuid binary(16) NOT NULL,
     CONSTRAINT examen_en_determinado_horario_pk PRIMARY KEY (uuid)
 );
 
 -- Table: examen_en_dia_RW
 CREATE TABLE examen_en_dia_RW (
-    uuid int NOT NULL AUTO_INCREMENT,
-    dia_RW_uuid int NOT NULL,
-    modalidad_uuid int NOT NULL,
+    uuid binary(16) NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
+    dia_RW_uuid binary(16) NOT NULL,
+    modalidad_uuid binary(16) NOT NULL,
     CONSTRAINT examen_en_determinado_horario_pk PRIMARY KEY (uuid)
 );
 
 -- Table: examen_en_semana_LS
 CREATE TABLE examen_en_semana_LS (
-    uuid int NOT NULL AUTO_INCREMENT,
-    semana_LS_uuid int NOT NULL,
-    modalidad_2_uuid int NOT NULL,
+    uuid binary(16) NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
+    semana_LS_uuid binary(16) NOT NULL,
+    modalidad_uuid binary(16) NOT NULL,
     CONSTRAINT examen_en_determinado_horario_pk PRIMARY KEY (uuid)
 );
 
 -- Table: materia
 CREATE TABLE materia (
-    id int NOT NULL AUTO_INCREMENT,
-    orden int NOT NULL,
+    uuid binary(16) NOT NULL,
     nombre varchar(90) NOT NULL,
-    imagen text NULL,
     activo boolean NOT NULL,
     mostrar_cliente boolean NOT NULL,
     edita_user_secundario boolean NOT NULL,
-    CONSTRAINT materia_pk PRIMARY KEY (id)
+    CONSTRAINT materia_pk PRIMARY KEY (uuid)
 );
 
 -- Table: modalidad
 CREATE TABLE modalidad (
-    id int NOT NULL AUTO_INCREMENT,
+    uuid binary(16) NOT NULL,
     nombre varchar(90) NOT NULL,
     precio decimal(6,2) NOT NULL,
     mostrar_cliente boolean NOT NULL,
@@ -95,33 +93,36 @@ CREATE TABLE modalidad (
     edita_user_secundario boolean NOT NULL,
     examen_RW boolean NOT NULL,
     examen_LS boolean NOT NULL,
-    nivel_id int NOT NULL,
-    orden int NOT NULL,
-    CONSTRAINT modalidad_pk PRIMARY KEY (id)
+    nivel_uuid binary(16) NOT NULL,
+    CONSTRAINT modalidad_pk PRIMARY KEY (uuid)
 );
 
 -- Table: nivel
 CREATE TABLE nivel (
-    id int NOT NULL AUTO_INCREMENT,
-    orden int NOT NULL,
+    uuid binary(16) NOT NULL,
     nombre varchar(90) NOT NULL,
     descripcion text NULL,
     pdf text NULL,
     imagen text NULL,
-    mostrar_cliente boolean NOT NULL,
     activo boolean NOT NULL,
+    mostrar_cliente boolean NOT NULL,
     edita_user_secundario boolean NOT NULL,
-    tipo_id int NOT NULL,
-    CONSTRAINT nivel_pk PRIMARY KEY (id)
+    tipo_uuid binary(16) NOT NULL,
+    CONSTRAINT nivel_pk PRIMARY KEY (uuid)
+);
+
+-- Table: orden_elementos
+CREATE TABLE orden_elementos (
+    uuid binary(16) NOT NULL,
+    tabla binary(16) NOT NULL,
+    elemento binary(16) NOT NULL,
+    orden int NOT NULL,
+    CONSTRAINT orden_elementos_pk PRIMARY KEY (uuid)
 );
 
 -- Table: reserva
 CREATE TABLE reserva (
-    uuid int NOT NULL AUTO_INCREMENT,
-    alumno_uuid int NOT NULL,
-    examen_en_dia_RW_uuid int NOT NULL,
-    examen_en_semana_LS_uuid int NOT NULL,
-    examen_en_dia_LS_uuid int NOT NULL,
+    uuid binary(16) NOT NULL,
     fecha_venta timestamp NOT NULL,
     medio_de_pago varchar(30) NOT NULL,
     nro_ref_pago int NOT NULL,
@@ -134,14 +135,18 @@ CREATE TABLE reserva (
     observaciones text NOT NULL,
     envio_domicilio_diploma boolean NOT NULL,
     direccion_envio_diploma text NOT NULL,
+    alumno_uuid binary(16) NOT NULL,
+    examen_en_dia_RW_uuid binary(16) NOT NULL,
+    examen_en_dia_LS_uuid binary(16) NOT NULL,
+    examen_en_semana_LS_uuid binary(16) NOT NULL,
     CONSTRAINT reserva_pk PRIMARY KEY (uuid)
 );
 
 -- Table: semana_LS
 CREATE TABLE semana_LS (
-    uuid int NOT NULL AUTO_INCREMENT,
+    uuid binary(16) NOT NULL,
     semana_examen date NOT NULL,
-    cupo_maximo INT NOT NULL,
+    cupo_maximo int NOT NULL,
     finaliza_inscripcion datetime NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
@@ -150,15 +155,13 @@ CREATE TABLE semana_LS (
 
 -- Table: tipo
 CREATE TABLE tipo (
-    id int NOT NULL AUTO_INCREMENT,
-    orden int NOT NULL,
+    uuid binary(16) NOT NULL,
     nombre varchar(90) NOT NULL,
-    imagen text NULL,
     activo boolean NOT NULL,
     mostrar_cliente boolean NOT NULL,
     edita_user_secundario boolean NOT NULL,
-    materia_id int NOT NULL,
-    CONSTRAINT tipo_pk PRIMARY KEY (id)
+    materia_uuid binary(16) NOT NULL,
+    CONSTRAINT tipo_pk PRIMARY KEY (uuid)
 );
 
 -- foreign keys
@@ -168,7 +171,7 @@ ALTER TABLE examen_en_dia_LS ADD CONSTRAINT examen_en_dia_LS_dia_LS FOREIGN KEY 
 
 -- Reference: examen_en_dia_LS_modalidad (table: examen_en_dia_LS)
 ALTER TABLE examen_en_dia_LS ADD CONSTRAINT examen_en_dia_LS_modalidad FOREIGN KEY examen_en_dia_LS_modalidad (modalidad_uuid)
-    REFERENCES modalidad (id);
+    REFERENCES modalidad (uuid);
 
 -- Reference: examen_en_dia_RW_dia_RW (table: examen_en_dia_RW)
 ALTER TABLE examen_en_dia_RW ADD CONSTRAINT examen_en_dia_RW_dia_RW FOREIGN KEY examen_en_dia_RW_dia_RW (dia_RW_uuid)
@@ -176,23 +179,23 @@ ALTER TABLE examen_en_dia_RW ADD CONSTRAINT examen_en_dia_RW_dia_RW FOREIGN KEY 
 
 -- Reference: examen_en_dia_RW_modalidad (table: examen_en_dia_RW)
 ALTER TABLE examen_en_dia_RW ADD CONSTRAINT examen_en_dia_RW_modalidad FOREIGN KEY examen_en_dia_RW_modalidad (modalidad_uuid)
-    REFERENCES modalidad (id);
+    REFERENCES modalidad (uuid);
 
 -- Reference: examen_en_semana_LS_modalidad (table: examen_en_semana_LS)
-ALTER TABLE examen_en_semana_LS ADD CONSTRAINT examen_en_semana_LS_modalidad FOREIGN KEY examen_en_semana_LS_modalidad (modalidad_2_uuid)
-    REFERENCES modalidad (id);
+ALTER TABLE examen_en_semana_LS ADD CONSTRAINT examen_en_semana_LS_modalidad FOREIGN KEY examen_en_semana_LS_modalidad (modalidad_uuid)
+    REFERENCES modalidad (uuid);
 
 -- Reference: examen_en_semana_LS_semana_LS (table: examen_en_semana_LS)
 ALTER TABLE examen_en_semana_LS ADD CONSTRAINT examen_en_semana_LS_semana_LS FOREIGN KEY examen_en_semana_LS_semana_LS (semana_LS_uuid)
     REFERENCES semana_LS (uuid);
 
 -- Reference: modalidad_nivel (table: modalidad)
-ALTER TABLE modalidad ADD CONSTRAINT modalidad_nivel FOREIGN KEY modalidad_nivel (nivel_id)
-    REFERENCES nivel (id);
+ALTER TABLE modalidad ADD CONSTRAINT modalidad_nivel FOREIGN KEY modalidad_nivel (nivel_uuid)
+    REFERENCES nivel (uuid);
 
 -- Reference: nivel_tipo (table: nivel)
-ALTER TABLE nivel ADD CONSTRAINT nivel_tipo FOREIGN KEY nivel_tipo (tipo_id)
-    REFERENCES tipo (id);
+ALTER TABLE nivel ADD CONSTRAINT nivel_tipo FOREIGN KEY nivel_tipo (tipo_uuid)
+    REFERENCES tipo (uuid);
 
 -- Reference: reserva_alumno (table: reserva)
 ALTER TABLE reserva ADD CONSTRAINT reserva_alumno FOREIGN KEY reserva_alumno (alumno_uuid)
@@ -211,8 +214,8 @@ ALTER TABLE reserva ADD CONSTRAINT reserva_examen_en_semana_LS FOREIGN KEY reser
     REFERENCES examen_en_semana_LS (uuid);
 
 -- Reference: tipo_materia (table: tipo)
-ALTER TABLE tipo ADD CONSTRAINT tipo_materia FOREIGN KEY tipo_materia (materia_id)
-    REFERENCES materia (id);
+ALTER TABLE tipo ADD CONSTRAINT tipo_materia FOREIGN KEY tipo_materia (materia_uuid)
+    REFERENCES materia (uuid);
 
 -- End of file.
 

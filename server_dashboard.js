@@ -20,6 +20,8 @@ app.get('/', function(req, res){
 
 app.get('/materia', dashboardController.materia)
 
+app.get('/tipo/:materia', dashboardController.tipo)
+
 app.listen(port, function () {
   console.log( "Listening on port number " + port );
 });
