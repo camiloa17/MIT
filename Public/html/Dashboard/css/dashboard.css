@@ -132,6 +132,7 @@ input:focus {
 
 .collection{
   border: 0px solid #e0e0e0 !important;
+  margin: 0 !important;
 }
 
 /*---------------------CHIPS---------------------*/

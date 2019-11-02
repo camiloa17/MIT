@@ -1,6 +1,6 @@
 /*      ESTA FUNCION SE REEMPLAZA POR UN FETCH LUEGO        */
 function appendNav() {
-  $.get("./sidenav/sidenav.html", function(data) {
+  $.get("./html/dashboard/sidenav/sidenav.html", function(data) {
     $("#sidenav").append(data);
   });
 }
@@ -8,7 +8,7 @@ function appendNav() {
 appendNav();
 
 function appendExamenes() {
-  $.get("./examenes/examenes.html", function(data) {
+  $.get("./html/dashboard/examenes/examenes.html", function(data) {
     $("#contenido").append(data);
   });  
 }

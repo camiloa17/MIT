@@ -16,7 +16,7 @@
                     <div class="row margin-bottom-0">
                         <div class="col s6 offset-s1 ">
                             <div class="input-field ">
-                                <input id="agregarMateria" type="text" placeholder="Agregar Materia Nueva">
+                                <input id="agregarMateria" autocomplete="off" type="text" placeholder="Agregar Materia Nueva">
                             </div>
                         </div>
                     </div>
@@ -56,14 +56,14 @@
                         <div class="col s9 offset-s1 left">
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
 
-                            <ul id="seleccioneMateriaEnTipo">
+                            <ul id="chipsMateriaEnTipo">
                                 <div class="progress ">
                                     <div class="indeterminate"></div>
                                 </div>
                             </ul>
 
                             <div class="input-field ">
-                                <input id="agregarTipo" class="hidden" type="text" placeholder="Agregar Tipo Nuevo">
+                                <input id="agregarTipo" class="hidden" autocomplete="off" type="text" placeholder="Agregar Tipo Nuevo">
                             </div>
 
                         </div>
@@ -440,5 +440,5 @@
     </div>
 </div>
 
-<script src="./examenes/examenes_materia.js"></script>
-<script src="./examenes/examenes_tipo.js"></script>
+<script src="./html/dashboard/examenes/examenes_vista.js"></script>
+<script src="./html/dashboard/examenes/examenes_servicio.js"></script>

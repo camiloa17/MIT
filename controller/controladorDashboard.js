@@ -1,5 +1,32 @@
 const con = require('../lib/conexiondb');
+const model = require ('../modelo/modeloDashboard');
 const process = require('process');
+
+
+function connectionToDb() {
+    return new Promise((resolve, reject) => {
+        con.getConnection(function (error, connection) {
+            if (error) {
+                reject(error)                
+            } else {
+                resolve(connection);
+            }
+        });
+    });
+}
+
+
+function queryToDb(connection, query) {
+    return new Promise((resolve, reject) => {
+        connection.query({ sql: query, timeout: 40000 }, function (error, data, fields) {
+            if (error) {
+                reject(console.log("Hubo un error en la consulta " + error.message))
+            } else {
+                resolve(data);
+            }
+        });
+    })
+};
 
 
 async function materia(req, res) {
@@ -15,35 +42,28 @@ async function tipo(req, res) {
 };
 
 
+async function examenesCambios(req, res) { 
+    let data = req.body;
+    let sql;
 
-
-function connectionToDb() {
-    return new Promise((resolve, reject) => {
-        con.getConnection(function (error, connection) {
-
-            if (error) {
-                reject(error)
-                
-            } else {
-                resolve(connection);
-            }
-
+    if (data.agregar) {
+        data.agregar.forEach(uuidToAdd => {
+            data.listaEstado.map( element => { 
+                if (element.uuid === uuidToAdd) {
+                    sql += `INSERT INTO materia (uuid, nombre, activo, mostrar_cliente, edita_user_secundario)
+                    VALUES 
+                    ( UUID_TO_BIN('${element.uuid}'), "${element.nombre}", ${element.activo}, ${element.mostrar_cliente}, ${element.edita_user_secundario});`
+                }
+            });
         });
-    });
+    }
+
+    console.log(sql)
 }
 
 
-function queryToDb(connection, query) {
-    return new Promise((resolve, reject) => {
-        connection.query({ sql: query, timeout: 40000 }, function (error, extracto, fields) {
-            if (error) {
-                reject(console.log("Hubo un error en la consulta " + error.message))
-            } else {
-                resolve(extracto);
-            }
-        });
-    })
-};
+
+
 
 async function buscarEnDB() {
     try {
@@ -79,5 +99,6 @@ process.on('uncaughtException', function (err) {
 
 module.exports = {
     materia: materia,
-    tipo: tipo
+    tipo: tipo,
+    examenesCambios: examenesCambios,
 };
