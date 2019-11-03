@@ -1,11 +1,13 @@
 
 function openNav(item){
     const clickItems = item.target.classList;
+    console.log(item);
+    console.log(item.target.nextElementSibling)
     if(clickItems.contains('right-side')){
         document.querySelector('.right-side-menu').classList.add('active');
         document.querySelector('.overflow').classList.add('overflow-menu');
     }else if(clickItems.contains('left-side')){
-        document.querySelector('.left-side-menu').classList.add('active');
+        item.target.nextElementSibling.classList.add('active')
         document.querySelector('.overflow').classList.add('overflow-menu');
     }
     
@@ -17,7 +19,7 @@ function closeNav(item){
         document.querySelector('.right-side-menu').classList.remove('active');;
         document.querySelector('.overflow').classList.remove('overflow-menu');
     } else if (clickItems.contains('left-side')) {
-        document.querySelector('.left-side-menu').classList.remove('active');
+        document.querySelector('.left-side-menu.active').classList.remove('active');
         document.querySelector('.overflow').classList.remove('overflow-menu');
     }
 }
@@ -57,11 +59,25 @@ function closeMenuItem(item){
 
 document.querySelector('.mobile-logo-ham').addEventListener('click',openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click',closeNav);
-document.querySelector('#ingles-menu').addEventListener('click',openNav);
-document.querySelector('.primary-menu-logo span').addEventListener('click', closeNav);
+//document.querySelector('#ingles-menu').addEventListener('click',openNav);
+document.querySelectorAll('.examen-materia').forEach(element=>{
+    element.addEventListener('click',openNav)
+})
+document.querySelectorAll('.primary-menu-logo span').forEach(element=>{
+    element.addEventListener('click', closeNav);
+})
+//document.querySelector('.primary-menu-logo span').addEventListener('click', closeNav);
 document.querySelectorAll('.materia-tipo').forEach(element => {
     element.addEventListener('click',openMenuItem)
 });
+
+window.addEventListener('onload',menuGet())
+
+async function menuGet(){
+    const response = await fetch('/menu')
+    const myJason = await response.json();
+    console.log(myJason);
+}
 
 
 
