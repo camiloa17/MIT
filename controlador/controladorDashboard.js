@@ -88,10 +88,18 @@ async function buscarEnDbTipo(materia) {
     }
 };
 
-async function getNivel(req, res) {
+async function getNivelChips(req, res) {
     let tipo = req.params.tipo;
     console.log("tipo", tipo)
     let data = await buscarEnDbNivel(tipo);
+    console.log("niveles", data)
+    res.send(JSON.stringify(data));
+};
+
+async function getNivel(req, res) {
+    let nivel = req.params.nivel;
+    console.log("nivel", nivel)
+    let data = await buscarEnDbNivelCompleto(nivel);
     console.log("niveles", data)
     res.send(JSON.stringify(data));
 };
@@ -111,6 +119,22 @@ async function buscarEnDbNivel(tipo) {
         return res.status(404).send("Hubo un error en la consulta" + err.message)
     }
 };
+
+async function buscarEnDbNivelCompleto(nivel) {
+    try {
+        const query = `SELECT uuid, nombre, orden, activo, descripcion, mostrar_cliente, tipo_uuid, pdf, imagen FROM nivel WHERE activo=1 AND uuid='${nivel}'`;
+        
+        const connection = await connectionToDb();
+        const data = await queryToDb(connection, query);
+        connection.release()
+        return data;
+
+    } catch (err) {
+        console.log("Hubo un error en la consulta", err.message);
+        return res.status(404).send("Hubo un error en la consulta" + err.message)
+    }
+};
+
 
 
 async function examenesCambios(req, res) { 
@@ -229,6 +253,7 @@ process.on('uncaughtException', function (err) {
 module.exports = {
     getMateria: getMateria,
     getTipo: getTipo,
+    getNivelChips: getNivelChips,
     getNivel: getNivel,
     examenesCambios: examenesCambios,
 };

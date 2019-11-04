@@ -26,7 +26,9 @@ app.get('/tipo', controladorDashboard.getTipo)
 
 app.get('/tipo/:materia', controladorDashboard.getTipo)
 
-app.get('/nivel/:tipo', controladorDashboard.getNivel)
+app.get('/nivelChips/:tipo', controladorDashboard.getNivelChips)
+
+app.get('/nivel/:nivel', controladorDashboard.getNivel)
 
 app.post('/examenes/', controladorDashboard.examenesCambios)
 

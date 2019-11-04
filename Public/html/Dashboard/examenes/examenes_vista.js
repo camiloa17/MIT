@@ -111,7 +111,17 @@ inicializarBotonReset(botonResetTipo, listaTipo);
 
 function inicializarBotonReset(boton, lista) {
   boton.on("click", () => {
-    getMateria();
+    
+    switch (lista) {
+      case listaMateria:
+        getMateria();
+        break;
+      case listaTipo:
+        getTipoEnTipo(chipsMateriaEnTipo.find(".ui-selected").attr("id"));
+        break;
+    }
+
+
     seGuardaOResetea(lista);
     // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
   });
@@ -276,17 +286,12 @@ function habilitarSelectable(ulChips) {
       (idSelected && ulChips === chipsMateriaEnTipo) ? getTipoEnTipo(idSelected) : null;
       (idSelected && ulChips === chipsMateriaEnNivel) ? getTipoEnNivel(idSelected) : null;
       (idSelected && ulChips === chipsTipoEnNivel) ? getNivelEnNivel(idSelected) : null;
+      (idSelected && ulChips === chipsNivelEnNivel) ? getNivel(idSelected) : null;
 
     }
   });
 }
 
-/*
-function chipPresionado(ulChips, idSelected) {
-  (idSelected && ulChips === chipsMateriaEnTipo) ? getTipo(idSelected) : removeAreaEdicionTipo();
-  (idSelected && ulChips === chipsMateriaEnNivel) ? getTipo(idSelected) : removeAreaEdicionTipo(); 
-}
-*/
 
 ////////////////////  Habilita o deshabilita la posibilidad de presionar un chip (se deshabilita cuando hay camibos pendientes)
 
@@ -328,8 +333,131 @@ const liMateriaTipoTemplate = materia => {
     materia.mostrar_cliente ? "visibility" : "visibility_off"
   }</i>
       </a>
-    </li>`;
+    </li>
+  `;
 };
+
+const liNivelTemplate = nivel => {
+  return `
+    <div id="${nivel.uuid}" activo="${nivel.activo}" mostrar_cliente="${nivel.mostrar_cliente}" dirty_input_nombre="0" dirty_input_descripcion="0" dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
+
+      <div class="container right clear-top-1 ">
+        <a href="#!" class="secondary-content delete">
+          <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+        </a>
+        
+        <a href="#!" class="secondary-content check">
+          <i class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+        </a>
+      </div>
+
+      <div class="row padding0 margin0">
+          <div class="input-field col s12 padding0 margin0  ">
+              <input class="weight500" autocomplete="off" placeholder="Tíulo" id="titulo"
+                  type="text" value="${nivel.nombre}">
+          </div>
+      </div>
+
+
+      <div class="row input-field padding0 margin0">
+          <textarea id="textarea1" class="materialize-textarea" autocomplete="off"
+              placeholder="Descripción del examen">${nivel.descripcion}</textarea>
+      </div>
+
+      <div class="row">
+        <form class="col s12 m12 l12 xl12">
+            <div
+                class="input-field col s4 m4 l5 xl5 offset-s1 offset-m1 offset-l1 offset-xl1">
+                <input id="first_name" type="text" autocomplete="off" class="">
+                <label for="first_name">Modalidad</label>
+            </div>
+            <div class="input-field col s3 m3 l4 xl4 ">
+                <input id="last_name" type="text" autocomplete="off" class="">
+                <label for="last_name">Precio</label>
+            </div>
+            <div class="col s1 l1 m1 xl1 clear-top-2 ">
+                <a
+                    class="btn-floating btn-small waves-effect waves-light background-azul ">
+                    <i class="material-icons">add</i>
+                </a>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col">
+                <ul id="modalidadNivel" class="collection">                     
+                </ul>
+            </div>
+        </div>
+
+        <form action="#">
+            <div class="file-field input-field">
+                <div class="btn-small btn background-azul">
+                    <span><i class="material-icons">add</i></span>
+                    <input type="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Ingrese una imagen 1000x1000">
+                </div>
+            </div>
+        </form>
+
+        <form action="#">
+            <div class="file-field input-field ">
+                <div class="btn-small btn background-azul">
+                    <span><i class="material-icons">add</i></span>
+                    <input type="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text"
+                        placeholder="Importar PDF">
+                </div>
+            </div>
+        </form>
+
+      </div>
+    </div>
+
+  `;
+}
+
+const liModalidadTemplate = modalidad => {
+  `
+  <li class="collection-item grey lighten-4 margin-bottom-0-4">
+  <a href="#!" class="secondary-content left">
+      <i
+          class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
+  </a>
+
+  <input class="browser-default" type="text"
+      value="Listening and Speaking">
+  <input class="browser-default precio width3rem" type="text"
+      value="€ 37">
+
+
+
+  <div class="secondary-content">
+      <a href="#!" class="secondary-content delete">
+          <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+      </a>
+
+      <a href="#!" class="secondary-content check">
+          <i
+              class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+      </a>
+
+      <label>
+          <input type="checkbox" class="filled-in" />
+          <span>Escrito</span>
+      </label>
+
+      <label>
+          <input type="checkbox" checked="checked" class="filled-in" />
+          <span>Oral</span>
+      </label>
+  </div>
+</li>`
+}
 
 //////////////////// Configuracion de botones de cada elemento LI de la lista
 function asignarFuncionalidadBotonesLista(elemento, lista) {
@@ -404,7 +532,7 @@ function visualizarChipMateriaTipo(data, chipLista) {
   });
 }
 
-function visualizarNivel(data, chipLista) {
+function visualizarChipNivel(data, chipLista) {
   let dataOrdenada = JSON.parse(JSON.stringify(data));
 
   dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
@@ -414,6 +542,15 @@ function visualizarNivel(data, chipLista) {
     elemento.activo ? chipLista.append(chipTemplate(elemento)) : null;
   });
 }
+
+function visualizarNivel(data, lista) {
+  let nivel = data[0]
+  console.log("aqui", nivel)
+  console.log(nivel.nombre)
+  lista.empty();
+  lista.append(liNivelTemplate(nivel));
+}
+
 //////////////////// Muestra o Esconde la lista y la botonera de Tipo dependiendo de si está seleccionado un chip Materia o no.
 function showAreaEdicionTipo() {
   listaTipo.removeClass("hidden");
@@ -614,13 +751,13 @@ async function getTipoEnNivel(materiaId) {
 async function getNivelEnNivel(tipoId) {
   console.log(tipoId);
   try {
-    const response = await fetch(`./nivel/${tipoId}`);
+    const response = await fetch(`./nivelChips/${tipoId}`);
     const data = await response.json();
 
     /*showAreaEdicionTipo();
     visualizarLista(data, listaTipo);*/
 
-    visualizarNivel(data, chipsNivelEnNivel);
+    visualizarChipNivel(data, chipsNivelEnNivel);
     
 
   } catch (err) {
@@ -628,8 +765,24 @@ async function getNivelEnNivel(tipoId) {
   }
 }
 
-async function getNivel() {
+async function getNivel(nivelId) {
   console.log("getting nivel");
+
+  console.log(nivelId);
+  try {
+    const response = await fetch(`./nivel/${nivelId}`);
+    const data = await response.json();
+    
+    console.log(data)
+
+    visualizarNivel(data, listaNivel);
+    
+
+  } catch (err) {
+    console.log(err);
+  }
+
+  
 }
 
 async function updateMateria(cambios) {
@@ -668,6 +821,9 @@ async function updateTipo(cambios) {
   }
 }
 
+async function updateNivelModalidad(cambios) {
+
+}
 
 
 

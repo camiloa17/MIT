@@ -52,6 +52,27 @@ ul li {
   color: #5a5a5a !important;
 }
 
+/*---------------------COLORES CHECKBOX CHECKED---------------------*/
+[type="checkbox"].filled-in:not(:checked)+span:not(.lever):after {
+  border: 2px solid #085796 !important;
+}
+
+label {
+  color: #085796 !important;
+  opacity: 0.9;
+  font-weight: 400 !important;
+}
+
+[type="checkbox"].filled-in:checked+span:not(.lever):after {
+  border: 2px solid #085796;
+  background-color: #085796;
+}
+
+[type="checkbox"]+span:not(.lever) {
+  padding-left: 1.6rem !important;
+  margin-right: 1rem !important;
+}
+
 /*---------------------Tamaños Texto ---------------------*/
 .weight400 {
   font-weight: 400 !important;
@@ -97,6 +118,10 @@ li.active div::after {
   transform: rotate(90deg);
 }
 
+.collapsible-body {
+  border-bottom: 0px;
+}
+
 /*---------------------INPUT FORMS---------------------*/
 input {
   background-color: transparent;
@@ -124,8 +149,13 @@ input:focus {
   box-shadow: 0 1px 0 0 #085796 !important;
 }
 
-/*---------------------BUTTONS---------------------*/
+/* Input Precio Modalidad Label */
+.input-field>label {
+  color: #5a5a5a !important;
+  font-weight: 400;
+}
 
+/*---------------------BUTTONS---------------------*/
 .button-opacity {
   opacity: 0.3;
 }
@@ -147,6 +177,11 @@ input:focus {
 .chip:hover {
   cursor: pointer !important;
 }
+
+/*---------------------WIDTHS---------------------*/
+.width3rem{
+  width: 3rem !important;
+} 
 
 /*---------------------MARGIN/PADDING---------------------*/
 .margin0 {

@@ -11,7 +11,7 @@
                     <div class="name padding-left2-4">Materia</div>
                 </div>
 
-                <div class="collapsible-body padding0 white">
+                <div class="collapsible-body padding0">
 
                     <div class="row margin-bottom-0">
                         <div class="col s6 offset-s1 ">
@@ -24,7 +24,7 @@
 
                     <div class="row">
                         <div class="col s12 m10 offset-m1 l10 offset-l1 xl8 offset-xl1">
-                            <ul id="listaMateria" class="collection todos ">
+                            <ul id="listaMateria" class="collection ">
                                 <div class="progress ">
                                     <div class="indeterminate"></div>
                                 </div>
@@ -51,7 +51,7 @@
                     <div class="padding-left2-4">Tipo</div>
                 </div>
 
-                <div class="collapsible-body padding0 white">
+                <div class="collapsible-body padding0">
 
                     <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
@@ -74,7 +74,7 @@
 
                     <div class="row">
                         <div class="col s12 m10 offset-m1 l10 offset-l1 xl8 offset-xl1">
-                            <ul id="listaTipo" class="collection todos hidden">
+                            <ul id="listaTipo" class="collection hidden">
                             </ul>
                         </div>
                     </div>
@@ -98,17 +98,17 @@
                     <div class="padding-left2-4">Nivel</div>
                 </div>
 
-                <div class="collapsible-body padding0 white">
+                <div class="collapsible-body padding0">
 
                     <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
 
-                            <div id="chipsMateriaEnNivel">
+                            <ul id="chipsMateriaEnNivel">
                                 <div class="progress ">
                                     <div class="indeterminate"></div>
                                 </div>
-                            </div>
+                            </ul>
                         </div>
                     </div>
 
@@ -116,11 +116,11 @@
                         <div class="col s9 offset-s1 left">
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione un Tipo:</h6>
 
-                            <div id="chipsTipoEnNivel">
+                            <ul id="chipsTipoEnNivel">
                                 <div class="progress ">
                                     <div class="indeterminate"></div>
                                 </div>
-                            </div>
+                            </ul>
                         </div>
                     </div>
 
@@ -128,7 +128,6 @@
                     <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Elegir Nivel para editar:</h6>
-
 
                             <ul id="chipsNivelEnNivel">
                                 <div class="progress">
@@ -140,175 +139,171 @@
                     </div>
 
 
+                    <div class="row clear-top-1">
+                        <div
+                            class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 white-text grey lighten-4">
+                            <div id="listaNivel" class="row">
 
 
-                    <div id="listaNivel" class="container width80">
-                        <div class="">
-                            <div class="  grey lighten-4 ">
 
-                                <div class=" white-text padding2">
 
-                                    <div class="container right">
+
+                                <!-- <div class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
+
+                                    <div class="container right clear-top-1 ">
                                         <a href="#!" class="secondary-content delete">
                                             <i
                                                 class="material-icons-outlined azul-texto right button-opacity ">delete</i>
                                         </a>
 
-                                        <a href="#!" class="secondary-content check ">
+                                        <a href="#!" class="secondary-content check">
                                             <i
                                                 class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
                                         </a>
                                     </div>
 
                                     <div class="row padding0 margin0">
-                                        <form class="col s12 padding0 margin0">
-
-                                            <div class="input-field col s12 padding0 margin0 ">
-                                                <input class="titulo-bold" placeholder="Tíulo" id="titulo" type="text"
-                                                    value="B1 ISE I">
-
-                                            </div>
-
-                                        </form>
+                                        <div class="input-field col s12 padding0 margin0  ">
+                                            <input class="weight500" autocomplete="off" placeholder="Tíulo" id="titulo"
+                                                type="text" value="B1 ISE I">
+                                        </div>
                                     </div>
 
 
-                                    <form class="input-field">
-                                        <div class="input-field padding0 margin0">
-                                            <textarea id="textarea1" class="materialize-textarea"
-                                                placeholder="Descripción del examen">Aquí va la descripción del examen.</textarea>
-                                        </div>
+                                    <div class="row input-field padding0 margin0">
+                                        <textarea id="textarea1" class="materialize-textarea" autocomplete="off"
+                                            placeholder="Descripción del examen">Aquí va la descripción del examen.</textarea>
+                                    </div>
 
-
-                                    </form>
-
-
-
-                                    <div class=" l12 ">
-                                        <form class="col l12">
-
-                                            <div class="input-field col l5">
-                                                <input id="first_name" type="text" class="">
+                                    <div class="row">
+                                        <form class="col s12 m12 l12 xl12">
+                                            <div
+                                                class="input-field col s4 m4 l5 xl5 offset-s1 offset-m1 offset-l1 offset-xl1">
+                                                <input id="first_name" type="text" autocomplete="off" class="">
                                                 <label for="first_name">Modalidad</label>
                                             </div>
-                                            <div class="input-field col l5 ">
-                                                <input id="last_name" type="text" class="">
+                                            <div class="input-field col s3 m3 l4 xl4 ">
+                                                <input id="last_name" type="text" autocomplete="off" class="">
                                                 <label for="last_name">Precio</label>
-
                                             </div>
-                                            <div class="col l1 clear-top-2 ">
+                                            <div class="col s1 l1 m1 xl1 clear-top-2 ">
                                                 <a
                                                     class="btn-floating btn-small waves-effect waves-light background-azul ">
                                                     <i class="material-icons">add</i>
                                                 </a>
                                             </div>
-
-
                                         </form>
 
+                                        <div class="row">
+                                            <div class="col">
+                                                <ul id="modalidadNivel" class="collection">
 
-                                        <div class="row margin-left1">
-                                            <div class="col margin-left1">
-                                                <ul id="modalidadNivel" class="collection todos center  ">
                                                     <li class="collection-item grey lighten-4 margin-bottom-0-4">
                                                         <a href="#!" class="secondary-content left">
                                                             <i
-                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
+                                                                class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
                                                         </a>
 
                                                         <input class="browser-default" type="text"
                                                             value="Listening and Speaking">
-
-                                                        <input class="browser-default precio" type="text" value="€ 37">
-
-
-
-                                                        <a href="#!" class="secondary-content delete red-hover">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
-                                                        </a>
+                                                        <input class="browser-default precio width3rem" type="text"
+                                                            value="€ 37">
 
 
 
-                                                        <a href="#!" class="secondary-content check">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
-                                                        </a>
+                                                        <div class="secondary-content">
+                                                            <a href="#!" class="secondary-content delete">
+                                                                <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                            </a>
 
-                                                        <a href="#!" class="secondary-content unclear-top ">
+                                                            <a href="#!" class="secondary-content check">
+                                                                <i
+                                                                    class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                            </a>
+
                                                             <label>
-                                                                <input type="checkbox" />
-                                                                <span>RW</span>
+                                                                <input type="checkbox" class="filled-in" />
+                                                                <span>Escrito</span>
                                                             </label>
+
                                                             <label>
-                                                                <input type="checkbox" />
-                                                                <span>LS</span>
+                                                                <input type="checkbox" checked="checked" class="filled-in" />
+                                                                <span>Oral</span>
                                                             </label>
-                                                        </a>
+                                                        </div>
                                                     </li>
 
-                                                    <li class="collection-item grey lighten-4 margin-bottom-0-4">
+                                                     <li class="collection-item grey lighten-4 margin-bottom-0-4">
                                                         <a href="#!" class="secondary-content left">
                                                             <i
-                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
+                                                                class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
                                                         </a>
 
                                                         <input class="browser-default" type="text"
                                                             value="Reading and Writing">
+                                                        <input class="browser-default precio width3rem" type="text"
+                                                            value="€ 37">
 
-                                                        <input class="browser-default precio" type="text" value="€ 50">
 
-                                                        <a href="#!" class="secondary-content delete red-hover">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
-                                                        </a>
 
-                                                        <a href="#!" class="secondary-content check">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
-                                                        </a>
+                                                        <div class="secondary-content">
+                                                            <a href="#!" class="secondary-content delete">
+                                                                <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                            </a>
 
-                                                        <a href="#!" class="secondary-content unclear-top ">
+                                                            <a href="#!" class="secondary-content check">
+                                                                <i
+                                                                    class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                            </a>
+
                                                             <label>
-                                                                <input type="checkbox" />
-                                                                <span>RW</span>
+                                                                <input type="checkbox" checked="checked" class="filled-in" />
+                                                                <span>Escrito</span>
                                                             </label>
+
                                                             <label>
-                                                                <input type="checkbox" />
-                                                                <span>LS</span>
+                                                                <input type="checkbox" class="filled-in" />
+                                                                <span>Oral</span>
                                                             </label>
-                                                        </a>
+                                                        </div>
                                                     </li>
 
                                                     <li class="collection-item grey lighten-4 margin-bottom-0-4">
-                                                        <a href="#!" class="secondary-content left">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
-                                                        </a>
+                                                            <a href="#!" class="secondary-content left">
+                                                                <i
+                                                                    class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
+                                                            </a>
+    
+                                                            <input class="browser-default" type="text"
+                                                                value="Completo">
+                                                            <input class="browser-default precio width3rem" type="text"
+                                                                value="€ 37">
+    
+    
+    
+                                                            <div class="secondary-content">
+                                                                <a href="#!" class="secondary-content delete">
+                                                                    <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+                                                                </a>
+    
+                                                                <a href="#!" class="secondary-content check">
+                                                                    <i
+                                                                        class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
+                                                                </a>
+    
+                                                                <label>
+                                                                    <input type="checkbox" checked="checked" class="filled-in" />
+                                                                    <span>Escrito</span>
+                                                                </label>
+    
+                                                                <label>
+                                                                    <input type="checkbox" checked="checked" class="filled-in" />
+                                                                    <span>Oral</span>
+                                                                </label>
+                                                            </div>
+                                                        </li>
 
-                                                        <input class="browser-default" type="text" value="Complete">
-                                                        <input class="browser-default precio" type="text" value="€ 69">
-
-                                                        <a href="#!" class="secondary-content delete red-hover">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity ">delete</i>
-                                                        </a>
-                                                        <a href="#!" class="secondary-content check">
-                                                            <i
-                                                                class="material-icons-outlined azul-texto right button-opacity">remove_red_eye</i>
-                                                        </a>
-
-                                                        <a href="#!" class="secondary-content unclear-top ">
-                                                            <label>
-                                                                <input type="checkbox" />
-                                                                <span>RW</span>
-                                                            </label>
-                                                            <label>
-                                                                <input type="checkbox" />
-                                                                <span>LS</span>
-                                                            </label>
-                                                        </a>
-                                                    </li>
+                                                   
                                                 </ul>
                                             </div>
                                         </div>
@@ -340,10 +335,16 @@
                                         </form>
 
                                     </div>
-                                </div>
+                                </div> -->
+
+
+
+
+
+
+
                             </div>
                         </div>
-
 
 
                         <div class="row clear-bottom-3">
@@ -357,7 +358,7 @@
                         </div>
 
                     </div>
-
+                </div>
             </li>
         </ul>
     </div>
