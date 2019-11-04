@@ -16,13 +16,14 @@
                     <div class="row margin-bottom-0">
                         <div class="col s6 offset-s1 ">
                             <div class="input-field ">
-                                <input id="agregarMateria" autocomplete="off" type="text" placeholder="Agregar Materia Nueva">
+                                <input id="agregarMateria" autocomplete="off" type="text"
+                                    placeholder="Agregar Materia Nueva">
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col s12 m10 l10 offset-l1 xl8 offset-xl1">
+                        <div class="col s12 m10 offset-m1 l10 offset-l1 xl8 offset-xl1">
                             <ul id="listaMateria" class="collection todos ">
                                 <div class="progress ">
                                     <div class="indeterminate"></div>
@@ -36,8 +37,8 @@
                             <a id="guardarMateria"
                                 class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
                             <a id="resetMateria"
-                                class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400 disabled">Reset</a>
-                                <span id="materiaError"></span>
+                                class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
+                            <span id="estadoMateria"></span>
                         </div>
                     </div>
                 </div>
@@ -63,7 +64,8 @@
                             </ul>
 
                             <div class="input-field ">
-                                <input id="agregarTipo" class="hidden" autocomplete="off" type="text" placeholder="Agregar Tipo Nuevo">
+                                <input id="agregarTipo" class="hidden" autocomplete="off" type="text"
+                                    placeholder="Agregar Tipo Nuevo">
                             </div>
 
                         </div>
@@ -71,7 +73,7 @@
 
 
                     <div class="row">
-                        <div class="col s12 m10 l10 offset-l1 xl8 offset-xl1">
+                        <div class="col s12 m10 offset-m1 l10 offset-l1 xl8 offset-xl1">
                             <ul id="listaTipo" class="collection todos hidden">
                             </ul>
                         </div>
@@ -79,12 +81,13 @@
 
                     <div class="row clear-bottom-3">
                         <div id="botonesTipo" class="col s10 offset-s1 hidden">
-                            <a id="guardarTipo" class="waves-effect waves-light btn btn-medium weight400 background-azul">Guardar</a>
+                            <a id="guardarTipo"
+                                class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
                             <a id="resetTipo"
-                                class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400">Reset</a>
-                                <span id="tipoError"></span>
+                                class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
+                            <span id="estadoTipo"></span>
                         </div>
-                        
+
                     </div>
                 </div>
             </li>
@@ -97,113 +100,49 @@
 
                 <div class="collapsible-body padding0 white">
 
-                    <div class="row ">
+                    <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
-                            <h6 class="gris-texto clear-top-2 ">Seleccione una Materia:</h6>
+                            <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
 
-                            <div id="chipis">
-                                <div id="chipa" class="chip waves-effect waves-light ui-selected">
-                                    Inglés
+                            <div id="chipsMateriaEnNivel">
+                                <div class="progress ">
+                                    <div class="indeterminate"></div>
                                 </div>
-                                <div id="chipb" class="chip waves-effect waves-light grey lighten-4">
-                                    Instrumento
-                                </div>
-                                <div id="chipd" class="chip waves-effect waves-light grey lighten-4">
-                                    Teatro
-                                </div>
-                                <div id="chipc" class="chip waves-effect waves-light grey lighten-4">
-                                    Danza
-                                </div>
-
                             </div>
                         </div>
                     </div>
 
-                    <div class="row ">
+                    <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
-                            <h6 class="gris-texto">Seleccione un Tipo:</h6>
+                            <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione un Tipo:</h6>
 
-                            <div id="chipis">
-                                <div id="chipa" class="chip waves-effect waves-light grey lighten-4">
-                                    GESE
+                            <div id="chipsTipoEnNivel">
+                                <div class="progress ">
+                                    <div class="indeterminate"></div>
                                 </div>
-                                <div id="chipb" class="chip waves-effect waves-light ui-selected">ISE
-                                </div>
-                                <div id="chipd" class="chip waves-effect waves-light grey lighten-4">
-                                    RESIT GESE
-                                </div>
-
                             </div>
                         </div>
                     </div>
 
 
-
-                    <div class="row ">
+                    <div class="row margin-bottom-0">
                         <div class="col s9 offset-s1 left">
-                            <h6 class="gris-texto">Elegir Nivel para editar:</h6>
+                            <h6 class="gris-texto clear-top-2 clear-bottom-1">Elegir Nivel para editar:</h6>
 
 
-                            <ul id="lista-modalidad">
-                                <a class="btn-floating btn-small waves-effect waves-light background-azul marginRBL0-7">
-                                    <i class="material-icons">add</i>
-                                </a>
-
-                                <li id="chipa" class="chip waves-effect waves-light grey lighten-4">
-                                    A2 - ISE Fundation
-                                    <i
-                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
-
-                                </li>
-
-                                <li id="chipb" class="chip waves-effect waves-light  ui-selected  active">
-                                    B1 - ISE I
-                                    <i
-                                        class=" move-chip material-icons-outlined text-white button-opacity move-button">import_export</i>
-                                </li>
-
-                                <li id="chipc" class="chip waves-effect waves-light grey lighten-4">
-                                    B2 - ISE II
-                                    <i
-                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
-                                </li>
-
-                                <li id="chipd" class="chip waves-effect waves-light grey lighten-4">
-                                    C1 - ISE III
-                                    <i
-                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
-                                </li>
-
-                                <li id="chipe" class="chip waves-effect waves-light grey lighten-4">
-                                    C2 - ISE IV
-                                    <i
-                                        class=" move-chip material-icons-outlined azul-texto button-opacity move-button">import_export</i>
-                                </li>
-
+                            <ul id="chipsNivelEnNivel">
+                                <div class="progress">
+                                    <div class="indeterminate"></div>
+                                </div>
                             </ul>
 
-
                         </div>
                     </div>
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <div class="container width80">
+                    <div id="listaNivel" class="container width80">
                         <div class="">
                             <div class="  grey lighten-4 ">
 
@@ -400,40 +339,24 @@
                                             </div>
                                         </form>
 
-
-
-
                                     </div>
-
-
-
                                 </div>
-
-
-
-
-
                             </div>
+                        </div>
 
 
 
+                        <div class="row clear-bottom-3">
+                            <div id="botonesNivel" class="col s10 offset-s1 hidden">
+                                <a id="guardarNivel"
+                                    class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
+                                <a id="resetNivel"
+                                    class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
+                                <span id="NivelError"></span>
+                            </div>
                         </div>
 
                     </div>
-
-
-
-
-
-
-                    <div class="row margin3">
-                        <div class="col s10 offset-s1">
-                            <a class="waves-effect waves-light btn btn-medium weight400 background-azul">Guardar</a>
-                            <a
-                                class="waves-effect waves-red btn btn-small white btn-flat azul-texto weight400">Reset</a>
-                        </div>
-                    </div>
-                </div>
 
             </li>
         </ul>

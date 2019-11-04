@@ -30,6 +30,14 @@ body {
   color: white !important;
 }
 
+/* La seleccion de chips es solo dentro de los lis y no en espacio ul  (para que no me deseleccione un chip cuando apreto fuera del li) */
+ul {
+  pointer-events: none;
+}
+ul li {
+  pointer-events: auto;
+}
+
 /*---------------------COLORES TEXTO / BACK---------------------*/
 .background-azul {
   /*  ex .color-azul  */

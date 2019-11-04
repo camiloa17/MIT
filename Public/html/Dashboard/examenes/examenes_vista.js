@@ -1,37 +1,50 @@
-const ulCollapsibleExamenes = $("#collapsibleExamenes");
-const listaMateria = $("#listaMateria");
-const listaTipo = $("#listaTipo");
+const ulCollapsibleExamenes = $('#collapsibleExamenes');
+const listaMateria = $('#listaMateria');
+const listaTipo = $('#listaTipo');
+const listaNivel = $('#listaNivel');
 
-const agregarMateria = $("#agregarMateria");
-const botonesMateria = $("#botonesMateria");
-const botonGuardarMateria = $("#guardarMateria");
-const botonResetMateria = $("#resetMateria");
+const agregarMateria = $('#agregarMateria');
+const botonesMateria = $('#botonesMateria');
+const botonGuardarMateria = $('#guardarMateria');
+const botonResetMateria = $('#resetMateria');
+const estadoMateria = $('#estadoMateria') 
 
-const agregarTipo = $("#agregarTipo");
-const botonesTipo = $("#botonesTipo");
-const botonGuardarTipo = $("#guardarTipo");
-const botonResetTipo = $("#resetTipo");
-const chipsMateriaEnTipo = $("#chipsMateriaEnTipo");
+const chipsMateriaEnTipo = $('#chipsMateriaEnTipo');
+const agregarTipo = $('#agregarTipo');
+const botonesTipo = $('#botonesTipo');
+const botonGuardarTipo = $('#guardarTipo');
+const botonResetTipo = $('#resetTipo');
+const estadoTipo = $('#estadoTipo')
+
+const chipsMateriaEnNivel = $('#chipsMateriaEnNivel');
+const chipsTipoEnNivel = $('#chipsTipoEnNivel');
+const chipsNivelEnNivel = $('#chipsNivelEnNivel');
+
+const botonesNivel = $('#botonesNivel');
+const guardarNivel = $('#guardarNivel');
+const resetNivel = $('#resetNivel');
+const estadoNivel = $('#estadoNivel');
+
 
 //////////////////// INICIALIZACION ACORDEON
 ulCollapsibleExamenes.collapsible({
   onOpenStart: function() {
-    /* Hasta que no selecciono un chip en tipo, no muestro ni lista ni botones */
+    // Hasta que no selecciono un chip en tipo, no muestro ni lista ni botones (se usa cuando entrate a tipo, fuiste a materia o nivel y volves a tipo)
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
       ? removeAreaEdicionTipo()
       : null;
   },
 
-  /* Cada vez que se abre una solapa del acordeon, se trae la información de la base de datos */
+  // Cada vez que se abre una solapa del acordeon, se trae la información de la base de datos
   onOpenEnd: function() {
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleMateria"
       ? getMateria()
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
-      ? getChipMateria()
+      ? getChipMateria(chipsMateriaEnTipo, listaTipo)
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-      ? getMateria()
+      ? getChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel)
       : null;
   }
 });
@@ -61,7 +74,7 @@ function agregarNuevoElemento(e, lista, input) {
     seGeneroCambioOrden();
 
     lista.append(liMateriaTipoTemplate(elemento));
-    asignarFuncionalidadBotones(elemento, lista);
+    asignarFuncionalidadBotonesLista(elemento, lista);
 
     input.val("");
   }
@@ -75,16 +88,23 @@ function inicializarBotonGuardar(boton, lista) {
   boton.on("click", () => {
     let elementos = generarEstoadoLista(lista);
 
-    let cambiosAGuardar = generarObjetoConCambios(elementos);
+    let cambiosAGuardar = generarObjetoConCambios(elementos, lista);
 
     console.log("Cambios a Guardar", cambiosAGuardar);
 
-    updateMateria(cambiosAGuardar);
+    switch (lista) {
+      case listaMateria:
+        updateMateria(cambiosAGuardar);
+        break;
+      case listaTipo:
+        updateTipo(cambiosAGuardar);
+        break;
+    }
+
     seGuardaOResetea(lista);
-    getMateria();
+    // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
   });
 }
-
 
 inicializarBotonReset(botonResetMateria, listaMateria);
 inicializarBotonReset(botonResetTipo, listaTipo);
@@ -93,13 +113,36 @@ function inicializarBotonReset(boton, lista) {
   boton.on("click", () => {
     getMateria();
     seGuardaOResetea(lista);
+    // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
   });
 }
 
 ////////////////////  Acciones visuales al generar cambios en listas
 function seGeneroUnCambioEnLista(lista) {
-  habilitarBotonera(lista);
-  deshabilitarAcordeon();
+  switch (lista) {
+    case listaMateria:
+      habilitarBotonera(lista);
+      deshabilitarAcordeon();
+      break;
+    case listaTipo:
+      habilitarBotonera(lista);
+      deshabilitarAcordeon();
+      disableSelectable(chipsMateriaEnTipo);
+      aplicarClaseNoSelectableChips(chipsMateriaEnTipo);
+      break;
+  }
+}
+
+function aplicarClaseNoSelectableChips(ulChips) {
+  ulChips.find("li").each(function() {
+    $(this).addClass("noSelectable");
+  });
+}
+
+function removerClaseNoSelectableChips(ulChips) {
+  ulChips.find("li").each(function() {
+    $(this).removeClass("noSelectable");
+  });
 }
 
 function habilitarBotonera(lista) {
@@ -115,15 +158,42 @@ function habilitarBotonera(lista) {
   }
 }
 
-function deshabilitarAcordeon() {
-  ulCollapsibleExamenes.removeClass("collapsible");
+//////////////////// Funcion que me indica la tabla de la base de datos a la cual pertenece una lista que está pendiente de guardaado de cambios
+function retornarPertenenciaTablaDb(lista) {
+  switch (lista) {
+    case listaMateria:
+      return "materia";
+    case listaTipo:
+      return "tipo";
+    case listaNivel:
+      return "nivel";
+    default:
+      return null;
+  }
 }
+
+
 
 ////////////////////  Acciones visuales al guardar o resetear cambios en listas
 function seGuardaOResetea(lista) {
-  habilitarAcordeon();
-  deshabilitarBotonera(lista);
-  reiniciarColasDeCambio(); // ESTO DEBE OCURRIR SI RECIBO UN OK DE GUARDADO DESDE EL SERVER
+  switch (lista) {
+    case listaMateria:
+      habilitarAcordeon();
+      deshabilitarBotonera(lista);
+      reiniciarColasDeCambio(); // ESTO DEBE OCURRIR SI RECIBO UN OK DE GUARDADO DESDE EL SERVER
+      break;
+    case listaTipo:
+      habilitarAcordeon();
+      deshabilitarBotonera(lista);
+      reiniciarColasDeCambio(); // ESTO DEBE OCURRIR SI RECIBO UN OK DE GUARDADO DESDE EL SERVER
+      removerClaseNoSelectableChips(chipsMateriaEnTipo);
+      enableSelectable(chipsMateriaEnTipo);
+      break;
+    case listaNivel:
+      break;
+    default:
+      return null;
+  }
 }
 
 function deshabilitarBotonera(lista) {
@@ -139,10 +209,14 @@ function deshabilitarBotonera(lista) {
   }
 }
 
+////////////////////  Cuando hay cambios pendientes se deshabilita la posibilidad de navegar por el acordeon
 function habilitarAcordeon() {
   ulCollapsibleExamenes.addClass("collapsible");
 }
 
+function deshabilitarAcordeon() {
+  ulCollapsibleExamenes.removeClass("collapsible");
+}
 
 ////////////////////  SORTABLE en las listas
 habilitaSortable(listaMateria);
@@ -177,10 +251,14 @@ function habilitaSortable(lista) {
 
 ////////////////////  SELECTABLE en los chips
 habilitarSelectable(chipsMateriaEnTipo);
+habilitarSelectable(chipsMateriaEnNivel);
+habilitarSelectable(chipsTipoEnNivel);
+habilitarSelectable(chipsNivelEnNivel);
 
 function habilitarSelectable(ulChips) {
   ulChips.selectable({
-    filter: ":not(ul)",
+    // Cuando selecciono un chip y tengo cambios pendientes, asigno una clase noSelectable a los chips y debo ejecutar listaX.selectable("disable")
+    cancel: ".noSelectable",
 
     stop: (event, ui) => {
       // Evito que se seleccionen multiples chips. Quedará solo seleccionado el primero si hay una selección de más de un chip
@@ -195,10 +273,32 @@ function habilitarSelectable(ulChips) {
         .attr("id");
 
       // Si selecciono un chip vólido, obtengo el id y mando a buscar info a la DB, si no selecciono ningun chip escondo la lista y la botonera de guardar/reset
-      idSelected ? getTipo(idSelected) : removeAreaEdicionTipo(); ////////////////////////////////////// ESTO LO DEBO HACER GENERAL
+      (idSelected && ulChips === chipsMateriaEnTipo) ? getTipoEnTipo(idSelected) : null;
+      (idSelected && ulChips === chipsMateriaEnNivel) ? getTipoEnNivel(idSelected) : null;
+      (idSelected && ulChips === chipsTipoEnNivel) ? getNivelEnNivel(idSelected) : null;
+
     }
   });
 }
+
+/*
+function chipPresionado(ulChips, idSelected) {
+  (idSelected && ulChips === chipsMateriaEnTipo) ? getTipo(idSelected) : removeAreaEdicionTipo();
+  (idSelected && ulChips === chipsMateriaEnNivel) ? getTipo(idSelected) : removeAreaEdicionTipo(); 
+}
+*/
+
+////////////////////  Habilita o deshabilita la posibilidad de presionar un chip (se deshabilita cuando hay camibos pendientes)
+
+function enableSelectable(ulChips) {
+  ulChips.selectable("enable");
+}
+
+function disableSelectable(ulChips) {
+  ulChips.selectable("disable");
+}
+
+
 
 //////////////////// PRESETS HTML lista
 const liMateriaTipoTemplate = materia => {
@@ -231,8 +331,8 @@ const liMateriaTipoTemplate = materia => {
     </li>`;
 };
 
-//////////////////// Configuracion de botones de cada elemento LI de la lista 
-function asignarFuncionalidadBotones(elemento, lista) {
+//////////////////// Configuracion de botones de cada elemento LI de la lista
+function asignarFuncionalidadBotonesLista(elemento, lista) {
   $(`#${elemento.uuid}_delete`).on("click", () => {
     $(`#${elemento.uuid}`).remove();
 
@@ -248,9 +348,11 @@ function asignarFuncionalidadBotones(elemento, lista) {
 
   $(`#${elemento.uuid}_visibility`).on("click", function() {
     seGeneroUnCambioEnLista(lista);
-    /* CAMBIOS VISUALES */
+
+    // Si esta la visibilidad en false, el input se ve inactivo
     $(`#${elemento.uuid} input`).toggleClass("inputInactivo");
 
+    // Cuando presiono boton visibilidad, cambia su icono
     $(`#${elemento.uuid}_visibility`).text(
       $(this)
         .text()
@@ -259,7 +361,7 @@ function asignarFuncionalidadBotones(elemento, lista) {
         : "visibility"
     );
 
-    /* CAMBIO BOOLEANO EN ATRIBUTO DEL LI */
+    // Si presioné el icono de visibilidad, cambio el atributo html mostrar_cliente y pongo en true el aviso que ocurrio un cambio
     $(`#${elemento.uuid}`).attr("mostrar_cliente", (index, attr) =>
       attr == 1 ? 0 : 1
     );
@@ -273,25 +375,25 @@ const chipTemplate = elemento => {
   <li id="${elemento.uuid}" class="chip">${elemento.nombre}</li>`;
 };
 
-//////////////////// Renderiza elementos en la lista a partir del preset li HTML 
+//////////////////// Renderiza elementos en la lista a partir del preset li HTML
 function visualizarLista(data, lista) {
   let dataOrdenada = JSON.parse(JSON.stringify(data));
 
   dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
   lista.empty();
 
-  console.log("Data from DB",dataOrdenada);
+  console.log("Data from DB", dataOrdenada);
 
   dataOrdenada.forEach(elemento => {
     // Muestro solo las materias activos
     elemento.activo ? lista.append(liMateriaTipoTemplate(elemento)) : null;
 
-    asignarFuncionalidadBotones(elemento, lista);
+    asignarFuncionalidadBotonesLista(elemento, lista);
   });
 }
 
-//////////////////// Renderiza elementos chip a partir del preset chip HTML 
-function visualizarChipMateria(data, chipLista) {
+//////////////////// Renderiza elementos chip a partir del preset chip HTML
+function visualizarChipMateriaTipo(data, chipLista) {
   let dataOrdenada = JSON.parse(JSON.stringify(data));
 
   dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
@@ -302,6 +404,16 @@ function visualizarChipMateria(data, chipLista) {
   });
 }
 
+function visualizarNivel(data, chipLista) {
+  let dataOrdenada = JSON.parse(JSON.stringify(data));
+
+  dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
+  chipLista.empty();
+
+  dataOrdenada.forEach(elemento => {
+    elemento.activo ? chipLista.append(chipTemplate(elemento)) : null;
+  });
+}
 //////////////////// Muestra o Esconde la lista y la botonera de Tipo dependiendo de si está seleccionado un chip Materia o no.
 function showAreaEdicionTipo() {
   listaTipo.removeClass("hidden");
@@ -315,9 +427,7 @@ function removeAreaEdicionTipo() {
   agregarTipo.addClass("hidden");
 }
 
-
-
-////////////////////  Se hace una lectura del estado actual de los elementos de la lista 
+////////////////////  Se hace una lectura del estado actual de los elementos de la lista
 function generarEstoadoLista(lista) {
   let elementos = [];
   var orden = 1;
@@ -349,15 +459,20 @@ function generarEstoadoLista(lista) {
   return elementos;
 }
 
-////////////////////  Se genera un objeto con los cambios realizados por el usuario
-function generarObjetoConCambios(elementos) {
+////////////////////  Se genera un objeto al presionar el boton guardar con los cambios realizados por el usuario desde el ultimo fetch de la DB
+////////////////////  Este objeto se envia al servidor con los cambios realizados para que impacten en la DB.
+function generarObjetoConCambios(elementos, lista) {
   return {
     agregar: colaAgregar,
     remover: colaRemover,
     cambioOrden: colaOrden,
     visibilidad_cambiar: colaVisible,
     inputValue_cambiar: colaInputValue,
-    listaEstado: elementos
+    listaEstado: elementos,
+    tabla: retornarPertenenciaTablaDb(lista),
+    materia: retornarPertenenciaTablaDb(lista)
+      ? chipsMateriaEnTipo.find(".ui-selected").attr("id")
+      : null
   };
 }
 
@@ -410,7 +525,6 @@ function ingresarNuevoInputValue(uuid) {
   }
 }
 
-
 //////////////////// Obtiene un UUID (!!!!!!!! Con webpack debemos incluir un generador de uuid final.)
 function uuid() {
   var uuid = "",
@@ -428,9 +542,6 @@ function uuid() {
   return uuid;
 }
 
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Consulta al servidor la lista de materias en la base de datos */
@@ -444,6 +555,121 @@ async function getMateria() {
     console.log(err);
   }
 }
+
+// Obtiene de DB los nombres de cada materia. Ingreso listaChips(en que # donde se ubicaran) y lislaLis (que # contiene la info que selecciono)
+async function getChipMateria(listaChips, listaLis) {
+  listaLis.empty(); //Limpio los lis antiguos
+  try {
+    const response = await fetch("./materia");
+    const data = await response.json();
+
+    visualizarChipMateriaTipo(data, listaChips);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getChipTipo(listaChips, listaLis) {
+  listaLis.empty();
+  try {
+    const response = await fetch("./tipo");
+    const data = await response.json();
+
+    visualizarChipMateriaTipo(data, listaChips);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getTipoEnTipo(materiaId) {
+  console.log(materiaId);
+  try {
+    const response = await fetch(`./tipo/${materiaId}`);
+    const data = await response.json();
+
+    showAreaEdicionTipo();
+    visualizarLista(data, listaTipo);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getTipoEnNivel(materiaId) {
+  console.log(materiaId);
+  try {
+    const response = await fetch(`./tipo/${materiaId}`);
+    const data = await response.json();
+
+    /*showAreaEdicionTipo();
+    visualizarLista(data, listaTipo);*/
+
+    visualizarChipMateriaTipo(data, chipsTipoEnNivel);
+    
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getNivelEnNivel(tipoId) {
+  console.log(tipoId);
+  try {
+    const response = await fetch(`./nivel/${tipoId}`);
+    const data = await response.json();
+
+    /*showAreaEdicionTipo();
+    visualizarLista(data, listaTipo);*/
+
+    visualizarNivel(data, chipsNivelEnNivel);
+    
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getNivel() {
+  console.log("getting nivel");
+}
+
+async function updateMateria(cambios) {
+  try {
+    const response = await fetch(`./examenes/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cambios)
+    });
+    const rta = await response.json();
+    console.log("Respuesta de update", rta);
+     // Luego de guardar las cosas en la base de datos, me trae esa info
+     getMateria();
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function updateTipo(cambios) {
+  try {
+    const response = await fetch(`./examenes/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cambios)
+    });
+    const rta = await response.json();
+    console.log("Respuesta de update", rta); 
+    // Luego de guardar las cosas en la base de datos, me trae esa info
+    getTipoEnTipo(cambios.materia);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+
 
 // //////////////////// ESTO LO VI CON ANGEL EN CLASE, PARA DESACOPLAR LA VISTA DEL SERVICIO
 // async function getMateria( callback ) {
@@ -469,49 +695,3 @@ async function getMateria() {
 //   // aca se desarrolla la funcion de la vista. de esta manera se desacopla la vista del servicio.
 
 // }
-
-async function getChipMateria() {
-  listaTipo.empty();
-  try {
-    const response = await fetch("./materia");
-    const data = await response.json();
-
-    visualizarChipMateria(data, chipsMateriaEnTipo);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function getTipo(materiaId) {
-  try {
-    const response = await fetch(`./tipo/${materiaId}`);
-    const data = await response.json();
-
-    showAreaEdicionTipo();
-    visualizarLista(data, listaTipo);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function getNivel() {
-  console.log("getting nivel");
-}
-
-
-async function updateMateria(cambios) {
-  try {
-    const response = await fetch("./examenes", {
-      method: "POST",
-      headers: {
-        // 'Accept': 'application/json',
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(cambios)
-    });
-    const rta = await response.json();
-    console.log("Respuesta de update",rta);
-  } catch (err) {
-    console.log(err);
-  }
-}

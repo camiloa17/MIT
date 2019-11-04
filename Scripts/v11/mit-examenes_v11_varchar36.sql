@@ -88,6 +88,7 @@ CREATE TABLE materia (
 CREATE TABLE modalidad (
     uuid varchar(36) NOT NULL,
     nombre varchar(90) NOT NULL,
+    orden int NOT NULL,
     precio decimal(6,2) NOT NULL,
     mostrar_cliente boolean NOT NULL,
     activo boolean NOT NULL,
@@ -102,6 +103,7 @@ CREATE TABLE modalidad (
 CREATE TABLE nivel (
     uuid varchar(36) NOT NULL,
     nombre varchar(90) NOT NULL,
+    orden int NOT NULL, 
     descripcion text NULL,
     pdf text NULL,
     imagen text NULL,

@@ -15,7 +15,6 @@ function connectionToDb() {
     });
 }
 
-
 function queryToDb(connection, query) {
     return new Promise((resolve, reject) => {
         connection.query({ sql: query, timeout: 40000 }, function (error, data, fields) {
@@ -28,19 +27,29 @@ function queryToDb(connection, query) {
     })
 };
 
+function queryToDbValues(connection, query, values) {
+    return new Promise((resolve, reject) => {
+        connection.query(query, [values], function (error, data, fields) {
+            if (error) {
+                reject(console.log("Hubo un error en la consulta " + error.message))
+            } else {
+                resolve(data);
+            }
+        });
+    })   
+};
 
 
-
-
-async function materia(req, res) {
-    let data = await buscarEnDB();
+async function getMateria(req, res) {
+    let data = await buscarEnDBMateria();
     res.send(JSON.stringify(data));
 };
 
-async function buscarEnDB() {
+
+async function buscarEnDBMateria() {
     try {
-        const query = "select uuid, nombre, orden, activo,  mostrar_cliente, edita_user_secundario from materia where activo=1;";
-        //const query = "select BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario from materia where activo=1;";
+        const query = "SELECT uuid, nombre, orden, activo, mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
+        //const query = "SELECT BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
         const connection = await connectionToDb();
         const data = await queryToDb(connection, query);
         connection.release()
@@ -50,19 +59,23 @@ async function buscarEnDB() {
         console.log("Hubo un error en la consulta", err.message);
         return res.status(404).send("Hubo un error en la consulta" + err.message)
     }
-}
+};
 
-async function tipo(req, res) {
+
+async function getTipo(req, res) {
     let materia = req.params.materia;
     let data = await buscarEnDbTipo(materia);
-    
     res.send(JSON.stringify(data));
 };
 
+
+
+
+
 async function buscarEnDbTipo(materia) {
     try {
-        const query = `select uuid, nombre, activo,  mostrar_cliente, edita_user_secundario from tipo where activo=1 and uuid='${materia}'`;
-        //const query = `select BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario from tipo where activo=1 and BIN_TO_UUID(materia_uuid)='${materia}'`;
+        const query = `SELECT uuid, nombre, orden, activo, mostrar_cliente, edita_user_secundario FROM tipo WHERE activo=1 AND materia_uuid='${materia}'`;
+        //const query = `SELECT BIN_TO_UUID(uuid) AS uuid, nombre, activo, mostrar_cliente, edita_user_secundario FROM tipo WHERE activo=1 AND BIN_TO_UUID(materia_uuid)='${materia}'`;
         
         const connection = await connectionToDb();
         const data = await queryToDb(connection, query);
@@ -73,62 +86,120 @@ async function buscarEnDbTipo(materia) {
         console.log("Hubo un error en la consulta", err.message);
         return res.status(404).send("Hubo un error en la consulta" + err.message)
     }
-}
+};
 
-process.on('uncaughtException', function (err) {
-    console.log(err);
-});
+async function getNivel(req, res) {
+    let tipo = req.params.tipo;
+    console.log("tipo", tipo)
+    let data = await buscarEnDbNivel(tipo);
+    console.log("niveles", data)
+    res.send(JSON.stringify(data));
+};
 
 
-function hex2bin(hex){
-    return (parseInt(hex, 16));
-}
+async function buscarEnDbNivel(tipo) {
+    try {
+        const query = `SELECT uuid, nombre, orden, activo FROM nivel WHERE activo=1 AND tipo_uuid='${tipo}'`;
+        
+        const connection = await connectionToDb();
+        const data = await queryToDb(connection, query);
+        connection.release()
+        return data;
+
+    } catch (err) {
+        console.log("Hubo un error en la consulta", err.message);
+        return res.status(404).send("Hubo un error en la consulta" + err.message)
+    }
+};
+
 
 async function examenesCambios(req, res) { 
-    let data = req.body;
+    let cambios = req.body;
+    await updateEnDbExamenesCambios(cambios);
+    //res.send(JSON.stringify(data));
+}
+
+
+async function updateEnDbExamenesCambios(cambios){
     let sql = '';
     let values = [];
 
-    if(data.visibilidad_cambiar.length) {
-        data.visibilidad_cambiar.forEach(uuidToChange => {
-            data.listaEstado.map( element => { 
+    //  Cambia el valor mostrar cliente. Chequea si hay Ids para cambiar su visibilidad, los busca en el listado de los elementos y cambia el estado a los necesarios.
+    if(cambios.visibilidad_cambiar.length) {
+        cambios.visibilidad_cambiar.forEach( uuidToChange => {
+            cambios.listaEstado.map( element => { 
                 if (element.uuid === uuidToChange) {
-                    sql += `UPDATE materia SET mostrar_cliente=${element.mostrar_cliente} WHERE uuid = '${element.uuid}';`
+                    sql += `UPDATE ${cambios.tabla} SET mostrar_cliente=${element.mostrar_cliente} WHERE uuid = '${element.uuid}';`
                 }
             });
         });        
-    }
+    };
 
-    if(data.cambioOrden){
-        console.log("DEBO GUARDAR NUEVO ORDEN")
-        data.listaEstado.map( element => { 
-            sql += `UPDATE materia SET orden=${element.orden} WHERE uuid = '${element.uuid}';`
+    //  Cambia el orden de los elementos de la tabla
+    if(cambios.cambioOrden){
+        cambios.listaEstado.map( element => { 
+            sql += `UPDATE ${cambios.tabla} SET orden=${element.orden} WHERE uuid = '${element.uuid}';`
             
         });
     }
 
-    if(data.inputValue_cambiar.length) {
-        data.inputValue_cambiar.forEach(uuidToChange => {
-            data.listaEstado.map( element => { 
+    //  Cambia el texto del input value
+    if(cambios.inputValue_cambiar.length) {
+        cambios.inputValue_cambiar.forEach(uuidToChange => {
+            cambios.listaEstado.map( element => { 
                 if (element.uuid === uuidToChange) {
-                    sql += `UPDATE materia SET nombre='${element.nombre}' WHERE uuid = '${element.uuid}';`
+                    sql += `UPDATE ${cambios.tabla} SET nombre='${element.nombre}' WHERE uuid = '${element.uuid}';`
                 }
             });
         });
         
     }
 
-    if (data.agregar.length) {
-        sql += "INSERT INTO materia (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario) VALUES ? "
-        data.agregar.forEach(uuidToAdd => {
-            data.listaEstado.map( element => { 
+    //  Agrega un elemento nuevo a la tabla
+    if (cambios.agregar.length) {        
+        if(cambios.tabla === "materia") {
+            sql += `INSERT INTO ${cambios.tabla} (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario) VALUES ? `
+        } else if (cambios.tabla === "tipo"){ 
+            sql +=`INSERT INTO ${cambios.tabla} (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario, materia_uuid) VALUES ? `
+        }
+
+        cambios.agregar.forEach(uuidToAdd => {
+            cambios.listaEstado.map( element => { 
                 if (element.uuid === uuidToAdd) {
-                    values.push( [ element.uuid , element.orden, element.nombre, element.activo, element.mostrar_cliente, element.edita_user_secundario] );
+                    values.push( !cambios.materia ? [ element.uuid , element.orden, element.nombre, element.activo, element.mostrar_cliente, element.edita_user_secundario  ] :[ element.uuid , element.orden, element.nombre, element.activo, element.mostrar_cliente, element.edita_user_secundario, cambios.materia  ]  );
                 }
             });
         });
     }
 
+    //  Cambia el valor de activo a los elementos. Se hace un borrado lógico. Un valor 1= se muestra en la web del cliente. Un valor 0= no se muestra en la web del cliente.
+    if (cambios.remover.length) {                
+        cambios.remover.forEach(uuidToRemove => {
+            sql += `UPDATE ${cambios.tabla} SET activo=0 WHERE uuid = '${uuidToRemove}';`
+            //sql += `UPDATE materia SET activo=0 WHERE BIN_TO_UUID(materia.uuid)='${uuidToRemove}';`
+        })
+    }
+      
+    console.log(sql, values)
+
+    try {
+        const connection = await connectionToDb();
+        const data = await queryToDbValues(connection, sql, values);
+        connection.release()
+        //return res.status(200).send("Los cambios se han realizado con éxito", data);
+
+    } catch (err) {
+        console.log("Hubo un error en la consulta", err.message);
+        return res.status(404).send("Hubo un error en la consulta" + err.message)
+    }
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// ESTO ES LO QUE NO FUNCIONA. COMO PONGO LA FUNCION UUID_TO_BIN EN UN ARRAY DE VALUES ??
     // if (data.agregar) {
     //     data.agregar.forEach(uuidToAdd => {
     //         data.listaEstado.map( element => { 
@@ -141,52 +212,23 @@ async function examenesCambios(req, res) {
     //     });
     // }
 
-    
-    if (data.remover.length) {
-                //sql += `UPDATE materia SET activo=0 WHERE BIN_TO_UUID(materia.uuid)='${uuidToRemove}';`
-        data.remover.forEach(uuidToRemove => {
-            sql += `UPDATE materia SET activo=0 WHERE uuid = '${uuidToRemove}';`
-        })
-    }
+    // var CURRENT_TIMESTAMP = { toSqlString: function() { return 'CURRENT_TIMESTAMP()'; } };
+    // var sql = mysql.format('UPDATE posts SET modified = ? WHERE id = ?', [CURRENT_TIMESTAMP, 42]);
+    // console.log(sql); // UPDATE posts SET modified = CURRENT_TIMESTAMP() WHERE id = 42
 
-    /*
-    var CURRENT_TIMESTAMP = { toSqlString: function() { return 'CURRENT_TIMESTAMP()'; } };
-    var sql = mysql.format('UPDATE posts SET modified = ? WHERE id = ?', [CURRENT_TIMESTAMP, 42]);
-    console.log(sql); // UPDATE posts SET modified = CURRENT_TIMESTAMP() WHERE id = 42
+    // let BIN_TO_UUID(uuid) = { toSqlString: function(uuid) { return `BIN_TO_UUID(${uuid})`; } };
+    // let sql2 = mysql.format('UPDATE posts SET modified = ? WHERE id = ?', [BIN_TO_UUID, 42]);
+//  
 
-    let BIN_TO_UUID(uuid) = { toSqlString: function(uuid) { return `BIN_TO_UUID(${uuid})`; } };
-    let sql2 = mysql.format('UPDATE posts SET modified = ? WHERE id = ?', [BIN_TO_UUID, 42]);
-    */
-    
-    console.log(sql, values)
-
-    try {
-        const connection = await connectionToDb();
-        const data = await queryToDbValues(connection, sql, values);
-        connection.release()
-        return data;
-
-    } catch (err) {
-        console.log("Hubo un error en la consulta", err.message);
-        return res.status(404).send("Hubo un error en la consulta" + err.message)
-    }
-}
-
-function queryToDbValues(connection, sql, values) {
-
-    connection.query(sql, [values], function (error) {
-        if (error) {
-            console.log("Hubo un error en la consulta " + error.message)
-        } 
-    });
-    
-};
-
-
+// Este codigo te permite atajar un error no contemplado y evita que te tire el server abajo.
+process.on('uncaughtException', function (err) {
+    console.log(err);
+});
 
 
 module.exports = {
-    materia: materia,
-    tipo: tipo,
+    getMateria: getMateria,
+    getTipo: getTipo,
+    getNivel: getNivel,
     examenesCambios: examenesCambios,
 };

@@ -20,11 +20,15 @@ app.get('/', function(req, res){
   res.sendFile( 'index.html', route);
 })
 
-app.get('/materia', controladorDashboard.materia)
+app.get('/materia', controladorDashboard.getMateria)
 
-app.get('/tipo/:materia', controladorDashboard.tipo)
+app.get('/tipo', controladorDashboard.getTipo)
 
-app.post('/examenes', controladorDashboard.examenesCambios)
+app.get('/tipo/:materia', controladorDashboard.getTipo)
+
+app.get('/nivel/:tipo', controladorDashboard.getNivel)
+
+app.post('/examenes/', controladorDashboard.examenesCambios)
 
 app.listen(port, function () {
   console.log( "Listening on port number " + port );
