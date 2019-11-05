@@ -19,11 +19,16 @@ const estadoTipo = $('#estadoTipo')
 const chipsMateriaEnNivel = $('#chipsMateriaEnNivel');
 const chipsTipoEnNivel = $('#chipsTipoEnNivel');
 const chipsNivelEnNivel = $('#chipsNivelEnNivel');
+const areaTipoEnNivel = $('#areaTipoEnNivel');
+const areaNivelEnNivel  = $('#areaNivelEnNivel');
+const areaListaNivel = $('#areaListaNivel')
 
 const botonesNivel = $('#botonesNivel');
 const guardarNivel = $('#guardarNivel');
 const resetNivel = $('#resetNivel');
 const estadoNivel = $('#estadoNivel');
+
+
 
 
 //////////////////// INICIALIZACION ACORDEON
@@ -33,21 +38,105 @@ ulCollapsibleExamenes.collapsible({
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
       ? removeAreaEdicionTipo()
       : null;
+      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
+      ? (function() {removeAreaTipoEnNivel(); removeAreaNivelEnNivel(); removeAreaEdicionNivel()})()
+      : null;
   },
 
   // Cada vez que se abre una solapa del acordeon, se trae la información de la base de datos
   onOpenEnd: function() {
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleMateria"
-      ? getMateria()
+      ? mostrarListaMateria()
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
-      ? getChipMateria(chipsMateriaEnTipo, listaTipo)
+      ? mostrarChipMateria(chipsMateriaEnTipo, listaTipo)
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-      ? getChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel)
+      ? (function(){mostrarChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel); removeAreaEdicionNivel()})()
       : null;
   }
 });
+
+// Busca las materias en la DB y renderiza la lista
+async function mostrarListaMateria() {
+  try {
+    let data = await getMateria(); 
+    renderListaMateriaOTipo(data, listaMateria);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// Busca las tipos en la DB de cada materiaID ingresada y renderiza la lista
+async function mostrarListaTipo(tipoId) {
+  try {
+    let data = await getTipo(tipoId); 
+    showAreaEdicionTipo();
+    renderListaMateriaOTipo(data, listaTipo);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function mostrarNivel(nivelId) {
+  try {
+    let data = await getNivel(nivelId); 
+    showAreaEdicionNivel();
+    renderNivel(data, listaNivel);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function mostrarModalidad(nivelId){
+  try {
+    let data = await getModalidad(nivelId);
+    console.log(data)
+    renderModalidad(data, $('#modalidadNivel'));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// Busca las materias en la DB y renderiza los chips. listaChips: aqui se colgaran los chips // listaLis: se limpia esta lista
+async function mostrarChipMateria(listaChips, listaLis){  
+  listaLis.empty(); //Limpio los chips antiguos de la lista
+  try {
+    let data = await getMateria(); 
+    visualizarChipMateriaTipo(data, listaChips);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// Busca los tipos en la DB y renderiza los chips
+async function mostrarChipTipo(listaChips, listaLis, idSelected){  
+  listaLis.empty(); //Limpio los chips antiguos de la lista
+  try {
+    let data = await getTipo(idSelected); 
+    showAreaTipoEnNivel();
+    removeAreaNivelEnNivel();
+    removeAreaEdicionNivel();
+    console.log("mirando data",data)
+    !data.length ? listaChips.append("Este elemento está vacío") : visualizarChipMateriaTipo(data, listaChips);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function mostrarChipNivel(listaChips, listaLis, idSelected){  
+  listaLis.empty(); //Limpio los chips antiguos de la lista
+  try {
+    let data = await getChipNivel(idSelected);
+    showAreaNivelEnNivel(); 
+    removeAreaEdicionNivel();
+    visualizarChipNivel(data, listaChips);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 
 //////////////////// AGREGAR NUEVO ELEMENTO A LA LISTA
 
@@ -114,10 +203,10 @@ function inicializarBotonReset(boton, lista) {
     
     switch (lista) {
       case listaMateria:
-        getMateria();
+        mostrarListaMateria();
         break;
       case listaTipo:
-        getTipoEnTipo(chipsMateriaEnTipo.find(".ui-selected").attr("id"));
+          mostrarListaTipo(chipsMateriaEnTipo.find(".ui-selected").attr("id"));
         break;
     }
 
@@ -259,6 +348,32 @@ function habilitaSortable(lista) {
   });
 }
 
+function habilitaSortableChip(lista) {
+  lista.sortable({
+    handle: ".move-button",
+    tolerance: "pointer",
+    connectWith: lista,
+
+    start: function(e, ui) {
+      ui.placeholder.height(ui.helper[0].scrollHeight * -0.6); // 1.15 para tener en cuenta el lugar del borde del li al moverse y no se generen saltos visuales
+  
+      // creates a temporary attribute on the element with the old index
+      $(this).attr("data-previndex", ui.item.index());
+    },
+
+    update: function(e, ui) {
+      // gets the new and old index then removes the temporary attribute
+      var newIndex = ui.item.index();
+      var oldIndex = $(this).attr("data-previndex");
+      $(this).removeAttr("data-previndex");
+      //seGeneroCambioOrden();
+
+      //Si no se movio de lugar, no se genera ningun cambio
+      //!(newIndex === oldIndex) ? seGeneroUnCambioEnLista(lista) : null;
+    }
+  });
+}
+
 ////////////////////  SELECTABLE en los chips
 habilitarSelectable(chipsMateriaEnTipo);
 habilitarSelectable(chipsMateriaEnNivel);
@@ -283,10 +398,17 @@ function habilitarSelectable(ulChips) {
         .attr("id");
 
       // Si selecciono un chip vólido, obtengo el id y mando a buscar info a la DB, si no selecciono ningun chip escondo la lista y la botonera de guardar/reset
-      (idSelected && ulChips === chipsMateriaEnTipo) ? getTipoEnTipo(idSelected) : null;
-      (idSelected && ulChips === chipsMateriaEnNivel) ? getTipoEnNivel(idSelected) : null;
-      (idSelected && ulChips === chipsTipoEnNivel) ? getNivelEnNivel(idSelected) : null;
-      (idSelected && ulChips === chipsNivelEnNivel) ? getNivel(idSelected) : null;
+      //Selecciono una Materia en solapa Tipo
+      (idSelected && ulChips === chipsMateriaEnTipo) ? mostrarListaTipo(idSelected) : null;
+      
+      //Selecciono una Materia en solapa Nivel
+      (idSelected && ulChips === chipsMateriaEnNivel) ? mostrarChipTipo(chipsTipoEnNivel, chipsTipoEnNivel, idSelected) : null;
+
+      //Selecciono un Tipo en solapa Nivel
+      (idSelected && ulChips === chipsTipoEnNivel) ? mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel ,idSelected) : null;
+      
+      //Selecciono un Nivel en la solapa
+      (idSelected && ulChips === chipsNivelEnNivel) ? (function() {mostrarNivel(idSelected) ; mostrarModalidad(idSelected)})() : null;
 
     }
   });
@@ -384,7 +506,7 @@ const liNivelTemplate = nivel => {
         </form>
 
         <div class="row">
-            <div class="col">
+            <div class="col s12 m12 l12 xl12">
                 <ul id="modalidadNivel" class="collection">                     
                 </ul>
             </div>
@@ -422,7 +544,7 @@ const liNivelTemplate = nivel => {
 }
 
 const liModalidadTemplate = modalidad => {
-  `
+  return `
   <li class="collection-item grey lighten-4 margin-bottom-0-4">
   <a href="#!" class="secondary-content left">
       <i
@@ -430,11 +552,9 @@ const liModalidadTemplate = modalidad => {
   </a>
 
   <input class="browser-default" type="text"
-      value="Listening and Speaking">
-  <input class="browser-default precio width3rem" type="text"
-      value="€ 37">
-
-
+      value="${modalidad.nombre}">
+  <input class="browser-default precio width4rem" type="text"
+      value="€${modalidad.precio}">
 
   <div class="secondary-content">
       <a href="#!" class="secondary-content delete">
@@ -447,16 +567,16 @@ const liModalidadTemplate = modalidad => {
       </a>
 
       <label>
-          <input type="checkbox" class="filled-in" />
+          <input type="checkbox" class="filled-in" ${modalidad.examen_RW ? "checked" : ""}  />
           <span>Escrito</span>
       </label>
 
       <label>
-          <input type="checkbox" checked="checked" class="filled-in" />
+          <input type="checkbox" class="filled-in" ${modalidad.examen_LS ? "checked" : ""}  />
           <span>Oral</span>
       </label>
   </div>
-</li>`
+</li>`;
 }
 
 //////////////////// Configuracion de botones de cada elemento LI de la lista
@@ -503,8 +623,17 @@ const chipTemplate = elemento => {
   <li id="${elemento.uuid}" class="chip">${elemento.nombre}</li>`;
 };
 
+const chipSortableTemplate = elemento => {  
+  return `
+  <li id="${elemento.uuid}" class="chip">
+  <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>
+  ${elemento.nombre}
+</li>`;
+}
+
 //////////////////// Renderiza elementos en la lista a partir del preset li HTML
-function visualizarLista(data, lista) {
+function renderListaMateriaOTipo(data, lista) {
+  console.log(data)
   let dataOrdenada = JSON.parse(JSON.stringify(data));
 
   dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
@@ -517,6 +646,31 @@ function visualizarLista(data, lista) {
     elemento.activo ? lista.append(liMateriaTipoTemplate(elemento)) : null;
 
     asignarFuncionalidadBotonesLista(elemento, lista);
+  });
+}
+
+function renderNivel(data, lista) {
+  let nivel = data[0]
+  console.log("aqui", nivel)
+  console.log(nivel.nombre)
+  lista.empty();
+  lista.append(liNivelTemplate(nivel));
+}
+
+
+
+function renderModalidad(data, lista) {
+  let dataOrdenada = JSON.parse(JSON.stringify(data));
+  
+  dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
+  lista.empty();
+
+  dataOrdenada.forEach(elemento => {
+    // Muestro solo las materias activos
+    elemento.activo ? lista.append(liModalidadTemplate(elemento)) : null;
+    console.log("vemos esto ",elemento.examen_LS, elemento.examen_RW)
+
+    //asignarFuncionalidadBotonesLista(elemento, lista);// FALTA ESTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
   });
 }
 
@@ -538,20 +692,28 @@ function visualizarChipNivel(data, chipLista) {
   dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
   chipLista.empty();
 
+  chipLista.append(botonAgregarNivel());  
+
   dataOrdenada.forEach(elemento => {
-    elemento.activo ? chipLista.append(chipTemplate(elemento)) : null;
+    elemento.activo ? chipLista.append(chipSortableTemplate(elemento)) : null; ///////debe ser sortable este
   });
+  console.log("sortable en ", chipLista)
+  habilitaSortableChip(chipLista);
 }
 
-function visualizarNivel(data, lista) {
-  let nivel = data[0]
-  console.log("aqui", nivel)
-  console.log(nivel.nombre)
-  lista.empty();
-  lista.append(liNivelTemplate(nivel));
+function botonAgregarNivel(){
+  return`
+  <div class="col s1 l1 m1 xl1">
+    <a class="btn-floating btn-small waves-effect waves-light background-azul ">
+      <i class="material-icons">add</i>
+    </a>
+  </div>
+  `
 }
+
 
 //////////////////// Muestra o Esconde la lista y la botonera de Tipo dependiendo de si está seleccionado un chip Materia o no.
+// EN LA SOLAPA TIPO
 function showAreaEdicionTipo() {
   listaTipo.removeClass("hidden");
   botonesTipo.removeClass("hidden");
@@ -563,6 +725,45 @@ function removeAreaEdicionTipo() {
   botonesTipo.addClass("hidden");
   agregarTipo.addClass("hidden");
 }
+
+
+
+// EN LA SOLAPA NIVEL
+function showBotoneraNivel(){
+  botonesNivel.removeClass("hidden");
+}
+
+function removeBotoneraNivel(){
+  botonesNivel.addClass("hidden");
+}
+
+function showAreaTipoEnNivel() {
+  areaTipoEnNivel.removeClass("hidden");
+}
+
+function removeAreaTipoEnNivel() {
+  areaTipoEnNivel.addClass("hidden");
+}
+
+function showAreaNivelEnNivel() {
+  areaNivelEnNivel.removeClass("hidden");
+  showBotoneraNivel()
+}
+
+function removeAreaNivelEnNivel() {
+  areaNivelEnNivel.addClass("hidden");
+  removeBotoneraNivel()
+}
+
+function showAreaEdicionNivel() {
+  areaListaNivel.removeClass("hidden");
+}
+
+function removeAreaEdicionNivel() {
+  areaListaNivel.addClass("hidden");
+}
+
+
 
 ////////////////////  Se hace una lectura del estado actual de los elementos de la lista
 function generarEstoadoLista(lista) {
@@ -681,110 +882,65 @@ function uuid() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* Consulta al servidor la lista de materias en la base de datos */
+//////////////////// CONSULTAS GET AL SERVIDOR
 async function getMateria() {
   try {
     const response = await fetch("./materia");
     const data = await response.json();
-
-    visualizarLista(data, listaMateria);
+    return data;
   } catch (err) {
     console.log(err);
   }
 }
 
-// Obtiene de DB los nombres de cada materia. Ingreso listaChips(en que # donde se ubicaran) y lislaLis (que # contiene la info que selecciono)
-async function getChipMateria(listaChips, listaLis) {
-  listaLis.empty(); //Limpio los lis antiguos
-  try {
-    const response = await fetch("./materia");
-    const data = await response.json();
-
-    visualizarChipMateriaTipo(data, listaChips);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function getChipTipo(listaChips, listaLis) {
-  listaLis.empty();
-  try {
-    const response = await fetch("./tipo");
-    const data = await response.json();
-
-    visualizarChipMateriaTipo(data, listaChips);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function getTipoEnTipo(materiaId) {
-  console.log(materiaId);
+async function getTipo(materiaId) {
   try {
     const response = await fetch(`./tipo/${materiaId}`);
     const data = await response.json();
-
-    showAreaEdicionTipo();
-    visualizarLista(data, listaTipo);
+    return data;
   } catch (err) {
     console.log(err);
   }
 }
 
-async function getTipoEnNivel(materiaId) {
-  console.log(materiaId);
-  try {
-    const response = await fetch(`./tipo/${materiaId}`);
-    const data = await response.json();
-
-    /*showAreaEdicionTipo();
-    visualizarLista(data, listaTipo);*/
-
-    visualizarChipMateriaTipo(data, chipsTipoEnNivel);
-    
-
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function getNivelEnNivel(tipoId) {
+// Me trae todos los nombres de los niveles de un tipo
+async function getChipNivel(tipoId) {
   console.log(tipoId);
   try {
-    const response = await fetch(`./nivelChips/${tipoId}`);
+    const response = await fetch(`./nivelChip/${tipoId}`);
     const data = await response.json();
-
-    /*showAreaEdicionTipo();
-    visualizarLista(data, listaTipo);*/
-
-    visualizarChipNivel(data, chipsNivelEnNivel);
-    
-
+    return data;
   } catch (err) {
     console.log(err);
   }
 }
 
+// Me trae toda la informacion de un nivel seleccionado
 async function getNivel(nivelId) {
-  console.log("getting nivel");
-
-  console.log(nivelId);
   try {
     const response = await fetch(`./nivel/${nivelId}`);
     const data = await response.json();
-    
-    console.log(data)
-
-    visualizarNivel(data, listaNivel);
-    
-
+    return data;
   } catch (err) {
     console.log(err);
   }
-
-  
 }
 
+// Me trae toda las modalidades de un nivel seleccionado
+async function getModalidad(nivelId) {
+  try {
+    const response = await fetch(`./modalidad/${nivelId}`);
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+
+
+//////////////////// UPDATES POST AL SERVIDOR
 async function updateMateria(cambios) {
   try {
     const response = await fetch(`./examenes/`, {
@@ -815,7 +971,7 @@ async function updateTipo(cambios) {
     const rta = await response.json();
     console.log("Respuesta de update", rta); 
     // Luego de guardar las cosas en la base de datos, me trae esa info
-    getTipoEnTipo(cambios.materia);
+    mostrarListaTipo(cambios.materia);
   } catch (err) {
     console.log(err);
   }

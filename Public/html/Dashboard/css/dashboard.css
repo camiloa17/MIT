@@ -69,8 +69,9 @@ label {
 }
 
 [type="checkbox"]+span:not(.lever) {
-  padding-left: 1.6rem !important;
+  padding-left: 2rem !important;
   margin-right: 1rem !important;
+  margin-left: 1rem !important;
 }
 
 /*---------------------Tamaños Texto ---------------------*/
@@ -157,11 +158,11 @@ input:focus {
 
 /*---------------------BUTTONS---------------------*/
 .button-opacity {
-  opacity: 0.3;
+  opacity: 0.3 !important;
 }
 
 .button-opacity:hover {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .collection-item{
@@ -173,14 +174,19 @@ input:focus {
   margin: 0 !important;
 }
 
+.move-button-nivel-margin-top{
+  margin-top: 0.2rem;
+  margin-left: 0.4rem !important;
+}
+
 /*---------------------CHIPS---------------------*/
 .chip:hover {
   cursor: pointer !important;
 }
 
 /*---------------------WIDTHS---------------------*/
-.width3rem{
-  width: 3rem !important;
+.width4rem{
+  width: 4rem !important;
 } 
 
 /*---------------------MARGIN/PADDING---------------------*/

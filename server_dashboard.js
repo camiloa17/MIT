@@ -22,13 +22,13 @@ app.get('/', function(req, res){
 
 app.get('/materia', controladorDashboard.getMateria)
 
-app.get('/tipo', controladorDashboard.getTipo)
-
 app.get('/tipo/:materia', controladorDashboard.getTipo)
 
-app.get('/nivelChips/:tipo', controladorDashboard.getNivelChips)
+app.get('/nivelChip/:tipo', controladorDashboard.getNivelChips)
 
 app.get('/nivel/:nivel', controladorDashboard.getNivel)
+
+app.get('/modalidad/:nivel', controladorDashboard.getModalidad)
 
 app.post('/examenes/', controladorDashboard.examenesCambios)
 
