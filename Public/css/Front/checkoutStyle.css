@@ -7,8 +7,6 @@
 body{
     font-family: 'Roboto', sans-serif;
     color:#085796;
-    height: 100%;
-
 }
 h1,
 h2,
@@ -197,7 +195,7 @@ h3{
     width:20px;
 }
 
-#steps ul .step-number.ongoing{
+#steps ul .step-number.selected-step{
     color:#262626;
 }
 
@@ -343,21 +341,22 @@ input[id="h6"]:checked ~ #l6{
 }
 
 #information-wrapper{
-    display: block;
+    display: flex;
     width: 250px;
-    margin:10px auto;
-    padding-left:30px;
+    flex-direction: column;
+    justify-content: center;
 }
 
 
-#information-wrapper input,
+/*#information-wrapper input,
 #information-wrapper label,
 #information-wrapper span{
     display: block;
 }
-
+*/
 #information-wrapper input{
     margin-bottom:15px;
+    padding-left: 5px;
 }
 
 
@@ -416,10 +415,47 @@ input[id="h6"]:checked ~ #l6{
 
 /*fin de estilos tarjeta stripe*/
 
+/*Selector de envio*/
+
+.envio-domicilio{
+    margin-top:20px;
+}
+
+.wrapper-decision-domicilio{
+    display:flex;
+    justify-content: center;
+    width:100%;
+}
+
+input[name="other-address"]{
+    display:none;
+}
+
+label.button-address{
+    display:inline-flex;
+    width:70px;
+    height:42px;
+    justify-content: center;
+    align-items: center;
+    background-color:#D8D8D8;
+    color:#fff;
+    margin-left:10px;
+}
+input[id="b1"]:checked ~ #label-si,
+input[id="b2"]:checked ~ #label-no{
+    background-color:#085796;
+}
+
+#seccion-nuevo-domicilio{
+    display: flex;
+    flex-direction: column;
+}
+
+/*Fin de Selector de Envio*/
 
 
 /*botones siguiente y atras*/
-#button-wrap{
+.button-wrap{
     display: flex;
     flex-direction: column;
 }
@@ -447,7 +483,6 @@ input[id="h6"]:checked ~ #l6{
 .exam-text>a:hover{
     color: #04467c;
     border: 1px solid #085796;
-
 }
 
 
@@ -463,6 +498,33 @@ input[id="h6"]:checked ~ #l6{
     background-color: #073f6d;
 }
 
+.wrapper-form{
+    width:100%;
+    height: auto;
+    position: relative;
+    left:50%;
+    transform: translate(-50%);
+}
+
+.exam-wrapper,
+.horario,
+.pago{
+    position: relative;
+    width:100%;
+    display: none;
+}
+
+.ongoing{
+    display:flex;
+}
+
+.backwards-wrapper{
+ display:none;
+}
+
+
+
+/*
 #backwards{
     opacity:0;
     visibility: hidden;
@@ -476,6 +538,7 @@ input[id="h6"]:checked ~ #l6{
     transition: all 1s;
     transform: scale(1);
 }
+*/
 
 /*botones siguiente y atras fin*/
 
@@ -634,6 +697,11 @@ input[id="h6"]:checked ~ #l6{
     #pago-stripe p{
         margin-top:10px;
         margin-bottom:30px; 
+    }
+
+    .button-checkout{
+        margin:0;
+        margin-top:20px;
     }
     
 

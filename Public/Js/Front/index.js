@@ -71,14 +71,6 @@ document.querySelectorAll('.materia-tipo').forEach(element => {
     element.addEventListener('click',openMenuItem)
 });
 
-window.addEventListener('onload',menuGet())
-
-async function menuGet(){
-    const response = await fetch('/menu')
-    const myJason = await response.json();
-    console.log(myJason);
-}
-
 
 
 

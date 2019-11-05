@@ -19,39 +19,40 @@
             <ul class="primary-menu-list left-side">
                 <% materia.forEach( (materia)=>{ %>
                 <li class="primary-menu-item">
-                    <a  class="left-side examen-materia"><%= materia %></a>
+                    <a class="left-side examen-materia"><%= materia %></a>
                     <ul class="left-side-menu">
                         <li class="primary-menu-logo">Mit<span class="left-side">X</span></li>
                         <li class="titulo-materia"><%= materia %></li>
                         <% tipos.forEach( (tipo)=>{ %>
-                            <% if(tipo.materia == materia){ %>
-                                <% if (tipo.tipo!=null) {%>
-                                <li class="materia-tipo">
-                                    <a href="#"><%= tipo.tipo %></a>
-                                    <ul data-state='closed' class='list-tipo'>
-                                        <% nivel.forEach((nivel)=>{ %>
-                                            <% if(nivel.tipo == tipo.tipo){ %>
-                                                <% if(nivel.nivel != null) { %>
-                                                    <li class="sub-item-tipo">
-                                                    <a href="#"><%= nivel.nivel %></a>
-                                                    <ul class="modo" data-state='closed'>
-                                                        <% modo.forEach((modo)=>{ %>
-                                                            <% if(modo.nivel==nivel.nivel){ %>
-                                                                <%if(modo.modo !=null){ %>
-                                                                    <li class="sub-item-modo"><a href="#"><%= modo.modo %></a></li>
-                                                                <% } %>
-                                                            <% } %>
-                                                            <% }) %>
-                                                    </ul>
-                                                    </li>
-                                                    <% }%>
+                        <% if(tipo.materia == materia){ %>
+                        <% if (tipo.tipo!=null) {%>
+                        <li class="materia-tipo">
+                            <a href="#"><%= tipo.tipo %></a>
+                            <ul data-state='closed' class='list-tipo'>
+                                <% nivel.forEach((nivel)=>{ %>
+                                <% if(nivel.tipo == tipo.tipo){ %>
+                                <% if(nivel.nivel != null) { %>
+                                <li class="sub-item-tipo">
+                                    <a href="#"><%= nivel.nivel %></a>
+                                    <ul class="modo" data-state='closed'>
+                                        <% modo.forEach((modo)=>{ %>
+                                            <% if(modo.nivel==nivel.nivel){ %>
+                                                <%if(modo.modo !=null){ %>
+                                                    <li class="sub-item-modo"><a href="#"><%= modo.modo %></a></li>
                                                 <% } %>
-                                            <% }) %>
+                                            <% } %>
+                                        <% }) %>
                                     </ul>
                                 </li>
-                                    <% } %>
                                 <% }%>
-                            <% }) %>
+                                <% } %>
+                                <% }) %>
+                            </ul>
+                        </li>
+                        <% } %>
+                        <% }%>
+                        <% }) %>
+                        <li class="materia-tipo tarifas"><button>Descargar tarifas</button></li>
                     </ul>
                 </li>
 

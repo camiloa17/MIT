@@ -23,12 +23,31 @@ function closeNav(item) {
 
 document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
+document.querySelectorAll('.button-checkout').forEach(button=>{
+  button.addEventListener('click', step)
+})
 
-
-function next(item){
-  
+function step(item){
+  const wrapper = item.target.parentElement.parentElement.parentElement;
+  const nextElement = wrapper.nextElementSibling;
+  const previousElement = wrapper.previousElementSibling;
+  const numeroPasos = document.querySelectorAll('.step-number').length;
+  if(item.target.classList.contains('next')){
+    wrapper.classList.remove('ongoing');
+    wrapper.classList.add('.backwards-wrapper');
+    nextElement.classList.add('ongoing');
+    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
+    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)].classList.add('selected-step');
+    document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos == 4) ? 25 * (parseInt(wrapper.dataset.step) + 1) : 20 * (parseInt(wrapper.dataset.step) + 1)}%`;
+  } else if (item.target.classList.contains('backwards')){
+    wrapper.classList.remove('ongoing');
+    previousElement.classList.remove('.backwards-wrapper');
+    previousElement.classList.add('ongoing');
+    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 2].classList.add('selected-step');
+    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)-1].classList.remove('selected-step');
+    document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos == 4) ? 25 * (parseInt(wrapper.dataset.step) - 1) : 20 * (parseInt(wrapper.dataset.step) - 1)}%`;
+  }
 }
-
 
 
 /*Codigo Stripe */
