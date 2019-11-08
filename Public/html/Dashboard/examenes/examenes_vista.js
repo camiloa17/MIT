@@ -68,7 +68,7 @@ $(document).ready(function() {
 
 function inicializarSelectDropdown() {
   $("select").formSelect();
-};
+}
 
 ////////////////////  Cuando hay cambios pendientes se deshabilita la posibilidad de navegar por el acordeon
 function habilitarAcordeon() {
@@ -103,31 +103,33 @@ async function mostrarListaTipo(tipoId) {
 // Busca el nivel seleccionado en la DB y lo renderiza
 async function mostrarNivel(nivelId) {
   try {
-    let data = await getNivel(nivelId);    
+    let data = await getNivel(nivelId);
     renderNivel(data, listaNivel);
   } catch (err) {
     console.log(err);
   }
 }
 
-function mostrarNivelNuevo(){
+function mostrarNivelNuevo() {
   const nivelNuevo = nuevoNivelTemplate();
   renderNivel(nivelNuevo, listaNivel);
   addNivel = 1;
 }
 
 function nuevoNivelTemplate() {
-  return [{
-    uuid: uuid(),
-    nombre: "Nombre del Nivel",
-    descripcion: "Descripcion del Nivel",
-    activo: 1,
-    mostrar_cliente: 0,
-    edita_user_secundario: 0,
-    tipo_uuid: $("#chipsMateriaEnTipo")
-      .find(".ui-selected")
-      .attr("id")
-  }];
+  return [
+    {
+      uuid: uuid(),
+      nombre: "Nombre del Nivel",
+      descripcion: "Descripcion del Nivel",
+      activo: 1,
+      mostrar_cliente: 0,
+      edita_user_secundario: 0,
+      tipo_uuid: $("#chipsMateriaEnTipo")
+        .find(".ui-selected")
+        .attr("id")
+    }
+  ];
 }
 
 // Busca las modalidades del nivel seleccionado en la DB y las renderiza
@@ -167,8 +169,6 @@ async function mostrarChipTipo(listaChips, listaLis, idSelected) {
   }
 }
 
-
-
 // Busca los niveles en la DB y renderiza los chips
 async function mostrarChipNivel(listaChips, listaLis, idSelected) {
   listaLis.empty(); //Limpio los chips antiguos de la lista
@@ -199,7 +199,6 @@ function deshabilitarTostadaGuardarResetear() {
   $(".collapsible-header, .noSelectable, #agregarNivel").off("click");
 }
 
-
 //////////////////// Renderiza elementos en la lista Materia o Tipo a partir del preset li HTML
 function renderListaMateriaOTipo(data, lista) {
   let dataOrdenada = JSON.parse(JSON.stringify(data));
@@ -219,11 +218,25 @@ function renderListaMateriaOTipo(data, lista) {
 
 function renderNivel(data, lista) {
   let nivel = data[0];
-  lista.empty();
-  lista.append(liNivelTemplate(nivel));
+  let newTemplate = liNivelTemplate(nivel);
+  lista.empty().append(newTemplate)
   showAreaEdicionNivel();
   inicializarSelectDropdown();
-  asignarFuncionalidadBotonesNivel(nivel, lista);  
+  asignarFuncionalidadBotonesNivel(nivel, lista);
+  mostrarModalidad(nivel.uuid);
+  asignarFuncionalidadBotoneAgregarModalidad(nivel.uuid)
+
+  aceptarSoloNumerosEnInput(nivel.uuid)
+  // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
+  $(`#${nivel.uuid}`).addClass("ui-selected");
+}
+
+function aceptarSoloNumerosEnInput(uuidInput){
+  $(`#${uuidInput}_modalidad_precio`).on('keydown', function(e) {
+    if (e.which == 69 || e.which == 107  || e.which == 109 ) {
+        e.preventDefault();
+    }
+  });
 }
 
 function renderModalidad(data, lista) {
@@ -235,9 +248,45 @@ function renderModalidad(data, lista) {
   dataOrdenada.forEach(elemento => {
     // Muestro solo las materias activos
     elemento.activo ? lista.append(liModalidadTemplate(elemento)) : null;
-
-    //asignarFuncionalidadBotonesLista(elemento, lista);// FALTA ESTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+    asignarFuncionalidadBotonesModalidad(elemento, listaNivel);
   });
+  
+  let nivelSeleccionado= chipsNivelEnNivel.find(".ui-selected").attr("id");
+
+  habilitaSortableModalidad(lista)
+}
+
+function nuevaModalidad(nivel){
+  console.log(nivel)
+  
+  return {
+  uuid: uuid(),
+  nombre: $(`#${nivel}_modalidad`).val(),
+  precio: $(`#${nivel}_modalidad_precio`).val(),
+  mostrar_cliente: true,
+  examen_RW: false,
+  examen_LS: false,
+  }
+};
+
+
+function asignarFuncionalidadBotoneAgregarModalidad(nivel) {
+  $(`#${nivel}_agregarModalidad`).on("click", function(){
+
+    if ( $(`#${nivel}_modalidad`).val() && $(`#${nivel}_modalidad_precio`).val() ) {
+      let modalidadDatos= nuevaModalidad(nivel)
+      let modalidadGenerada = liModalidadTemplate(modalidadDatos)
+      let nombreLista = $("#modalidadNivel")
+      nombreLista.append(modalidadGenerada)
+
+      $(`#${nivel}_modalidad`).val("");
+      $(`#${nivel}_modalidad_precio`).val("");
+
+      asignarFuncionalidadBotonesModalidad(modalidadDatos, nombreLista)
+      seGeneroUnCambioEnLista(listaNivel);
+    }
+
+  });     
 }
 
 //////////////////// Renderiza elementos chip a partir del preset chip HTML
@@ -307,7 +356,6 @@ function removeAreaNivelEnNivel() {
 
 function showAreaEdicionNivel() {
   areaListaNivel.removeClass("hidden");
-  
 }
 
 function removeAreaEdicionNivel() {
@@ -345,8 +393,6 @@ function agregarNuevoElemento(e, lista, input) {
   }
 }
 
-
-
 ////////////////////  BOTONES guardar y reset
 inicializarBotonGuardarMateriaTipo(botonGuardarMateria, listaMateria);
 inicializarBotonGuardarMateriaTipo(botonGuardarTipo, listaTipo);
@@ -374,13 +420,23 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
         updateTipo(cambiosAGuardarTipo);
         break;
       case listaNivel:
+        let nivelSeleccionado = chipsNivelEnNivel
+          .find(".ui-selected")
+          .attr("id");
         let cambiosAGuardarNivel = generarEstadoNivel();
         console.log("Cambios a Guardar", cambiosAGuardarNivel);
         updateNivelModalidad(cambiosAGuardarNivel);
-        mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel, $('#chipsTipoEnNivel').find(".ui-selected").attr("id"))
-        break; 
+        mostrarChipNivel(
+          chipsNivelEnNivel,
+          chipsNivelEnNivel,
+          $("#chipsTipoEnNivel")
+            .find(".ui-selected")
+            .attr("id")
+        );
+        mostrarNivel(nivelSeleccionado);
+        
+        break;
     }
-
     seGuardaOResetea(lista);
     // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
   });
@@ -405,20 +461,29 @@ function inicializarBotonResetMateriaTipo(boton, lista) {
         let nivelSeleccionado = chipsNivelEnNivel
           .find(".ui-selected")
           .attr("id");
-      
 
-        if (nivelSeleccionado) {  
-          
+        if (nivelSeleccionado) {
           seGuardaOResetea(lista);
-          mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel, $('#chipsTipoEnNivel').find(".ui-selected").attr("id"));
+          mostrarChipNivel(
+            chipsNivelEnNivel,
+            chipsNivelEnNivel,
+            $("#chipsTipoEnNivel")
+              .find(".ui-selected")
+              .attr("id")
+          );
           mostrarNivel(nivelSeleccionado);
-          mostrarModalidad(nivelSeleccionado);
-        } else {
           
+        } else {
           removeAreaEdicionNivel();
-          deshabilitarBotonera(listaNivel);             
+          deshabilitarBotonera(listaNivel);
           seGuardaOResetea(lista);
-          mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel, $('#chipsTipoEnNivel').find(".ui-selected").attr("id"));
+          mostrarChipNivel(
+            chipsNivelEnNivel,
+            chipsNivelEnNivel,
+            $("#chipsTipoEnNivel")
+              .find(".ui-selected")
+              .attr("id")
+          );
         }
         break;
     }
@@ -429,7 +494,7 @@ function inicializarBotonResetMateriaTipo(boton, lista) {
 function asignarFuncionalidadBotonAgregarNivel() {
   $("#agregarNivel").on("click", () => {
     chipsNivelEnNivel.find(".ui-selected").removeClass("ui-selected");
-    mostrarNivelNuevo()
+    mostrarNivelNuevo();
     showAreaEdicionNivel();
     addNivel = true;
     seGeneroUnCambioEnLista(listaNivel);
@@ -437,31 +502,42 @@ function asignarFuncionalidadBotonAgregarNivel() {
 }
 
 ////////////////////  Acciones visuales al generar cambios en listas Materia o Tipo
+let yaSeHizoUnCambio = false;
+
 function seGeneroUnCambioEnLista(lista) {
   switch (lista) {
     case listaMateria:
-      habilitarBotonera(lista);
-      deshabilitarAcordeon();
-      habilitarTostadaGuardarResetear();
+      if (!yaSeHizoUnCambio) {
+        habilitarBotonera(lista);
+        deshabilitarAcordeon();
+        habilitarTostadaGuardarResetear();
+        yaSeHizoUnCambio = true;
+      }
       break;
     case listaTipo:
-      habilitarBotonera(lista);
-      deshabilitarAcordeon();
-      disableSelectable(chipsMateriaEnTipo);
-      aplicarClaseNoSelectableChips(chipsMateriaEnTipo);
-      habilitarTostadaGuardarResetear();
+      if (!yaSeHizoUnCambio) {
+        habilitarBotonera(lista);
+        deshabilitarAcordeon();
+        disableSelectable(chipsMateriaEnTipo);
+        aplicarClaseNoSelectableChips(chipsMateriaEnTipo);
+        habilitarTostadaGuardarResetear();
+        yaSeHizoUnCambio = true;
+      }
       break;
     case listaNivel:
-      $("#agregarNivel").off("click");
-      disableSelectable(chipsMateriaEnNivel);
-      deshabilitarAcordeon();
-      aplicarClaseNoSelectableChips(chipsMateriaEnNivel);
-      disableSelectable(chipsTipoEnNivel);
-      aplicarClaseNoSelectableChips(chipsTipoEnNivel);
-      disableSelectable(chipsNivelEnNivel);
-      habilitarBotonera(lista);
-      aplicarClaseNoSelectableChips(chipsNivelEnNivel);
-      habilitarTostadaGuardarResetear();
+      if (!yaSeHizoUnCambio) {
+        $("#agregarNivel").off("click");
+        disableSelectable(chipsMateriaEnNivel);
+        deshabilitarAcordeon();
+        aplicarClaseNoSelectableChips(chipsMateriaEnNivel);
+        disableSelectable(chipsTipoEnNivel);
+        aplicarClaseNoSelectableChips(chipsTipoEnNivel);
+        disableSelectable(chipsNivelEnNivel);
+        habilitarBotonera(lista);
+        aplicarClaseNoSelectableChips(chipsNivelEnNivel);
+        habilitarTostadaGuardarResetear();
+        yaSeHizoUnCambio = true;
+      }
       break;
   }
 }
@@ -542,6 +618,7 @@ function seGuardaOResetea(lista) {
     default:
       return null;
   }
+  yaSeHizoUnCambio= false;
 }
 
 // Deshabilita la botonera Guardar y Reset
@@ -572,7 +649,7 @@ function asignarFuncionalidadBotonesLista(elemento, lista) {
     seGeneroCambioOrden();
   });
 
-  $(`#${elemento.uuid} input`).on("change", function() {
+  $(`#${elemento.uuid} input`).on("input", function() {
     $(`#${elemento.uuid}`).attr("dirty_input", (index, attr) => 1);
     seGeneroUnCambioEnLista(lista);
   });
@@ -600,7 +677,6 @@ function asignarFuncionalidadBotonesLista(elemento, lista) {
   });
 }
 
-
 //////////////////// Configuracion de botones de cada nivel
 function asignarFuncionalidadBotonesNivel(elemento, lista) {
   $(`#${elemento.uuid}_delete`).on("click", () => {
@@ -612,12 +688,12 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_nombre`).on("change", function() {
-    $(`#${elemento.uuid}_nivel`).attr("dirty_input_nombre",  1);
+  $(`#${elemento.uuid}_nombre`).on("input", function() {
+    $(`#${elemento.uuid}_nivel`).attr("dirty_input_nombre", 1);
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_descripcion`).on("change", function() {
+  $(`#${elemento.uuid}_descripcion`).on("input", function() {
     $(`#${elemento.uuid}_nivel`).attr("dirty_input_descripcion", 1);
     seGeneroUnCambioEnLista(lista);
   });
@@ -641,8 +717,10 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     $(`#${elemento.uuid}_nivel`).attr("mostrar_cliente", (index, attr) =>
       attr == 1 ? 0 : 1
     );
-    $(`#${elemento.uuid}_nivel`).attr("dirty_mostrar_cliente", (index, attr) => 1);
-   
+    $(`#${elemento.uuid}_nivel`).attr(
+      "dirty_mostrar_cliente",
+      (index, attr) => 1
+    );
   });
 
   $(`#${elemento.uuid}_imagen`).on("change", function() {
@@ -654,10 +732,50 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     $(`#${elemento.uuid}_nivel`).attr("dirty_pdf", 1);
     seGeneroUnCambioEnLista(lista);
   });
-
 }
 
+function asignarFuncionalidadBotonesModalidad(elemento, lista) {
+  console.log(elemento, lista)
+  $(`#${elemento.uuid}_delete`).on("click", () => {
+    $(`#${elemento.uuid}`).remove();
+    seGeneroUnCambioEnLista(listaNivel);    
+  });
 
+  $(`#${elemento.uuid}_nombre`).on("input", function() {
+    seGeneroUnCambioEnLista(lista);
+  });
+
+  $(`#${elemento.uuid}_precio`).on("input", function() {
+    seGeneroUnCambioEnLista(lista);
+  });
+
+  $(`#${elemento.uuid}_examen_RW`).on("click", function() {
+    seGeneroUnCambioEnLista(lista);
+  });
+
+  $(`#${elemento.uuid}_examen_LS`).on("click", function() {
+    seGeneroUnCambioEnLista(lista);
+  });
+
+
+  $(`#${elemento.uuid}_visibility`).on("click", function() {
+    seGeneroUnCambioEnLista(lista);
+
+    // Si esta la visibilidad en false, el input se ve inactivo
+    $(`#${elemento.uuid} input`).toggleClass("inputInactivo");
+
+    // Cuando presiono boton visibilidad, cambia su icono
+    $(`#${elemento.uuid}_visibility`).text(
+      $(this)
+        .text()
+        .trim() == "visibility"
+        ? "visibility_off"
+        : "visibility"
+    );
+
+
+  });
+}
 
 ////////////////////  SORTABLE en las listas
 habilitaSortable(listaMateria);
@@ -686,6 +804,33 @@ function habilitaSortable(lista) {
 
       //Si no se movio de lugar, no se genera ningun cambio
       !(newIndex === oldIndex) ? seGeneroUnCambioEnLista(lista) : null;
+    }
+  });
+}
+
+function habilitaSortableModalidad(lista) {
+  lista.sortable({
+    handle: ".move-button",
+    tolerance: "pointer",
+    placeholder: "white",
+    connectWith: lista,
+
+    start: function(e, ui) {
+      // creates a temporary attribute on the element with the old index
+      $(this).attr("data-previndex", ui.item.index());
+
+      ui.placeholder.height(ui.helper[0].scrollHeight * 1.15); // 1.15 para tener en cuenta el lugar del borde del li al moverse y no se generen saltos visuales
+    },
+
+    update: function(e, ui) {
+      // gets the new and old index then removes the temporary attribute
+      var newIndex = ui.item.index();
+      var oldIndex = $(this).attr("data-previndex");
+      $(this).removeAttr("data-previndex");
+      
+      //Si no se movio de lugar, no se genera ningun cambio
+      
+      !(newIndex === oldIndex) ? seGeneroUnCambioEnLista(listaNivel) : null;
     }
   });
 }
@@ -760,7 +905,6 @@ function habilitarSelectable(ulChips) {
       idSelected && ulChips === chipsNivelEnNivel
         ? (function() {
             mostrarNivel(idSelected);
-            mostrarModalidad(idSelected);
           })()
         : null;
     }
@@ -855,15 +999,16 @@ const liNivelTemplate = nivel => {
         <form class="col s12 m12 l12 xl12">
             <div
                 class="input-field col s4 m4 l5 xl5 offset-s1 offset-m1 offset-l1 offset-xl1">
-                <input id="first_name" type="text" autocomplete="off" class="">
-                <label for="first_name">Modalidad</label>
+                <input id="${nivel.uuid}_modalidad" type="text" autocomplete="off" class="">
+                <label for="${nivel.uuid}_modalidad">Modalidad</label>
             </div>
             <div class="input-field col s3 m3 l4 xl4 ">
-                <input id="last_name" type="text" autocomplete="off" class="">
-                <label for="last_name">Precio</label>
+                <input id="${nivel.uuid}_modalidad_precio" type="number" autocomplete="off" >
+                <label for="${nivel.uuid}_modalidad_precio ">Precio Euros</label>
+                
             </div>
             <div class="col s1 l1 m1 xl1 clear-top-2 ">
-                <a
+                <a id="${nivel.uuid}_agregarModalidad"
                     class="btn-floating btn-small waves-effect waves-light background-azul ">
                     <i class="material-icons">add</i>
                 </a>
@@ -918,18 +1063,12 @@ const liModalidadTemplate = modalidad => {
           class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
   </a>
 
-  <input id="${
-    modalidad.uuid
-  }_nombre" class="browser-default" type="text" value="${modalidad.nombre}">
-  <input id="${
-    modalidad.uuid
-  }_precio" class="browser-default precio width4rem" type="text" value="€${
-    modalidad.precio
-  }">
+  <input id="${modalidad.uuid}_nombre" class="browser-default" type="text" value="${modalidad.nombre}">
+  <input id="${modalidad.uuid}_precio" class="browser-default precio width4rem" type="number" value="${modalidad.precio}">
 
   <div class="secondary-content">
       <a href="#!" class="secondary-content delete">
-          <i class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+          <i id="${modalidad.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
       </a>
 
       <a href="#!" class="secondary-content check">
@@ -1032,8 +1171,11 @@ function reiniciarColasDeCambioNivel() {
 function generarEstadoNivel() {
   // como los ids del li de los chips tienen el uuid, los id de los niveles tienen _nivel y se lo debo sacar
 
-  if (listaNivel.find("div").attr("id")){
-    let nivelId = listaNivel.find("div").attr("id").replace('_nivel', '');
+  if (listaNivel.find("div").attr("id")) {
+    let nivelId = listaNivel
+      .find("div")
+      .attr("id")
+      .replace("_nivel", "");
 
     let modalidades = [];
     let chipNiveles = [];
@@ -1059,7 +1201,8 @@ function generarEstadoNivel() {
           orden: ordenModalidad++,
           nombre: $(`#${modalidadId}_nombre`).val(),
           precio: $(`#${modalidadId}_precio`).val(),
-          mostrar_cliente: $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
+          mostrar_cliente:
+            $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
           examen_RW: $(`#${modalidadId}_examen_RW`).prop("checked"),
           examen_LS: $(`#${modalidadId}_examen_LS`).prop("checked"),
           edita_user_secundario: 0
@@ -1079,7 +1222,7 @@ function generarEstadoNivel() {
       addNivel: addNivel,
       removeNivel: removeNivel
     };
-  } else {    
+  } else {
     let ordenNivel = 1;
     let chipNiveles = [];
 
@@ -1092,7 +1235,7 @@ function generarEstadoNivel() {
       });
     });
 
-    return {niveles: chipNiveles}
+    return { niveles: chipNiveles };
   }
 }
 

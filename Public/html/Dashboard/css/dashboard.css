@@ -164,6 +164,19 @@ input:focus {
   font-weight: 400;
 }
 
+/* Remueve las flechitas al ingresar un numero*/
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type='number'] {
+  -moz-appearance:textfield;
+}
+
+
+
 /*---------------------DROPDOWN MENU ---------------------*/
 .dropdown-content li>a, .dropdown-content li>span {
   color: #085796 !important;
