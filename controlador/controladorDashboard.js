@@ -49,8 +49,7 @@ async function getMateria(req, res) {
 
 async function buscarEnDBMateria() {
   try {
-    const query =
-      "SELECT uuid, nombre, orden, activo, mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
+    const query =       "SELECT uuid, nombre, orden, activo, mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
     //const query = "SELECT BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
     const connection = await connectionToDb();
     const data = await queryToDb(connection, query);
@@ -201,10 +200,11 @@ async function updateEnDbExamenesCambios(cambios) {
   //  Agrega un elemento nuevo a la tabla
   if (cambios.agregar.length) {
     if (cambios.tabla === "materia") {
-      sql += `INSERT INTO ${cambios.tabla} (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario) VALUES ? `;
+      sql += `INSERT INTO ${cambios.tabla} (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario) VALUES ? ; `
     } else if (cambios.tabla === "tipo") {
       sql += `INSERT INTO ${cambios.tabla} (uuid, orden, nombre, activo, mostrar_cliente, edita_user_secundario, materia_uuid) VALUES ? `;
     }
+
 
     cambios.agregar.forEach(uuidToAdd => {
       cambios.listaEstado.map(element => {

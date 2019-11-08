@@ -91,9 +91,16 @@ label {
   font-size: 1.4rem !important;
 }
 
+
+
 /*---------------------SIDE NAV ---------------------*/
 .width-sidenav {
   width: 16rem;
+}
+
+/*Hamburguesa boton triger*/
+a {
+  color: #085796;
 }
 
 /*---------------------COLLAPSIBLE ---------------------*/
@@ -144,6 +151,7 @@ input:focus {
   text-decoration: line-through !important;
 }
 
+
 .input-field input[type="text"]:focus,
 .materialize-textarea:focus:not([readonly]) {
   border-bottom: 1px solid #085796 !important;
@@ -154,6 +162,23 @@ input:focus {
 .input-field>label {
   color: #5a5a5a !important;
   font-weight: 400;
+}
+
+/*---------------------DROPDOWN MENU ---------------------*/
+.dropdown-content li>a, .dropdown-content li>span {
+  color: #085796 !important;
+}
+
+
+/*---------------------TOSTADAS---------------------*/
+.toast{
+  background-color: #085796 !important;
+}
+
+
+/*---------------------MODAL---------------------*/
+.modal{
+  color: #085796 !important;
 }
 
 /*---------------------BUTTONS---------------------*/
@@ -178,6 +203,8 @@ input:focus {
   margin-top: 0.2rem;
   margin-left: 0.4rem !important;
 }
+
+
 
 /*---------------------CHIPS---------------------*/
 .chip:hover {

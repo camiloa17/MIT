@@ -77,6 +77,7 @@ CREATE TABLE examen_en_semana_LS (
 CREATE TABLE materia (
     uuid binary(16) NOT NULL,
     nombre varchar(90) NOT NULL,
+    orden int,
     activo boolean NOT NULL,
     mostrar_cliente boolean NOT NULL,
     edita_user_secundario boolean NOT NULL,
@@ -86,6 +87,7 @@ CREATE TABLE materia (
 -- Table: modalidad
 CREATE TABLE modalidad (
     uuid binary(16) NOT NULL,
+    orden int,
     nombre varchar(90) NOT NULL,
     precio decimal(6,2) NOT NULL,
     mostrar_cliente boolean NOT NULL,
@@ -100,6 +102,7 @@ CREATE TABLE modalidad (
 -- Table: nivel
 CREATE TABLE nivel (
     uuid binary(16) NOT NULL,
+    orden int,
     nombre varchar(90) NOT NULL,
     descripcion text NULL,
     pdf text NULL,
@@ -156,6 +159,7 @@ CREATE TABLE semana_LS (
 -- Table: tipo
 CREATE TABLE tipo (
     uuid binary(16) NOT NULL,
+    orden int,
     nombre varchar(90) NOT NULL,
     activo boolean NOT NULL,
     mostrar_cliente boolean NOT NULL,

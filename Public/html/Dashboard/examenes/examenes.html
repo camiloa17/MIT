@@ -129,12 +129,13 @@
                         <div class="col s9 offset-s1 left">
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Elegir Nivel para editar:</h6>
 
+
                             <ul id="chipsNivelEnNivel">
                                 <div class="progress">
                                     <div class="indeterminate"></div>
                                 </div>
                             </ul>
-
+                            <div id="lugarBotonAgregarNivel"></div>
                         </div>
                     </div>
 
@@ -161,6 +162,22 @@
             </li>
         </ul>
     </div>
+
+    <a class="waves-effect waves-light btn modal-trigger" href="#modalEliminar">Modal</a>
+
+    <div id="modalEliminar" idEliminar="ss" class="modal">
+        <div class="modal-content">
+            <h4>¿Eliminar?</h4>
+            <p>Está por eliminar un elemento y todos sus elementos dependientes de forma definitiva.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:console.log('aceptó', $('#modalEliminar').attr('idEliminar'));" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
+            <a href="javascript:console.log('canceló', $('#modalEliminar').attr('idEliminar'));" class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+        </div>
+    </div>
+
+  
+
 </div>
 
 <script src="./html/dashboard/examenes/examenes_vista.js"></script>
