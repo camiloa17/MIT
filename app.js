@@ -39,8 +39,6 @@ app.get('/checkout', (req, res) => {
     res.render('checkout', { stylesheet: stylesheet })
 })
 
-app.get('/menu', controller.adquirirMenu)
-
 app.use(errorHandler);
 
 app.listen(3000, () => {

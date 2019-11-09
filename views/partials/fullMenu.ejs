@@ -19,12 +19,12 @@
             <ul class="primary-menu-list left-side">
                 <% materia.forEach( (materia)=>{ %>
                 <li class="primary-menu-item">
-                    <a class="left-side examen-materia"><%= materia %></a>
+                    <a class="left-side examen-materia"><%= materia.materias %></a>
                     <ul class="left-side-menu">
                         <li class="primary-menu-logo">Mit<span class="left-side">X</span></li>
-                        <li class="titulo-materia"><%= materia %></li>
+                        <li class="titulo-materia"><%= materia.materias %></li>
                         <% tipos.forEach( (tipo)=>{ %>
-                        <% if(tipo.materia == materia){ %>
+                        <% if(tipo.materia == materia.materias){ %>
                         <% if (tipo.tipo!=null) {%>
                         <li class="materia-tipo">
                             <a href="#"><%= tipo.tipo %></a>
