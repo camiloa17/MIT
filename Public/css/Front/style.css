@@ -348,7 +348,7 @@ h3{
 /*---------------Seccion Team------------------------------------------------------------------------------------------*/
 
 #team{
-    margin-top:30px;
+    margin-top:50px;
     margin-bottom: 20px;
 }
 #team h2{
@@ -376,6 +376,7 @@ h3{
 
 #team-text{
     width:100%;
+    padding: 20px 50px;
 }
  #team-text p{
         margin-top:25px;
@@ -393,6 +394,7 @@ h3{
     justify-content: center;
     background-color: #065494;
     width: 100%;
+    padding: 50px 0;
 }
 
 #footer-contact h2{
@@ -582,6 +584,7 @@ textarea[name='mensaje'].footer-form-input{
    #team-image-wrapper{
     width:50%;
     }
+
     #team{
     margin-top:108px;
     }
