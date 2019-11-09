@@ -12,6 +12,7 @@ h1,
 h2,
 h3{
     font-family: 'Roboto Slab', serif;
+    font-weight: 700;
 }
 
 /*-----------------------------------------------Menu-----------------------------------------------------------------------*/
@@ -347,13 +348,14 @@ h3{
 /*---------------Seccion Team------------------------------------------------------------------------------------------*/
 
 #team{
-    margin-top:108px;
+    margin-top:30px;
+    margin-bottom: 20px;
 }
 #team h2{
     text-align: center;
     margin-bottom: 65px;
     font-weight: bold;
-    font-size: 70px;
+    font-size: 35px;
 }
 #team-wrapper{
     flex-wrap: wrap;
@@ -377,16 +379,119 @@ h3{
 }
  #team-text p{
         margin-top:25px;
-    }
+}
 
-/*---------------Seccion Team------------------------------------------------------------------------------------------*/
+/*---------------fin-Seccion Team------------------------------------------------------------------------------------------*/
+
+/*-------------------Seccion contacto-----------------*/
+
+/*pongo los elemento centrados en el div y pongo color al contacto*/
+#footer-contact{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #065494;
+    width: 100%;
+}
+
+#footer-contact h2{
+    color:#fff;
+    margin-top:20px;
+    font-size: 35px;
+    
+}
+
+#footer-contact form{
+    text-align: center;
+}
+
+/*Quito de los inputs los borders y agrego el border de abajo, pongo el color blanco al texto*/
+.footer-form-input{
+    display: block;
+    margin-top:20px;
+    border:none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    color:#FFFFFF;
+    text-align: center;
+    padding-bottom: 11px;
+    width:300px;
+}
+.footer-form-input::placeholder{
+    color:rgba(255, 255, 255, 0.418);
+    font-size: 16px;
+}
+
+/*Quito los bordes cuando los inputs esten activos y focus*/
+.footer-form-input:focus,
+.footer-form-input:active{
+    border:1px solid rgba(255, 255, 255, 0.384);
+    outline:none;
+}
+
+/*El text area solo se puede expandir verticalmente hasta 300px*/
+textarea[name='mensaje'].footer-form-input{
+    resize: vertical;
+    max-height: 300px;
+}
+
+/*Estilo boton*/
+#footer-submit-button{
+    background: #F7F7F7;
+    border:none;
+    height:50px;
+    width: 121px;
+    margin: 10px 0;
+    color:#085796;
+}
+
+/*footer politicas*/
+ #lower-footer{
+     background-color:#000;
+     color: #FFFFFF;
+     display:flex;
+     flex-direction: column;
+     align-items: center;
+     padding:20px 0;
+     text-align: center;
+     font-size: 9px;
+ }
+
+ #lower-footer div{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+#lower-footer p{
+    width: 150px;
+}
+
+ #lower-footer ul{
+     list-style: none;
+ }
+ #lower-footer ul>li{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+ #lower-footer a{
+     color: #FFFFFF;
+     text-decoration: none;
+ }
 
 
+/*Fin footer politicas*/
+
+/*-----Seccion Footer--------*/
 
 /*--------------------Estilos para desktop----------------------------------------------------*/
 
 @media only screen and (min-width:991px){
-
+    #footer-contact h2,
+    #team h2{
+        font-size: 70px;
+    }
     /*-----------------------Seccion menu desktop--------------------------------------------------*/
     /*Se esconde el logo superior, los logos de el menu lateral*/
     .mobile-logo-ham,
@@ -477,6 +582,9 @@ h3{
    #team-image-wrapper{
     width:50%;
     }
+    #team{
+    margin-top:108px;
+    }
 
     #team-text{
         width:50%;
@@ -485,10 +593,30 @@ h3{
     }
   /*---------------Fin Seccion Team Desktop------------------------------------------------------------------------------------------*/
 
-   
-   /*Checkout*/
-    #steps ul .step-number{
-        margin-left:48px;
+   /*Lower footer- privacidad*/
+     #lower-footer{
+        flex-direction: row;
+        justify-content: space-between;
+        padding:20px 0;
+        text-align: center;
+        font-size: 9px;
     }
-   /*Fin Checkou*/
+
+    #lower-footer div{
+        width: auto;
+    }
+    #lower-footer p{
+        margin-left:30px;
+        width:300px;
+    }
+
+    #lower-footer ul>li{
+        display: inline-block;
+    }
+
+    #lower-footer ul>li:nth-child(2){
+        border-left: 2px solid #fff;
+        border-right: 2px solid #fff;
+    }
+   /*end-lower footer privacidad*/
 }

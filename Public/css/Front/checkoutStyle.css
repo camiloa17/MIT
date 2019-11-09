@@ -523,7 +523,6 @@ input[id="b2"]:checked ~ #label-no{
 }
 
 
-
 /*
 #backwards{
     opacity:0;
@@ -543,6 +542,44 @@ input[id="b2"]:checked ~ #label-no{
 /*botones siguiente y atras fin*/
 
 /*---------------------End Seccion Checkout----------------------------------------------------------------*/
+
+/*footer politicas*/
+ #lower-footer{
+     background-color:#000;
+     color: #FFFFFF;
+     display:flex;
+     flex-direction: column;
+     align-items: center;
+     padding:20px 0;
+     text-align: center;
+     font-size: 9px;
+ }
+
+ #lower-footer div{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+#lower-footer p{
+    width: 150px;
+}
+
+ #lower-footer ul{
+     list-style: none;
+ }
+ #lower-footer ul>li{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+ #lower-footer a{
+     color: #FFFFFF;
+     text-decoration: none;
+ }
+
+
+/*Fin footer politicas*/
+
 
 
 
@@ -703,6 +740,33 @@ input[id="b2"]:checked ~ #label-no{
         margin:0;
         margin-top:20px;
     }
+
+    /*Lower footer- privacidad*/
+     #lower-footer{
+        flex-direction: row;
+        justify-content: space-between;
+        padding:20px 0;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    #lower-footer div{
+        width: auto;
+    }
+    #lower-footer p{
+        margin-left:30px;
+        width:300px;
+    }
+
+    #lower-footer ul>li{
+        display: inline-block;
+    }
+
+    #lower-footer ul>li:nth-child(2){
+        border-left: 2px solid #fff;
+        border-right: 2px solid #fff;
+    }
+   /*end-lower footer privacidad*/
     
 
 }

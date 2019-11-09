@@ -44,7 +44,6 @@ exports.adquirirMenu = async ()=>{
         
     }); 
 
-    
     function comparar(a, b) {
         return a.orden - b.orden
     }
@@ -53,7 +52,6 @@ exports.adquirirMenu = async ()=>{
     tipo.sort(comparar);
     nivel.sort(comparar);
     modo.sort(comparar);
-    
 
     return {
         materias: materias,
