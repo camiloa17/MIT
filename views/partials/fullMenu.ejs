@@ -38,7 +38,7 @@
                                         <% modo.forEach((modo)=>{ %>
                                             <% if(modo.nivel==nivel.nivel){ %>
                                                 <%if(modo.modo !=null){ %>
-                                                    <li class="sub-item-modo"><a href="/checkout/<%=materia.materias%>/<%=tipo.tipo%>/<%=modo.modo%>"><%= modo.modo %></a></li>
+                                                    <li class="sub-item-modo"><a href="/checkout/<%=materia.materias%>/<%=tipo.tipo%>/<%=nivel.nivel %>/<%=modo.modo%>"><%= modo.modo %></a></li>
                                                 <% } %>
                                             <% } %>
                                         <% }) %>

@@ -34,12 +34,13 @@ app.get('/', asyncErrorWrap(async (req,res) => {
     res.render("home", { stylesheet: stylesheet, materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
 }));
 
-app.get('/checkout/:materias/:tipos/:modos', (req, res) => {
+app.get('/checkout/:materia/:tipo/:nivel/:modo', (req, res) => {
     const stylesheet = "/css/Front/checkoutStyle.css";
     const params ={
-        materia:req.params.materias,
-        tipo:req.params.tipos,
-        modo:req.params.modos
+        materia:req.params.materia,
+        tipo:req.params.tipo,
+        nivel:req.params.nivel,
+        modo:req.params.modo
         }
 
     console.log(stylesheet,params);
