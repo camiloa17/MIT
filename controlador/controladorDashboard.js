@@ -84,17 +84,17 @@ async function buscarEnDbTipo(materia) {
 
 async function getNivelChips(req, res) {
   let tipo = req.params.tipo;
-  console.log("tipo", tipo);
+  //console.log("tipo", tipo);
   let data = await buscarEnDbNivel(tipo);
-  console.log("niveles", data);
+  //console.log("niveles", data);
   res.send(JSON.stringify(data));
 }
 
 async function getNivel(req, res) {
   let nivel = req.params.nivel;
-  console.log("nivel", nivel);
+  //console.log("nivel", nivel);
   let data = await buscarEnDbNivelCompleto(nivel);
-  console.log("niveles", data);
+  //console.log("niveles", data);
   res.send(JSON.stringify(data));
 }
 
@@ -149,6 +149,77 @@ async function buscarEnDbNivelCompleto(nivel) {
     return res.status(404).send("Hubo un error en la consulta" + err.message);
   }
 }
+
+
+async function examenesUpdateNivelModalidad (req, res) {
+  let cambios = req.body
+  await updateEnDbExamenesCambiosNivelModalidad(cambios);
+}
+
+async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
+  let sql = "";
+  let values= [];
+  
+  console.log(cambios)
+  console.log((cambios.removeNivel))
+  
+
+  if (cambios.removeNivel) {
+    sql += `UPDATE nivel SET activo=0 WHERE uuid = '${cambios.removeNivel}';`;
+  }
+
+  if (cambios.addNivel) {
+    sql += `INSERT INTO nivel (uuid, orden, tipo_uuid, nombre, descripcion, activo, mostrar_cliente, pdf, imagen, edita_user_secundario) VALUES 
+    ('${cambios.uuid}', '0',  '${cambios.tipo_uuid}', '${cambios.nombre}', '${cambios.descripcion}', '1', '${cambios.mostrar_cliente}', '${cambios.pdf}', '${cambios.imagen}', '0' ) ; `
+  }
+
+  if (cambios.cambioDataNivel) {
+    sql += `UPDATE nivel SET nombre='${cambios.nombre}', descripcion='${cambios.descripcion}', mostrar_cliente='${cambios.mostrar_cliente}', pdf='${cambios.pdf}' , imagen='${cambios.imagen}' WHERE uuid = '${cambios.uuid}';`
+  }
+  
+  if (cambios.cambioOrdenChipNiveles) {
+    cambios.niveles.forEach(element => {
+      sql += `UPDATE nivel SET orden=${element.orden} WHERE uuid = '${element.uuid}';`;
+    })    
+  }
+
+  if(cambios.removeModalidades) {
+    cambios.removeModalidades.forEach(element => {
+      sql += `UPDATE modalidad SET activo=0 WHERE uuid='${element}';`;
+    });
+  }
+
+
+  if(cambios.addModalidades) {
+    cambios.addModalidades.forEach(element => {
+      sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS) 
+      VALUES ('${element}', '1', '0', '${cambios.uuid}', '${""}', '${0}','${0}','${0}','${0}','${0}');`;
+    });
+  }
+
+
+  if(cambios.cambioModalidades){
+    cambios.modalidades.forEach(element => {
+      sql += `UPDATE modalidad SET orden='${element.orden}', nombre='${element.nombre}', precio='${element.precio}', mostrar_cliente='${element.mostrar_cliente}', examen_RW=${element.examen_RW}, examen_LS=${element.examen_LS} WHERE uuid='${element.uuid}';  `
+    });
+  }
+
+
+
+  try {
+    const connection = await connectionToDb();
+    const data = await queryToDbValues(connection, sql, values);
+    connection.release();
+    //return res.status(200).send("Los cambios se han realizado con éxito", data);
+  } catch (err) {
+    console.log("Hubo un error en la consulta", err.message);
+    return res.status(404).send("Hubo un error en la consulta" + err.message);
+  }
+
+
+}
+
+
 
 async function examenesCambios(req, res) {
   let cambios = req.body;
@@ -234,7 +305,7 @@ async function updateEnDbExamenesCambios(cambios) {
     });
   }
 
-  console.log(sql, values);
+  //console.log(sql, values);
 
   try {
     const connection = await connectionToDb();
@@ -282,4 +353,5 @@ module.exports = {
   getNivel: getNivel,
   getModalidad: getModalidad,
   examenesCambios: examenesCambios,
+  examenesUpdateNivelModalidad: examenesUpdateNivelModalidad,
 };

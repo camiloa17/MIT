@@ -32,6 +32,8 @@ app.get('/modalidad/:nivel', controladorDashboard.getModalidad)
 
 app.post('/examenes/', controladorDashboard.examenesCambios)
 
+app.post('/examenesUpdateNivelModalidad/', controladorDashboard.examenesUpdateNivelModalidad)
+
 app.listen(port, function () {
   console.log( "Listening on port number " + port );
 });

@@ -82,6 +82,7 @@ function deshabilitarAcordeon() {
 // Busca las materias en la DB y renderiza la lista
 async function mostrarListaMateria() {
   try {
+    //progressIndeterminate(listaMateria)
     let data = await getMateria();
     renderListaMateriaOTipo(data, listaMateria);
   } catch (err) {
@@ -100,6 +101,12 @@ async function mostrarListaTipo(tipoId) {
   }
 }
 
+function progressIndeterminate(lista) {
+  lista.empty();
+  lista.append(`<div class="progress "><div class="indeterminate"></div></div>
+  `);                              
+};
+
 // Busca el nivel seleccionado en la DB y lo renderiza
 async function mostrarNivel(nivelId) {
   try {
@@ -113,17 +120,19 @@ async function mostrarNivel(nivelId) {
 function mostrarNivelNuevo() {
   const nivelNuevo = nuevoNivelTemplate();
   renderNivel(nivelNuevo, listaNivel);
-  addNivel = 1;
+  let chipNuevoNivel = chipSortableTemplate(nivelNuevo[0])
+  $(`#chipsNivelEnNivel`).append(chipNuevoNivel);
+ 
 }
 
 function nuevoNivelTemplate() {
   return [
     {
       uuid: uuid(),
-      nombre: "Nombre del Nivel",
+      nombre: "Nuevo Nivel",
       descripcion: "Descripcion del Nivel",
       activo: 1,
-      mostrar_cliente: 0,
+      mostrar_cliente: 1,
       edita_user_secundario: 0,
       tipo_uuid: $("#chipsMateriaEnTipo")
         .find(".ui-selected")
@@ -282,7 +291,9 @@ function asignarFuncionalidadBotoneAgregarModalidad(nivel) {
       $(`#${nivel}_modalidad`).val("");
       $(`#${nivel}_modalidad_precio`).val("");
 
-      asignarFuncionalidadBotonesModalidad(modalidadDatos, nombreLista)
+      asignarFuncionalidadBotonesModalidad(modalidadDatos, nombreLista);
+      addModalidades.push(modalidadDatos.uuid)
+      cambioModalidades=true;
       seGeneroUnCambioEnLista(listaNivel);
     }
 
@@ -379,7 +390,7 @@ function agregarNuevoElemento(e, lista, input) {
       uuid: uuid(),
       nombre: e.target.value,
       activo: 1,
-      mostrar_cliente: 0,
+      mostrar_cliente: 1,
       edita_user_secundario: 0
     };
     colaAgregar.push(elemento.uuid);
@@ -423,7 +434,7 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
         let nivelSeleccionado = chipsNivelEnNivel
           .find(".ui-selected")
           .attr("id");
-        let cambiosAGuardarNivel = generarEstadoNivel();
+        let cambiosAGuardarNivel = generarEstadoNivel(nivelSeleccionado);
         console.log("Cambios a Guardar", cambiosAGuardarNivel);
         updateNivelModalidad(cambiosAGuardarNivel);
         mostrarChipNivel(
@@ -497,6 +508,7 @@ function asignarFuncionalidadBotonAgregarNivel() {
     mostrarNivelNuevo();
     showAreaEdicionNivel();
     addNivel = true;
+    cambioOrdenChipNiveles = true;
     seGeneroUnCambioEnLista(listaNivel);
   });
 }
@@ -680,29 +692,39 @@ function asignarFuncionalidadBotonesLista(elemento, lista) {
 //////////////////// Configuracion de botones de cada nivel
 function asignarFuncionalidadBotonesNivel(elemento, lista) {
   $(`#${elemento.uuid}_delete`).on("click", () => {
-    $(`#${elemento.uuid}_nivel`).remove();
+    $(`#${elemento.uuid}_nivel`).remove(); // Remueve el nivel de la visualizacion del nivel
+    $(`#${elemento.uuid}`).remove();  // Remueve el chip con el nombre del nivel
     removeAreaEdicionNivel();
 
     // Indico que este elemento debe ser removido
-    removeNivel = true;
+    removeNivel.push(elemento.uuid);
+    cambioOrdenChipNiveles = true;
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_nombre`).on("input", function() {
+  $(`#${elemento.uuid}_nombre`).on("input", function() {    
     $(`#${elemento.uuid}_nivel`).attr("dirty_input_nombre", 1);
+
+    // Actualiza el nombre del chip cuando se cambia el nombre en input del nombre del nivel
+    let iconoSortable = $(`#${elemento.uuid}`).clone().children();
+    let nuevoTextChip = $(`#${elemento.uuid}_nombre`).val();
+    $(`#${elemento.uuid}`).empty().prepend(nuevoTextChip).prepend(iconoSortable)
+    cambioDataNivel= true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_descripcion`).on("input", function() {
     $(`#${elemento.uuid}_nivel`).attr("dirty_input_descripcion", 1);
+    cambioDataNivel= true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_visibility`).on("click", function() {
+    cambioDataNivel= true;
     seGeneroUnCambioEnLista(lista);
 
     // Si esta la visibilidad en false, el input se ve inactivo
-    $(`#${elemento.uuid}_nivel input`).toggleClass("inputInactivo");
+    $(`#${elemento.uuid}_nombre`).toggleClass("inputInactivo");
 
     // Cuando presiono boton visibilidad, cambia su icono
     $(`#${elemento.uuid}_visibility`).text(
@@ -725,44 +747,53 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
 
   $(`#${elemento.uuid}_imagen`).on("change", function() {
     $(`#${elemento.uuid}_nivel`).attr("dirty_imagen", 1);
+    cambioDataNivel= true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_pdf`).on("change", function() {
     $(`#${elemento.uuid}_nivel`).attr("dirty_pdf", 1);
+    cambioDataNivel= true;
     seGeneroUnCambioEnLista(lista);
   });
 }
 
 function asignarFuncionalidadBotonesModalidad(elemento, lista) {
-  console.log(elemento, lista)
+
   $(`#${elemento.uuid}_delete`).on("click", () => {
     $(`#${elemento.uuid}`).remove();
+    cambioModalidades=true;
+    removeModalidades.push(elemento.uuid)
     seGeneroUnCambioEnLista(listaNivel);    
   });
 
   $(`#${elemento.uuid}_nombre`).on("input", function() {
+    cambioModalidades=true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_precio`).on("input", function() {
+    cambioModalidades=true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_examen_RW`).on("click", function() {
+    cambioModalidades=true;
     seGeneroUnCambioEnLista(lista);
   });
 
   $(`#${elemento.uuid}_examen_LS`).on("click", function() {
+    cambioModalidades=true;
     seGeneroUnCambioEnLista(lista);
   });
 
 
   $(`#${elemento.uuid}_visibility`).on("click", function() {
+    cambioModalidades=true;
     seGeneroUnCambioEnLista(lista);
 
     // Si esta la visibilidad en false, el input se ve inactivo
-    $(`#${elemento.uuid} input`).toggleClass("inputInactivo");
+    $(`#${elemento.uuid}_nombre`).toggleClass("inputInactivo");
 
     // Cuando presiono boton visibilidad, cambia su icono
     $(`#${elemento.uuid}_visibility`).text(
@@ -830,11 +861,12 @@ function habilitaSortableModalidad(lista) {
       
       //Si no se movio de lugar, no se genera ningun cambio
       
-      !(newIndex === oldIndex) ? seGeneroUnCambioEnLista(listaNivel) : null;
+      !(newIndex === oldIndex) ? (function(){seGeneroUnCambioEnLista(listaNivel), cambioModalidades=true})() : null;
     }
   });
 }
 
+// Esta Sortabilidad es para los chips de niveles
 function habilitaSortableChip(lista) {
   lista.sortable({
     handle: ".move-button",
@@ -857,7 +889,7 @@ function habilitaSortableChip(lista) {
 
       //Si no se movio de lugar, no se genera ningun cambio
       console.log(newIndex, oldIndex, lista);
-      !(newIndex === oldIndex) ? seGeneroUnCambioEnLista(listaNivel) : null;
+      !(newIndex === oldIndex) ? (function(){seGeneroUnCambioEnLista(listaNivel); cambioOrdenChipNiveles = true})() : null;
     }
   });
 }
@@ -933,7 +965,7 @@ const liMateriaTipoTemplate = materia => {
       </a>
 
       <input class="browser-default weight500 ${
-        !materia.mostrar_cliente ? "inputInactivo" : null
+        !materia.mostrar_cliente ? "inputInactivo" : ""
       }" type="text" value="${materia.nombre}">
 
       <a  href="#!" class="secondary-content delete red-hover">
@@ -978,7 +1010,9 @@ const liNivelTemplate = nivel => {
 
       <div class="row padding0 margin0">
           <div class="input-field col s12 padding0 margin0  ">
-              <input class="weight500" autocomplete="off" placeholder="Tíulo" id="${
+              <input class="weight500 ${
+                !nivel.mostrar_cliente ? "inputInactivo" : ""
+              }" autocomplete="off" placeholder="Tíulo" id="${
                 nivel.uuid
               }_nombre"
                   type="text" value="${nivel.nombre}">
@@ -1063,7 +1097,9 @@ const liModalidadTemplate = modalidad => {
           class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
   </a>
 
-  <input id="${modalidad.uuid}_nombre" class="browser-default" type="text" value="${modalidad.nombre}">
+  <input id="${modalidad.uuid}_nombre" class="browser-default ${
+    !modalidad.mostrar_cliente ? "inputInactivo" : ""
+  } " type="text" value="${modalidad.nombre}">
   <input id="${modalidad.uuid}_precio" class="browser-default precio width4rem" type="number" value="${modalidad.precio}">
 
   <div class="secondary-content">
@@ -1109,8 +1145,8 @@ const chipTemplate = elemento => {
 const chipSortableTemplate = elemento => {
   return `
   <li id="${elemento.uuid}" class="chip">
-  <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>
   ${elemento.nombre}
+  <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>  
 </li>`;
 };
 
@@ -1159,19 +1195,29 @@ function generarEstoadoLista(lista) {
 ////////////////////  Se hace una lectura del estado actual del nivel mostrado
 
 let addNivel = false;
-let removeNivel = false;
+let removeNivel = [];
+let cambioOrdenChipNiveles = false;
+let cambioDataNivel = false;
+
 let cambioModalidades = false;
+let addModalidades = [];
+let removeModalidades = [];
 
 function reiniciarColasDeCambioNivel() {
   addNivel = false;
-  removeNivel = false;
+  removeNivel = [];
+  cambioOrdenChipNiveles = false;
+  cambioDataNivel = false;
+
   cambioModalidades = false;
+  addModalidades = [];
+  removeModalidades = [];
 }
 
-function generarEstadoNivel() {
-  // como los ids del li de los chips tienen el uuid, los id de los niveles tienen _nivel y se lo debo sacar
-
-  if (listaNivel.find("div").attr("id")) {
+function generarEstadoNivel(nivelSeleccionado) {
+  // Si estoy mostrando un nivel, obtengo el id limpio sin "_nivel"
+  
+  if (listaNivel.children().length > 0 ) {
     let nivelId = listaNivel
       .find("div")
       .attr("id")
@@ -1179,9 +1225,9 @@ function generarEstadoNivel() {
 
     let modalidades = [];
     let chipNiveles = [];
-    let ordenModalidad = 1;
-    let ordenNivel = 1;
+    let ordenNivel = 1; //Desde donde comienza a sumar el orden de los niveles
 
+    // Obtengo el estado de orden de los niveles
     chipsNivelEnNivel.find(`li`).each(function() {
       let nivelId = $(this).attr("id");
 
@@ -1190,19 +1236,20 @@ function generarEstadoNivel() {
         orden: ordenNivel++
       });
     });
-
+    
+    let ordenModalidad=1;
     $("#modalidadNivel")
       .find(`li`)
       .each(function() {
         let modalidadId = $(this).attr("id");
+        
 
         modalidades.push({
           uuid: modalidadId,
           orden: ordenModalidad++,
           nombre: $(`#${modalidadId}_nombre`).val(),
           precio: $(`#${modalidadId}_precio`).val(),
-          mostrar_cliente:
-            $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
+          mostrar_cliente: $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
           examen_RW: $(`#${modalidadId}_examen_RW`).prop("checked"),
           examen_LS: $(`#${modalidadId}_examen_LS`).prop("checked"),
           edita_user_secundario: 0
@@ -1211,16 +1258,21 @@ function generarEstadoNivel() {
 
     return {
       uuid: nivelId,
+      tipo_uuid: $(`#chipsTipoEnNivel`).find(".ui-selected").attr("id"),
       nombre: $(`#${nivelId}_nombre`).val(),
       descripcion: $(`#${nivelId}_descripcion`).val(),
       mostrar_cliente: listaNivel.find("div").attr("mostrar_cliente"),
       pdf: $(`#${nivelId}_pdf input`).val(),
       imagen: $(`#${nivelId}_imagen input`).val(),
+      cambioDataNivel: cambioDataNivel,
       modalidades: modalidades,
       cambioModalidades: cambioModalidades,
-      niveles: chipNiveles,
       addNivel: addNivel,
-      removeNivel: removeNivel
+      removeNivel: removeNivel,
+      cambioOrdenChipNiveles: cambioOrdenChipNiveles,
+      niveles: chipNiveles,
+      addModalidades: addModalidades,
+      removeModalidades: removeModalidades,
     };
   } else {
     let ordenNivel = 1;
@@ -1231,11 +1283,17 @@ function generarEstadoNivel() {
 
       chipNiveles.push({
         uuid: nivelId,
-        orden: ordenNivel++
+        orden: ordenNivel++        
       });
     });
 
-    return { niveles: chipNiveles };
+    return { 
+      niveles: chipNiveles, 
+      removeNivel: removeNivel,
+      cambioOrdenChipNiveles: cambioOrdenChipNiveles,
+      cambioDataNivel: false,
+      cambioModalidades: false,
+     };
   }
 }
 
@@ -1414,8 +1472,22 @@ async function updateTipo(cambios) {
 }
 
 async function updateNivelModalidad(cambios) {
-  console.log("guardaremos cambios de nivel");
+  try {
+    const response = await fetch(`./examenesUpdateNivelModalidad/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cambios)
+    });
+    const rta = await response.json();
+    // Luego de guardar las cosas en la base de datos, me trae esa info
+    mostrarNivel(cambios.uuid);
+  } catch (err) {
+    console.log(err);
+  }
 }
+
 
 // //////////////////// ESTO LO VI CON ANGEL EN CLASE, PARA DESACOPLAR LA VISTA DEL SERVICIO
 // async function getMateria( callback ) {
