@@ -34,7 +34,7 @@ app.get('/', asyncErrorWrap(async (req,res) => {
     res.render("home", { stylesheet: stylesheet, materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
 }));
 
-app.get('/checkout/:materia/:tipo/:nivel/:modo', (req, res) => {
+app.get('/checkout/:materia/:tipo/:nivel/:modo',asyncErrorWrap (async(req, res) => {
     const stylesheet = "/css/Front/checkoutStyle.css";
     const params ={
         materia:req.params.materia,
@@ -42,10 +42,11 @@ app.get('/checkout/:materia/:tipo/:nivel/:modo', (req, res) => {
         nivel:req.params.nivel,
         modo:req.params.modo
         }
+    const preciosDescripcion = await controller.consultarDescripcionYPrecioExamen(params.nivel,params.modo);
+    
+    res.render('checkout', { stylesheet: stylesheet, tipo:params.tipo,nivel:params.nivel,modo:params.modo,precio:preciosDescripcion.precio,descripcion:preciosDescripcion.descripcion})
+}));
 
-    console.log(stylesheet,params);
-    res.render('checkout', { stylesheet: stylesheet })
-})
 
 app.use(errorHandler);
 

@@ -17,7 +17,7 @@
     </div>
     <div id="information">
         <h3>EXAMEN DE</h3>
-        <h1>A2 - ISE Fundation - Listening & Speaking</h1>
+        <h1><%= nivel %> - <%= modo %></h1>
         <form action="" method="post">
             <div class="wrapper-form">
             <div class="exam-wrapper ongoing" data-step="1">
@@ -26,12 +26,8 @@
                 </div>
                 <div class="exam-text">
                     <h4>Descripción del examen</h4>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-                        been the industry's standard
-                        dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled
-                        it to make a type specimen
-                        book.</p>
-                    <span>$240</span>
+                    <p><%=descripcion%></p>
+                    <span>$<%= precio %></span>
 
                     <a href="#">Descargar las Normas</a>
                         <div class="button-wrap">

@@ -2,6 +2,8 @@ const utils = require('../utils');
 
 const conexion = require(`../database/conexionDB/conexionbd`);
 
+
+
 exports.adquirirMenu = async ()=>{
 
     //const sql = "select m.nombre as materia,m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad from materia m left join tipo t on t.materia_id = m.id left join nivel n on t.id = n.tipo_id left join modalidad mo on n.id = mo.nivel_id;"
@@ -11,7 +13,6 @@ exports.adquirirMenu = async ()=>{
     const tipo = [];
     const nivel = [];
     const modo = [];
-    
     
     respuesta.forEach(element => {
         if (!materias.find((objetoMateriaItem) => {
@@ -60,5 +61,15 @@ exports.adquirirMenu = async ()=>{
         modo: modo
     };
 
+}
+
+
+exports.consultarDescripcionYPrecioExamen = async(nivel,modalidad)=>{
+    const sql = 'select n.descripcion as descripcion, mo.precio as precio from nivel as n join modalidad as mo on n.uuid=mo.nivel_uuid where n.nombre = ? and mo.nombre = ?;';
+    const respuesta = await utils.queryAsync(sql,[nivel,modalidad]);
+    return {
+        descripcion:respuesta[0].descripcion,
+        precio:respuesta[0].precio
+    };
 }
 
