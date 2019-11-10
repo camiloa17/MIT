@@ -235,6 +235,8 @@ function renderNivel(data, lista) {
   mostrarModalidad(nivel.uuid);
   asignarFuncionalidadBotoneAgregarModalidad(nivel.uuid)
 
+
+
   aceptarSoloNumerosEnInput(nivel.uuid)
   // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
   $(`#${nivel.uuid}`).addClass("ui-selected");
@@ -517,6 +519,8 @@ function asignarFuncionalidadBotonAgregarNivel() {
 let yaSeHizoUnCambio = false;
 
 function seGeneroUnCambioEnLista(lista) {
+  console.log("Cambios generados")
+  console.log(lista)
   switch (lista) {
     case listaMateria:
       if (!yaSeHizoUnCambio) {
@@ -651,14 +655,44 @@ function deshabilitarBotonera(lista) {
   }
 }
 
+function eliminarElementoLista(uuid, lista) {
+  switch(lista){
+    case listaMateria:
+      $(`#${uuid}`).remove();
+      ingresarColaRemover(uuid);
+      seGeneroUnCambioEnLista(lista);
+      seGeneroCambioOrden();
+      break;
+    case listaTipo:
+        $(`#${uuid}`).remove();
+        ingresarColaRemover(uuid);
+        seGeneroUnCambioEnLista(lista);
+        seGeneroCambioOrden();
+        break;
+    case listaNivel:
+      $(`#${uuid}_nivel`).remove(); // Remueve el nivel de la visualizacion del nivel
+      $(`#${uuid}`).remove();  // Remueve el chip con el nombre del nivel
+      removeAreaEdicionNivel();
+  
+      // Indico que este elemento debe ser removido
+      removeNivel.push(uuid);
+      cambioOrdenChipNiveles = true;
+      seGeneroUnCambioEnLista(lista);
+      break;
+  }
+
+  
+}
+
+let elementoAEliminar = {uuid: "", lista: ""}
+
+
 //////////////////// Configuracion de botones de cada elemento LI de la lista
 function asignarFuncionalidadBotonesLista(elemento, lista) {
-  $(`#${elemento.uuid}_delete`).on("click", () => {
-    $(`#${elemento.uuid}`).remove();
 
-    ingresarColaRemover(elemento.uuid);
-    seGeneroUnCambioEnLista(lista);
-    seGeneroCambioOrden();
+  $(`#${elemento.uuid}_delete`).on("click", () => {
+    elementoAEliminar.uuid= elemento.uuid;
+    elementoAEliminar.lista= lista;
   });
 
   $(`#${elemento.uuid} input`).on("input", function() {
@@ -692,14 +726,8 @@ function asignarFuncionalidadBotonesLista(elemento, lista) {
 //////////////////// Configuracion de botones de cada nivel
 function asignarFuncionalidadBotonesNivel(elemento, lista) {
   $(`#${elemento.uuid}_delete`).on("click", () => {
-    $(`#${elemento.uuid}_nivel`).remove(); // Remueve el nivel de la visualizacion del nivel
-    $(`#${elemento.uuid}`).remove();  // Remueve el chip con el nombre del nivel
-    removeAreaEdicionNivel();
-
-    // Indico que este elemento debe ser removido
-    removeNivel.push(elemento.uuid);
-    cambioOrdenChipNiveles = true;
-    seGeneroUnCambioEnLista(lista);
+    elementoAEliminar.uuid= elemento.uuid;
+    elementoAEliminar.lista= lista;
   });
 
   $(`#${elemento.uuid}_nombre`).on("input", function() {    
@@ -764,7 +792,7 @@ function asignarFuncionalidadBotonesModalidad(elemento, lista) {
     $(`#${elemento.uuid}`).remove();
     cambioModalidades=true;
     removeModalidades.push(elemento.uuid)
-    seGeneroUnCambioEnLista(listaNivel);    
+    seGeneroUnCambioEnLista(listaNivel);
   });
 
   $(`#${elemento.uuid}_nombre`).on("input", function() {
@@ -953,6 +981,8 @@ function disableSelectable(ulChips) {
   ulChips.selectable("disable");
 }
 
+
+
 //////////////////// PRESETS HTML elemento de la lista Materia o Tipo
 const liMateriaTipoTemplate = materia => {
   return `
@@ -968,7 +998,7 @@ const liMateriaTipoTemplate = materia => {
         !materia.mostrar_cliente ? "inputInactivo" : ""
       }" type="text" value="${materia.nombre}">
 
-      <a  href="#!" class="secondary-content delete red-hover">
+      <a  href="#modalEliminar" class="secondary-content modal-trigger delete">
         <i id="${
           materia.uuid
         }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
@@ -985,6 +1015,34 @@ const liMateriaTipoTemplate = materia => {
   `;
 };
 
+
+let imagenes= ["spanish.png", "english.png", "italian.png", "french.png"];
+let pdf= ["spanish.pdf", "english.pdf", "italian.pdf", "french.pdf"];
+
+function generarNombreImagenes(nivel) {
+  let textHTML="";
+  imagenes.forEach( element => {
+    textHTML+=
+    `
+      <option value="" ${ (element === nivel.imagen) ? "selected" : ""} data-icon="../../files/images/${element}" class="left">${element}</option>
+    `
+  });
+  return textHTML;
+}
+
+function generarNombrePdfs(nivel) {
+  let textHTML="";
+  pdf.forEach( element => {
+    textHTML+=
+    `
+      <option value="" ${ (element === nivel.pdf) ? "selected" : ""} class="left">${element}</option>
+    `
+  });
+  return textHTML;
+}
+
+
+
 //////////////////// PRESETS HTML elemento nivel
 const liNivelTemplate = nivel => {
   return `
@@ -993,7 +1051,7 @@ const liNivelTemplate = nivel => {
   }" dirty_input_nombre="0" dirty_input_descripcion="0" dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
 
       <div class="container right clear-top-1 ">
-        <a href="#!" class="secondary-content delete">
+        <a href="#modalEliminar" class="secondary-content delete modal-trigger">
           <i id="${
             nivel.uuid
           }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
@@ -1059,10 +1117,7 @@ const liNivelTemplate = nivel => {
         <div id="${nivel.uuid}_imagen" class="input-field col s6 m6 l6 xl6  ">
           <select  class="icons ">
             <option value="" selected>Seleccionar</option>
-            <option value="" data-icon="../../files/images/spanish.png" class="left">spanish.jpg</option>
-            <option value="" data-icon="../../files/images/english.png" class="left">english.png</option>
-            <option value="" data-icon="../../files/images/french.png" class="left">french.png</option>
-            <option value="" data-icon="../../files/images/italian.png" class="left">italian.png</option>
+            ${ generarNombreImagenes(nivel) }
           </select>
           <label>Imagen</label>
         </div>
@@ -1070,10 +1125,7 @@ const liNivelTemplate = nivel => {
         <div id="${nivel.uuid}_pdf" class="input-field col s6 m6 l6 xl6  ">
         <select  class="icons ">
           <option value="" selected>Seleccionar</option>
-          <option value=""  class="left">normas_spanish.pdf</option>
-          <option value=""  class="left">normas_english.pdf</option>
-          <option value=""  class="left">normas_french.pdf</option>
-          <option value=""  class="left">normas_italian.pdf</option>
+          ${ generarNombrePdfs(nivel) }
         </select>
         <label>PDF</label>
       </div>
@@ -1103,7 +1155,7 @@ const liModalidadTemplate = modalidad => {
   <input id="${modalidad.uuid}_precio" class="browser-default precio width4rem" type="number" value="${modalidad.precio}">
 
   <div class="secondary-content">
-      <a href="#!" class="secondary-content delete">
+      <a href="#!" class="secondary-content delete ">
           <i id="${modalidad.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
       </a>
 

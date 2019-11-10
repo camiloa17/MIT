@@ -163,16 +163,14 @@
         </ul>
     </div>
 
-    <a class="waves-effect waves-light btn modal-trigger" href="#modalEliminar">Modal</a>
-
-    <div id="modalEliminar" idEliminar="ss" class="modal">
+    <div id="modalEliminar" class="modal">
         <div class="modal-content">
             <h4>¿Eliminar?</h4>
             <p>Está por eliminar un elemento y todos sus elementos dependientes de forma definitiva.</p>
         </div>
         <div class="modal-footer">
-            <a href="javascript:console.log('aceptó', $('#modalEliminar').attr('idEliminar'));" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
-            <a href="javascript:console.log('canceló', $('#modalEliminar').attr('idEliminar'));" class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+            <a href="javascript:eliminarElementoLista(elementoAEliminar.uuid, elementoAEliminar.lista);" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
+            <a class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
         </div>
     </div>
 
