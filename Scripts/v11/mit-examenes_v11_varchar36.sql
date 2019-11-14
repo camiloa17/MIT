@@ -21,26 +21,26 @@ CREATE TABLE alumno (
     CONSTRAINT alumno_pk PRIMARY KEY (uuid)
 );
 
--- Table: dia_LS
-CREATE TABLE dia_LS (
-    uuid binary(16) NOT NULL,
-    fecha_examenLS datetime NOT NULL,
-    cupo_maximo int NOT NULL,
-    finaliza_inscripcion datetime NOT NULL,
-    pausado boolean NOT NULL,
-    activo boolean NOT NULL,
-    CONSTRAINT horario_pk PRIMARY KEY (uuid)
+
+CREATE TABLE `diaLS` (
+    `uuid` varchar(36) NOT NULL,
+    `fechaExamen` datetime NOT NULL,
+    `cupoMaximo` int NOT NULL,
+    `finalizaInscripcion` date NOT NULL,
+    `pausado` boolean NOT NULL,
+    `activo` boolean NOT NULL,
+    PRIMARY KEY (`uuid`)
 );
 
--- Table: dia_RW
-CREATE TABLE dia_RW (
-    uuid binary(16) NOT NULL,
-    fecha_examenRW datetime NOT NULL,
-    cupo_maximo int NOT NULL,
-    finaliza_inscripcion datetime NOT NULL,
-    pausado boolean NOT NULL,
-    activo boolean NOT NULL,
-    CONSTRAINT horario_pk PRIMARY KEY (uuid)
+
+CREATE TABLE `diaRW` (
+    `uuid` varchar(36) NOT NULL,
+    `fechaExamen` datetime NOT NULL,
+    `cupoMaximo` int NOT NULL,
+    `finalizaInscripcion` date NOT NULL,
+    `pausado` boolean NOT NULL,
+    `activo` boolean NOT NULL,
+    PRIMARY KEY (`uuid`)
 );
 
 -- Table: examen_en_dia_LS
@@ -55,21 +55,21 @@ CREATE TABLE examen_en_dia_LS (
 
 -- Table: examen_en_dia_RW
 CREATE TABLE examen_en_dia_RW (
-    uuid binary(16) NOT NULL,
+    uuid varchar(36) NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
-    dia_RW_uuid binary(16) NOT NULL,
+    dia_RW_uuid varchar(36) NOT NULL,
     modalidad_uuid binary(16) NOT NULL,
     CONSTRAINT examen_en_determinado_horario_pk PRIMARY KEY (uuid)
 );
 
 -- Table: examen_en_semana_LS
 CREATE TABLE examen_en_semana_LS (
-    uuid binary(16) NOT NULL,
+    uuid varchar(36) NOT NULL,
     pausado boolean NOT NULL,
     activo boolean NOT NULL,
-    semana_LS_uuid binary(16) NOT NULL,
-    modalidad_uuid binary(16) NOT NULL,
+    semana_LS_uuid varchar(36) NOT NULL,
+    modalidad_uuid varchar(36) NOT NULL,
     CONSTRAINT examen_en_determinado_horario_pk PRIMARY KEY (uuid)
 );
 
@@ -147,7 +147,7 @@ CREATE TABLE reserva (
 
 -- Table: semana_LS
 CREATE TABLE semana_LS (
-    uuid binary(16) NOT NULL,
+    uuid varchar(36) NOT NULL,
     semana_examen date NOT NULL,
     cupo_maximo int NOT NULL,
     finaliza_inscripcion datetime NOT NULL,

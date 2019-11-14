@@ -34,6 +34,13 @@ app.post('/examenes/', controladorDashboard.examenesCambios)
 
 app.post('/examenesUpdateNivelModalidad/', controladorDashboard.examenesUpdateNivelModalidad)
 
+app.post('/agregarFechaDia/', controladorDashboard.agregarFechaDia)
+
+app.get('/listarHorarios/', controladorDashboard.listarHorarios)
+
+app.get('/listarExamenes/', controladorDashboard.listarExamenes)
+
+
 app.listen(port, function () {
   console.log( "Listening on port number " + port );
 });

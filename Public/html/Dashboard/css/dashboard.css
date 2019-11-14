@@ -215,6 +215,13 @@ input[type="number"] {
   opacity: 1 !important;
 }
 
+.move-button-nivel-margin-top {
+  margin-top: 0.2rem;
+  margin-left: 0.4rem !important;
+}
+
+/*---------------------COLLECTIONS---------------------*/
+
 .collection-item {
   border-bottom: 1px solid #e0e0e0 !important;
 }
@@ -222,11 +229,6 @@ input[type="number"] {
 .collection {
   border: 0px solid #e0e0e0 !important;
   margin: 0 !important;
-}
-
-.move-button-nivel-margin-top {
-  margin-top: 0.2rem;
-  margin-left: 0.4rem !important;
 }
 
 /*---------------------RADIOBUTTONS---------------------*/
@@ -255,6 +257,9 @@ input[type="number"] {
 .width4rem {
   width: 4rem !important;
 }
+
+
+
 
 /*---------------------MARGIN/PADDING---------------------*/
 .margin0 {
@@ -301,12 +306,22 @@ input[type="number"] {
   padding: 0.7rem !important;
 }
 
+.padding-left0{
+  padding-left: 0 !important;
+}
+
 .padding-left2-4 {
   padding-left: 2.4rem !important;
 }
 
 .padding-left3 {
   padding-left: 3rem !important;
+}
+
+/*---------------------HEIGHT COLLECTION---------------------*/
+.height24rem {
+  height: 24rem;
+  overflow-y: auto;
 }
 
 /*---------------------DATEPICKER---------------------*/

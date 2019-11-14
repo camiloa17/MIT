@@ -47,10 +47,70 @@ async function getMateria(req, res) {
   res.send(JSON.stringify(data));
 }
 
+
+
+async function listarHorarios(req, res) {
+  let data = await buscarEnDBListaHorarios();
+  res.send(JSON.stringify(data));
+}
+
+async function agregarFechaDia(req, res){
+  let cambios = req.body
+  let data = await agregarFechaEnDb(cambios);
+  console.log(data)
+
+  res.send(JSON.stringify(data));
+}
+
+
+
+async function listarExamenes(req, res) {
+  console.log(req, res)
+  let data = await buscarEnDBListaExamenes();
+  console.log(data)
+  res.send(JSON.stringify(data));
+}
+
+
+async function agregarFechaEnDb(fechas) {
+  let sql = "";
+  let values= [];
+
+  switch (fechas.tipo) {
+    case "LS":
+      console.log("es LS")
+      sql += `INSERT INTO diaLS (uuid, fechaExamen, cupoMaximo, finalizaInscripcion, pausado, activo) VALUES
+      ('${fechas.uuid}', '${fechas.dia} ${fechas.hora}', '${fechas.cupo}', '${fechas.finaliza}', '0', '1');`
+    break;
+
+    case "RW":
+        console.log("es RW")
+        sql += `INSERT INTO diaRW (uuid, fechaExamen, cupoMaximo, finalizaInscripcion, pausado, activo) VALUES
+        ('${fechas.uuid}', '${fechas.dia} ${fechas.hora}', '${fechas.cupo}', '${fechas.finaliza}', '0', '1');`
+    break;
+  }
+
+
+  try {
+    console.log("Escribimos el siguiente record", sql)
+    const connection = await connectionToDb();
+    const data = await queryToDbValues(connection, sql, values);
+    connection.release();
+    //return res.status(200).send("Los cambios se han realizado con éxito", data);
+  } catch (err) {
+    console.log("Hubo un error en la consulta", err.message);
+    return res.status(404).send("Hubo un error en la consulta" + err.message);
+  }
+
+
+}
+
+
+
 async function buscarEnDBMateria() {
   try {
     const query =       "SELECT uuid, nombre, orden, activo, mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
-    //const query = "SELECT BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
+    const query = "SELECT BIN_TO_UUID(uuid) as uuid, nombre, activo,  mostrar_cliente, edita_user_secundario FROM materia WHERE activo=1;";
     const connection = await connectionToDb();
     const data = await queryToDb(connection, query);
     connection.release();
@@ -60,6 +120,39 @@ async function buscarEnDBMateria() {
     return res.status(404).send("Hubo un error en la consulta" + err.message);
   }
 }
+
+
+
+async function buscarEnDBListaHorarios() {
+  try {
+    const query =       "SELECT uuid, fechaExamen, cupoMaximo, finalizaInscripcion, pausado, activo FROM diaLS WHERE activo=1;";
+  
+    const connection = await connectionToDb();
+    const data = await queryToDb(connection, query);
+    connection.release();
+    return data;
+  } catch (err) {
+    console.log("Hubo un error en la consulta", err.message);
+    return res.status(404).send("Hubo un error en la consulta" + err.message);
+  }
+}
+
+async function buscarEnDBListaExamenes() {
+  try {
+    const query = "select m.nombre as materia, m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, mo.uuid as uuid from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid where ((m.mostrar_cliente = 1 or m.mostrar_cliente is NULL) and (t.mostrar_cliente=1 or t.mostrar_cliente is NULL) and(n.mostrar_cliente=1 or n.mostrar_cliente is NULL) and (mo.mostrar_cliente=1 or mo.mostrar_cliente is NULL)) AND((m.activo is NULL or m.activo = 1) and(t.activo is NULL or t.activo = 1) and (n.activo is NULL or n.activo = 1) and (mo.activo is NULL or mo.activo = 1));";
+  
+    const connection = await connectionToDb();
+    const data = await queryToDb(connection, query);
+    console.log(query, data)
+    connection.release();
+    return data;
+  } catch (err) {
+    console.log("Hubo un error en la consulta", err.message);
+    return res.status(404).send("Hubo un error en la consulta" + err.message);
+  }
+}
+
+
 
 async function getTipo(req, res) {
   let materia = req.params.materia;
@@ -224,7 +317,7 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 async function examenesCambios(req, res) {
   let cambios = req.body;
   await updateEnDbExamenesCambios(cambios);
-  //res.send(JSON.stringify(data));
+  res.send(JSON.stringify(data));
 }
 
 async function updateEnDbExamenesCambios(cambios) {
@@ -311,7 +404,7 @@ async function updateEnDbExamenesCambios(cambios) {
     const connection = await connectionToDb();
     const data = await queryToDbValues(connection, sql, values);
     connection.release();
-    //return res.status(200).send("Los cambios se han realizado con éxito", data);
+    //return res.status(200).send("Los cambios se han realizado con éxito");
   } catch (err) {
     console.log("Hubo un error en la consulta", err.message);
     return res.status(404).send("Hubo un error en la consulta" + err.message);
@@ -354,4 +447,7 @@ module.exports = {
   getModalidad: getModalidad,
   examenesCambios: examenesCambios,
   examenesUpdateNivelModalidad: examenesUpdateNivelModalidad,
+  agregarFechaDia:agregarFechaDia,
+  listarHorarios: listarHorarios,
+  listarExamenes: listarExamenes,
 };
