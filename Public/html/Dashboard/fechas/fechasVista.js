@@ -67,7 +67,7 @@ class FechasVista {
     <div class="row margin0">
         <div class="input-field col s5 m4 l3 xl2">
             <input id="inputCupoAgregarDia" type="number" autocomplete="off" >
-            <label for="inputCupoAgregarDia">Cupo máx.</label>
+            <label for="inputCupoAgregarDia">Cupo</label>
         </div>
     </div>
 
@@ -82,7 +82,7 @@ class FechasVista {
         </div>
         <div class="col s5 m4 l3 xl2">
             <input id="finalizaAgregarDia" type="text" class="datepicker" disabled>
-            <label class="gris-texto">Fecha FINALIZA inscripción</label>
+            <label class="gris-texto">FINALIZA inscripción</label>
         </div>
     </div>
 
@@ -230,7 +230,6 @@ class FechasVista {
       },
 
       onClose: () => {
-        console.log("close");
         this.chequearSiFechaFinalizacionEsPosterior();
       }
     });
@@ -257,16 +256,16 @@ class FechasVista {
   async mostrarListaDeHorarios() {
     let listaHorarios = await this.fechasServicio.getListaHorarios();
 
+
     listaHorarios.forEach(horario => {
-      $("#listaHorarios").append(
-        `
+      $("#listaHorarios").append(        `
             <li class="collection-item azul-texto">
                 <i
                     class="material-icons-outlined secondary-content right azul-texto button-opacity">visibility</i>
-                <span class="badge" data-badge-caption="cupos">30</span>
+                <span class="badge" data-badge-caption="cupos">${horario.cupo_maximo}</span>
                 <span class="new badge background-azul" data-badge-caption="libres">24</span>
-                <span class="new badge blue-grey  lighten-2" data-badge-caption="">ORAL</span>
-                ${this.fechasServicio.stringDiaHoraEspanol(horario.fechaExamen)}
+                <span class="new badge blue-grey  lighten-2" data-badge-caption="">${(horario.source === "RW") ? "ESCR" : "ORAL"}</span>
+                ${this.fechasServicio.stringDiaHoraEspanol(horario.fecha_Examen)}
             </li>
             `
       );
@@ -328,12 +327,15 @@ class FechasVista {
     console.log(listaExamenes);
 
   }
-
+  
+//borrar esto de abajo que esta repetido
+/*
   async mostrarListaDeHorarios() {
     let listaHorarios = await this.fechasServicio.getListaHorarios();
 
+
     listaHorarios.forEach(horario => {
-      console.log(horario);
+      console.log(horario.source);
       $("#listaExamenes").append(
         `
             <li class="collection-item azul-texto">
@@ -342,12 +344,12 @@ class FechasVista {
                 <span class="badge" data-badge-caption="cupos">30</span>
                 <span class="new badge background-azul" data-badge-caption="libres">24</span>
                 <span class="new badge blue-grey  lighten-2" data-badge-caption="">ORAL</span>
-                ${this.fechasServicio.stringDiaHoraEspanol(horario.fechaExamen)}
+                ${this.fechasServicio.stringDiaHoraEspanol(horario.fecha_Examen)}
             </li>
             `
       );
     });
-  }
+  }*/
 
   habilitarSelectableFechas(ulChips) {
     ulChips.selectable({

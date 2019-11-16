@@ -11,9 +11,9 @@ function appendExamenes() {
   $.get("./html/dashboard/examenes/examenes.html", function(data) {
     $("#contenido").append(data);
   });  
-  // $.get("./html/dashboard/fechas/fechas.html", function(data) {
-  //   $("#contenido").append(data);
-  // });  
+  $.get("./html/dashboard/fechas/fechas.html", function(data) {
+    $("#contenido").append(data);
+  });  
 }
 
 appendExamenes();
