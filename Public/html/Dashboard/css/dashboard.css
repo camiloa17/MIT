@@ -30,13 +30,19 @@ body {
   color: white !important;
 }
 
+
 /* La seleccion de chips es solo dentro de los lis y no en espacio ul  (para que no me deseleccione un chip cuando apreto fuera del li) */
-ul {
+/*Se aplica a los uls*/
+.disableSelectOusideChip {
   pointer-events: none;
 }
-ul li {
+
+/*Se aplica a los lis*/
+.enableSelectLi{
   pointer-events: auto;
 }
+
+
 
 /*---------------------COLORES TEXTO / BACK---------------------*/
 .background-azul {
@@ -71,6 +77,12 @@ label {
   padding-left: 2rem !important;
   margin-right: 1rem !important;
   margin-left: 1rem !important;
+}
+
+
+[type="checkbox"]:checked+span:not(.lever):before {
+  border-right: 2px solid #085796;
+  border-bottom: 2px solid #085796
 }
 
 /*---------------------Tamaños Texto ---------------------*/
@@ -222,11 +234,11 @@ input[type="number"] {
 
 /*---------------------COLLECTIONS---------------------*/
 
-.collection-item {
+.collection-item, .collection-item:last-child {
   border-bottom: 1px solid #e0e0e0 !important;
 }
 
-.collection {
+.collectionSinBorde {
   border: 0px solid #e0e0e0 !important;
   margin: 0 !important;
 }
@@ -258,7 +270,12 @@ input[type="number"] {
   width: 4rem !important;
 }
 
-
+.cupos{
+  width: 6rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.85rem !important;
+}
 
 
 /*---------------------MARGIN/PADDING---------------------*/
@@ -357,4 +374,35 @@ input[type="number"] {
 }
 .timepicker-canvas line {
   stroke: #86aac7 !important;
+}
+
+/* COLLECTION LISTA HORARIOS */
+#listaHorarios .ui-selected{
+  color: white !important;
+}
+
+#listaHorarios .ui-selected .cupos{
+  color: white !important;
+}
+
+#listaHorarios .ui-selected i{
+  color: white !important;
+}
+
+#listaExamenes .ui-selected{
+  color: white !important;
+}
+
+#listaExamenes .ui-selected i{
+  color: white !important;
+}
+
+
+
+.cursorPointer{
+  cursor:pointer;
+}
+
+.hoverGrey:hover{
+  background-color: #e0e0e0;
 }

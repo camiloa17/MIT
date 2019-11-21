@@ -143,11 +143,7 @@ async function updateEnDbExamenesCambios(cambios) {
     //Cambia el valor de activo a los elementos. Se hace un borrado lógico. Un valor 1= se muestra en la web del cliente. Un valor 0= no se muestra en la web del cliente.
     if (cambios.remover.length) {
       cambios.remover.forEach(uuidToRemove => {
-        sql += `UPDATE ${connection.escapeId(
-          cambios.tabla
-        )} SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(
-          uuidToRemove
-        )};`;
+        sql += `UPDATE ${connection.escapeId(cambios.tabla)} SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(uuidToRemove)};`;
       });
     }
 
@@ -262,10 +258,10 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
   try {
     connection = await connectionToDb();
 
+    console.log(cambios)
+
     if (cambios.removeNivel.length) {
-      sql += `UPDATE nivel SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(
-        cambios.removeNivel
-      )};`;
+      sql += `UPDATE nivel SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(cambios.removeNivel)};`;
     }
 
     if (cambios.addNivel) {
@@ -284,58 +280,32 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
     }
 
     if (cambios.cambioDataNivel) {
-      sql += `UPDATE nivel SET nombre=${connection.escape(
-        cambios.nombre
-      )}, descripcion=${connection.escape(
-        cambios.descripcion
-      )}, mostrar_cliente=${connection.escape(
-        cambios.mostrar_cliente
-      )}, pdf=${connection.escape(cambios.pdf)} , imagen=${connection.escape(
-        cambios.imagen
-      )} WHERE BIN_TO_UUID(uuid) = ${connection.escape(cambios.uuid)};`;
+      sql += `UPDATE nivel SET nombre=${connection.escape(cambios.nombre)}, descripcion=${connection.escape(cambios.descripcion)}, mostrar_cliente=${connection.escape(cambios.mostrar_cliente)}, pdf=${connection.escape(cambios.pdf)} , imagen=${connection.escape(cambios.imagen)} WHERE BIN_TO_UUID(uuid) = ${connection.escape(cambios.uuid)};`;
     }
 
     if (cambios.cambioOrdenChipNiveles) {
       cambios.niveles.forEach(element => {
-        sql += `UPDATE nivel SET orden=${connection.escape(
-          element.orden
-        )} WHERE BIN_TO_UUID(uuid) = ${connection.escape(element.uuid)};`;
+        sql += `UPDATE nivel SET orden=${connection.escape(element.orden)} WHERE BIN_TO_UUID(uuid) = ${connection.escape(element.uuid)};`;
       });
     }
 
-    if (cambios.removeModalidades.length) {
-      cambios.removeModalidades.forEach(element => {
-        sql += `UPDATE modalidad SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(
-          element
-        )};`;
-      });
-    }
+    if(cambios.cambioModalidades){
+      if (cambios.removeModalidades.length) {
+        cambios.removeModalidades.forEach(element => {
+          sql += `UPDATE modalidad SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(element)};`;
+        });
+      }
 
-    if (cambios.addModalidades.length) {
-      cambios.addModalidades.forEach(element => {
-        sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS) 
-      VALUES (${connection.escape(element)}, '1', '0', ${connection.escape(
-          cambios.uuid
-        )}, ' ', 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
-      });
-    }
+      if (cambios.addModalidades.length) {
+        cambios.addModalidades.forEach(element => {
+          sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS) VALUES (UUID_TO_BIN(${connection.escape(element)}), '1', '0', UUID_TO_BIN(${connection.escape(cambios.uuid)}), ' ', 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
+        });
+      }
 
-    if (cambios.cambioModalidades) {
-      cambios.modalidades.forEach(element => {
-        sql += `UPDATE modalidad SET orden=${connection.escape(
-          element.orden
-        )}, nombre=${connection.escape(
-          element.nombre
-        )}, precio=${connection.escape(
-          element.precio
-        )}, mostrar_cliente=${connection.escape(
-          element.mostrar_cliente
-        )}, examen_RW=${connection.escape(
-          element.examen_RW
-        )}, examen_LS=${connection.escape(
-          element.examen_LS
-        )} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
-      });
+      if (cambios.cambioModalidades) {
+        cambios.modalidades.forEach(element => {
+          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;      });
+      }
     }
 
     const data = await queryToDb(connection, sql, values);
@@ -347,42 +317,73 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 
 ////////////////////////////////////////////////////////////////// SOLAPA FECHAS //////////////////////////////////////////////////////////////////
 
-async function agregarFechaDia(req, res) {
+
+
+async function agregarExamenFechaDia(req, res) {
   let cambios = req.body;
-  let data = await agregarFechaEnDb(cambios);
+  let data = await agregarExamenFechaDiaEnDb(cambios);
   res.send(JSON.stringify(data));
 }
 
-async function agregarFechaEnDb(fechas) {
+async function agregarExamenFechaDiaEnDb(cambios) {
   let sql = "";
   let values = [];
   let connection;
-
+  
   try {
     connection = await connectionToDb();
 
+    console.log(cambios.addExamenesFechaDia.length, cambios.addExamenesFechaDia)
+
+    if(cambios.addExamenesFechaDia.length){
+
+      cambios.addExamenesFechaDia.forEach( (uuidExamen) => {
+        console.log(uuidExamen)
+        cambios.estadoListaExamenesDia.map(element => {
+          if(element.examen === uuidExamen){
+            sql += `INSERT INTO examen_en_dia_RW (uuid, dia_RW_uuid, modalidad_uuid, activo, pausado) VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
+          }
+        });     
+      });
+
+    }
+ 
+
+    const data = await queryToDb(connection, sql, values);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+async function agregarFechaDia(req, res) {
+  let cambios = req.body;
+  let data = await agregarFechaDiaEnDb(cambios);
+  res.send(JSON.stringify(data));
+}
+
+async function agregarFechaDiaEnDb(fechas) {
+  let sql = "";
+  let values = [];
+  let connection;
+  let fechaHora;
+  
+  console.log(fechas)
+
+  try {
+    connection = await connectionToDb();
+    console.log(fechas.tipo)
+
     switch (fechas.tipo) {
       case "LS":
-        const fechaHora = `${fechas.dia} ${fechas.hora}`;
-
-        sql += `INSERT INTO dia_LS (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES
-      ( UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(
-          fechaHora
-        )}, ${connection.escape(fechas.cupo)}, ${connection.escape(
-          fechas.finaliza
-        )}, '0', '1');`;
+        //fechaHora = `${fechas.dia} ${fechas.hora}`;
+        console.log("INGRESA FECHA ", fechas.fecha)
+        sql += `INSERT INTO dia_LS (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES ( UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.fecha)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`;
         break;
 
       case "RW":
-          const fechaHora = `${fechas.dia} ${fechas.hora}`;
-
-        sql += `INSERT INTO dia_RW (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES
-      (UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(
-        fechaHora
-        )}, ${connection.escape(fechas.cupo)}, ${connection.escape(
-          fechas.finaliza
-        )}, '0', '1');`;
-        break;
+        fechaHora = `${fechas.dia} ${fechas.hora}`;
+        sql += `INSERT INTO dia_RW (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES (UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.fecha)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`;        break;
     }
 
     const data = await queryToDb(connection, sql, values);
@@ -391,6 +392,38 @@ async function agregarFechaEnDb(fechas) {
     if (connection) connection.release();
   }
 }
+
+async function agregarFechaSemana(req, res) {
+  let cambios = req.body;
+  let data = await agregarFechaSemanaEnDb(cambios);
+  res.send(JSON.stringify(data));
+}
+
+async function agregarFechaSemanaEnDb(fechas) {
+  let sql = "";
+  let values = [];
+  let connection;
+  let fechaHora;
+  
+  console.log(fechas)
+
+  try {
+    connection = await connectionToDb();
+ 
+
+    sql += `INSERT INTO semana_LS (uuid, semana_Examen, cupo_maximo, finaliza_inscripcion, pausado, activo) VALUES ( UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.semana)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`;
+       
+
+    const data = await queryToDb(connection, sql, values);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+
+
+
 
 async function listarHorarios(req, res) {
   let data = await buscarEnDBListaHorarios();
@@ -420,7 +453,7 @@ async function buscarEnDBListaExamenes() {
   let connection;
   try {
     const query =
-      "select m.nombre as materia, m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, mo.uuid as uuid from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid where ((m.mostrar_cliente = 1 or m.mostrar_cliente is NULL) and (t.mostrar_cliente=1 or t.mostrar_cliente is NULL) and(n.mostrar_cliente=1 or n.mostrar_cliente is NULL) and (mo.mostrar_cliente=1 or mo.mostrar_cliente is NULL)) AND((m.activo is NULL or m.activo = 1) and(t.activo is NULL or t.activo = 1) and (n.activo is NULL or n.activo = 1) and (mo.activo is NULL or mo.activo = 1));";
+      "select m.nombre as materia, m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, mo.examen_rw as rw, mo.examen_ls as ls, BIN_TO_UUID(mo.uuid) as uuid from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid where ((m.mostrar_cliente = 1 or m.mostrar_cliente is NULL) and (t.mostrar_cliente=1 or t.mostrar_cliente is NULL) and(n.mostrar_cliente=1 or n.mostrar_cliente is NULL) and (mo.mostrar_cliente=1 or mo.mostrar_cliente is NULL)) AND((m.activo is NULL or m.activo = 1) and(t.activo is NULL or t.activo = 1) and (n.activo is NULL or n.activo = 1) and (mo.activo is NULL or mo.activo = 1));";
 
     connection = await connectionToDb();
     const data = await queryToDb(connection, query);
@@ -429,6 +462,38 @@ async function buscarEnDBListaExamenes() {
     if (connection) connection.release();
   }
 }
+
+
+async function getExamenesEnFecha(req, res) {
+  let fecha = req.params.fecha;
+  let tipo = req.params.tipo;
+  let data = await buscarEnDbExamenesEnFecha(fecha, tipo);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbExamenesEnFecha(fecha, tipo) {
+  let connection;
+  try {
+    connection = await connectionToDb();
+    let query; 
+
+    switch (tipo) {
+      case "RW":
+        query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_RW_uuid) as fecha_uuid, pausado FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
+      break;
+      case "LS":
+        query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;
+      break;
+    }
+    const values = [fecha];
+    
+    const data = await queryToDb(connection, query, values);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 
 // Este codigo te permite atajar un error no contemplado y evita que te tire el server abajo.
 process.on("uncaughtException", function(err) {
@@ -446,5 +511,8 @@ module.exports = {
 
   agregarFechaDia: agregarFechaDia,
   listarHorarios: listarHorarios,
-  listarExamenes: listarExamenes
+  listarExamenes: listarExamenes,
+  getExamenesEnFecha: getExamenesEnFecha,
+  agregarExamenFechaDia: agregarExamenFechaDia,
+  agregarFechaSemana: agregarFechaSemana,
 };

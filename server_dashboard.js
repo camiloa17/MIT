@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const controladorDashboard = require('./controlador/controladorDashboard')
 const port  = process.env.PORT || 8080;
 
+//const mailSenderFile = require('./mailSender/mailSender')
+
 const app = express();
 
 function asyncErrorWrap(f) {
@@ -16,6 +18,7 @@ function errorHandler(err, req, res, next) {
       return next(err);
   }
   res.status(500);
+  console.log(err)
   res.send({ error: err.toString()});
 }
 
@@ -28,7 +31,6 @@ app.use(bodyParser.json());
 app.use(express.static(`Public`));
 
 const route = {root:`${__dirname}/Public/html/Dashboard/`}
-
 
 app.get('/', function(req, res){
   res.sendFile( 'index.html', route);
@@ -56,7 +58,15 @@ app.get('/listarHorarios/',  asyncErrorWrap(controladorDashboard.listarHorarios)
 
 app.get('/listarExamenes/',  asyncErrorWrap(controladorDashboard.listarExamenes))
 
+app.get('/listarExamenesEnFecha/:fecha&:tipo',  asyncErrorWrap(controladorDashboard.getExamenesEnFecha))
+
+app.post('/agregarExamenFechaDia/',  asyncErrorWrap(controladorDashboard.agregarExamenFechaDia))
+
+app.post('/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
+
+
 app.use(errorHandler);
+
 
 app.listen(port, function () {
   console.log( "Listening on port number " + port );

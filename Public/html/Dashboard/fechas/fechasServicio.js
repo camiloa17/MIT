@@ -14,9 +14,49 @@ class FechasServicio {
     }
   }
 
+  async agregarExamenFechaDia(datos) {
+    try {
+      const response = await fetch(`./agregarExamenFechaDia/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+      const rta = await response.json();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async agregarFechaSemana(datos) {
+    try {
+      const response = await fetch(`./agregarFechaSemana/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+      const rta = await response.json();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async getListaHorarios() {
     try {
       const response = await fetch("./listarHorarios/");
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async getExamenesEnFecha(fecha, tipo) {
+    try {
+      const response = await fetch(`./listarExamenesEnFecha/${fecha}&${tipo}`);
       const data = await response.json();
       return data;
     } catch (err) {
@@ -39,8 +79,6 @@ class FechasServicio {
     let mes = datetime.slice(5, 7);
     let dia = datetime.slice(8, 10);
     let hora = datetime.slice(11, 16);
-
-    
 
     let fechaJs = new Date(anio, mes-1, dia);
  
@@ -70,7 +108,7 @@ class FechasServicio {
     meses['11'] = "Nov";
     meses['12'] = "Dic";
 
-    let stringDia = `${weekday[numeroDia]} ${dia} de ${meses[mes]} ${anio} // ${hora} hs`;
+    let stringDia = `${weekday[numeroDia]} ${dia} de ${meses[mes]} ${anio} - ${hora} hs`;
     return stringDia;
   }
 

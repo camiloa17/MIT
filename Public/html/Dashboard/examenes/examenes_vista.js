@@ -111,6 +111,7 @@ function progressIndeterminate(lista) {
 async function mostrarNivel(nivelId) {
   try {
     let data = await getNivel(nivelId);
+    console.log(data)
     renderNivel(data, listaNivel);
   } catch (err) {
     console.log(err);
@@ -1140,7 +1141,7 @@ const liNivelTemplate = nivel => {
 
         <div class="row">
             <div class="col s12 m12 l12 xl12">
-                <ul id="modalidadNivel" class="collection">                     
+                <ul id="modalidadNivel" class="collection collectionSinBorde">                     
                 </ul>
             </div>
         </div>
@@ -1227,13 +1228,13 @@ const liModalidadTemplate = modalidad => {
 //////////////////// PRESETS HTML chip sin ser sortable (chips de materia o tipo)
 const chipTemplate = elemento => {
   return `
-  <li id="${elemento.uuid}" class="chip">${elemento.nombre}</li>`;
+  <li id="${elemento.uuid}" class="chip enableSelectLi">${elemento.nombre}</li>`;
 };
 
 //////////////////// PRESETS HTML chip sortable (chips de niveles)
 const chipSortableTemplate = elemento => {
   return `
-  <li id="${elemento.uuid}" class="chip">
+  <li id="${elemento.uuid}" class="chip enableSelectLi">
   ${elemento.nombre}
   <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>  
 </li>`;
