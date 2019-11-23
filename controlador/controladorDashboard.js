@@ -329,14 +329,16 @@ async function agregarExamenFechaDiaEnDb(cambios) {
   let sql = "";
   let values = [];
   let connection;
+
+  console.log(cambios)
   
   try {
     connection = await connectionToDb();
 
     console.log(cambios.addExamenesFechaDia.length, cambios.addExamenesFechaDia)
 
-    if(cambios.addExamenesFechaDia.length){
-
+    if(cambios.addExamenesFechaDia.length && cambios.tipoDeLista === "RW"){
+      console.log("guardamos un RW")
       cambios.addExamenesFechaDia.forEach( (uuidExamen) => {
         console.log(uuidExamen)
         cambios.estadoListaExamenesDia.map(element => {
@@ -345,8 +347,20 @@ async function agregarExamenFechaDiaEnDb(cambios) {
           }
         });     
       });
-
     }
+
+      if(cambios.addExamenesFechaDia.length && cambios.tipoDeLista.length === 6){
+        console.log("guardamos una SEMANA")
+        cambios.addExamenesFechaDia.forEach( (uuidExamen) => {
+          console.log(uuidExamen)
+          cambios.estadoListaExamenesDia.map(element => {
+            if(element.examen === uuidExamen){
+              sql += `INSERT INTO examen_en_semana_LS (uuid, semana_LS_uuid, modalidad_uuid, activo, pausado) VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
+            }
+          });     
+        });
+      }
+    
  
 
     const data = await queryToDb(connection, sql, values);
@@ -423,6 +437,26 @@ async function agregarFechaSemanaEnDb(fechas) {
 
 
 
+async function listarSemanas(req, res) {
+  let data = await buscarEnDBListaSemanas();
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDBListaSemanas() {
+  let connection;
+  try {
+    // YEARKEER(date, 3) segun ISO 8601 
+    const query =
+      "SELECT BIN_TO_UUID(uuid) as uuid, YEARWEEK(semana_Examen,3) AS yyyyss, cupo_maximo, finaliza_inscripcion, pausado, activo FROM semana_LS WHERE activo=1 ORDER BY semana_Examen;";
+    connection = await connectionToDb();
+  
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 
 
 async function listarHorarios(req, res) {
@@ -435,6 +469,27 @@ async function buscarEnDBListaHorarios() {
   try {
     const query =
       "SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'LS' as source FROM dia_LS UNION SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'RW' as source FROM dia_RW WHERE activo=1 ORDER BY fecha_Examen;";
+    connection = await connectionToDb();
+  
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+
+
+async function listarHorariosOrales(req, res) {
+  let data = await buscarEnDBListaHorariosOrales();
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDBListaHorariosOrales() {
+  let connection;
+  try {
+    const query =
+      "SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'LS' as source FROM dia_LS WHERE activo=1 ;";
     connection = await connectionToDb();
   
     const data = await queryToDb(connection, query);
@@ -462,6 +517,33 @@ async function buscarEnDBListaExamenes() {
     if (connection) connection.release();
   }
 }
+
+
+
+async function getExamenesEnSemana(req, res) {
+  let semana = req.params.semana;
+  console.log(semana)
+  let data = await buscarEnDbExamenesEnSemana(semana);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbExamenesEnSemana(semana_uuid) {
+  let connection;
+  try {
+    connection = await connectionToDb();
+    let query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(semana_LS_uuid) as semana_uuid, pausado FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `; 
+
+    console.log(query)
+    
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+
+
 
 
 async function getExamenesEnFecha(req, res) {
@@ -495,6 +577,59 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
 }
 
 
+async function listarReservaSemanasLs(req, res) {
+  let semana = req.params.semana;
+  let data = await buscarEnDbReservaEnSemanaLs(semana);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbReservaEnSemanaLs(semana) {
+  let connection;
+  try {
+    connection = await connectionToDb();
+   
+    let query = `SELECT
+    BIN_TO_UUID(r.uuid) as reserva_uuid,
+    BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
+    BIN_TO_UUID(r.examen_en_dia_LS_uuid) as examen_dia_LS_uuid,
+    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_semana_LS_uuid,
+    BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) as uuid_semana_LS,
+    semana_LS.semana_examen as fecha_semana_examen,
+    
+    a.nombre as alumno_nombre,
+    a.apellido as alumno_apellido,
+    a.documento as alumno_documento_id,
+    a.candidate_number as alumno_candidate_number,
+    a.genero as alumno_genero,
+    a.email as alumno_email
+    
+    from reserva r
+    LEFT JOIN alumno a on r.alumno_uuid = a.uuid
+    LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
+    LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
+    WHERE BIN_TO_UUID(semana_LS.uuid) = ${connection.escape(semana)};`;
+
+    console.log("BUSCANDO RESERVAS")
+
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 // Este codigo te permite atajar un error no contemplado y evita que te tire el server abajo.
 process.on("uncaughtException", function(err) {
   console.log(err);
@@ -511,8 +646,13 @@ module.exports = {
 
   agregarFechaDia: agregarFechaDia,
   listarHorarios: listarHorarios,
+  listarHorariosOrales: listarHorariosOrales,
   listarExamenes: listarExamenes,
   getExamenesEnFecha: getExamenesEnFecha,
   agregarExamenFechaDia: agregarExamenFechaDia,
   agregarFechaSemana: agregarFechaSemana,
+  listarSemanas: listarSemanas,
+  getExamenesEnSemana: getExamenesEnSemana,
+  listarReservaSemanasLs: listarReservaSemanasLs,
+  
 };

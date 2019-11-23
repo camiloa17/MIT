@@ -64,3 +64,20 @@ VALUES
 ( UUID_TO_BIN('ad859a07-f1c2-4887-b2ec-1bf75db5233a'),  UUID_TO_BIN('83db5f76-d0ef-47da-912f-c538c29709e5'), 1, "Listening & Speaking", 167, true, true, false, false, true),
 ( UUID_TO_BIN('8c2103a6-c6fd-4658-a5e4-96f368092b99'),  UUID_TO_BIN('572c1b0d-2c04-436c-884e-466dd056d25b'), 1, "Listening & Speaking", 167, true, true, false, false, true),
 ( UUID_TO_BIN('a74f6bb8-4dcd-4b71-8f0b-5953fd089cb9'),  UUID_TO_BIN('215f39d7-630c-4333-b322-3b5d152b2204'), 1, "Listening & Speaking", 167, true, true, false, false, true);
+
+INSERT INTO `alumno` (`uuid`, `nombre`, `apellido`, `documento`, `candidate_number`, `genero`, `email`, `activo`)
+VALUES
+(UUID_TO_BIN('94fd2f5f-89a5-447a-b2a0-4169206d2eb0'), 'Alberto', 'Frigerio', '32.634.436', '500468232', 'M', 'alberto@gmail.com', 1 ),
+(UUID_TO_BIN('9b602f8b-8882-4928-af2f-2078a70314d4'), 'Aurelio', 'Maciel', '42.365.712', '500154638', 'M', 'aurel@gmail.com', 1 ),
+(UUID_TO_BIN('4080a35b-da31-404d-be85-d5b601883783'), 'Evaristo', 'Fernandez', '7.534.981', '5009765412', 'M', 'evar@gmail.com', 1 ),
+(UUID_TO_BIN('731f94d9-00a7-49e2-8653-979d0ca16cd3'), 'Miguel', 'Serna', '22.563.481', '500843169', 'M', 'migue@gmail.com', 1 ),
+(UUID_TO_BIN('be65eb6b-dd89-41df-bdae-b14d137eb2df'), 'Jamaica', 'Miote', '17.562.346', '500778513', 'F', 'jama@gmail.com', 1 );
+
+INSERT INTO `reserva` (`uuid`, `alumno_uuid`, `examen_en_dia_RW_uuid`, `examen_en_dia_LS_uuid`, `examen_en_semana_LS_uuid`)
+VALUES 
+( UUID_TO_BIN('aa84c50a-6f99-4a7b-a370-c8de4a7bc5e0'), UUID_TO_BIN('94fd2f5f-89a5-447a-b2a0-4169206d2eb0'), UUID_TO_BIN('3f804e3f-7a5d-4aee-b96b-aff3a461eaa2'), , ),
+( UUID_TO_BIN('6b06f498-3f62-4b71-aec7-0e717737f9e3'), UUID_TO_BIN('9b602f8b-8882-4928-af2f-2078a70314d4'), UUID_TO_BIN('b95d80f1-ff35-4ef5-a400-3ad00b61b3cf'), , ),
+( UUID_TO_BIN('445df480-64c0-4489-a2e1-e4d6a328178e'), UUID_TO_BIN('4080a35b-da31-404d-be85-d5b601883783'), , , UUID_TO_BIN('ce60ac28-7357-4b42-b4e0-de3e5e165936'),
+( UUID_TO_BIN('1514c860-1bfc-4e21-b77b-cd67726efcff'), UUID_TO_BIN('731f94d9-00a7-49e2-8653-979d0ca16cd3'), , , UUID_TO_BIN('18dd03ab-9afe-473c-a7d9-8bd29dccc3a7'),
+( UUID_TO_BIN('8851f438-169d-41cd-a710-792572836ce9'), UUID_TO_BIN('be65eb6b-dd89-41df-bdae-b14d137eb2df'), UUID_TO_BIN('d98f4114-c71f-4118-abf0-fdf6ee4cd08e'), , ),
+( UUID_TO_BIN('1b70722a-6e39-4f41-b9a7-bf825ad1dacd'), UUID_TO_BIN('be65eb6b-dd89-41df-bdae-b14d137eb2df'), , , UUID_TO_BIN('18dd03ab-9afe-473c-a7d9-8bd29dccc3a7');

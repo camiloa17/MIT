@@ -56,6 +56,8 @@ app.post('/agregarFechaDia/',  asyncErrorWrap(controladorDashboard.agregarFechaD
 
 app.get('/listarHorarios/',  asyncErrorWrap(controladorDashboard.listarHorarios))
 
+app.get('/listarHorariosOrales/',  asyncErrorWrap(controladorDashboard.listarHorariosOrales))
+
 app.get('/listarExamenes/',  asyncErrorWrap(controladorDashboard.listarExamenes))
 
 app.get('/listarExamenesEnFecha/:fecha&:tipo',  asyncErrorWrap(controladorDashboard.getExamenesEnFecha))
@@ -64,6 +66,11 @@ app.post('/agregarExamenFechaDia/',  asyncErrorWrap(controladorDashboard.agregar
 
 app.post('/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
 
+app.get('/listarSemanas/', asyncErrorWrap(controladorDashboard.listarSemanas))
+
+app.get('/listarExamenesEnSemana/:semana', asyncErrorWrap(controladorDashboard.getExamenesEnSemana))
+
+app.get('/listarReservaSemanasLs/:semana', asyncErrorWrap(controladorDashboard.listarReservaSemanasLs))
 
 app.use(errorHandler);
 

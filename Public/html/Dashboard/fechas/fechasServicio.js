@@ -44,6 +44,7 @@ class FechasServicio {
     }
   }
 
+  // Me trae horarios de Orales y Escritos
   async getListaHorarios() {
     try {
       const response = await fetch("./listarHorarios/");
@@ -54,9 +55,55 @@ class FechasServicio {
     }
   }
 
+  // Me trae horarios de Orales
+  async getListaHorariosOrales() {
+    try {
+      const response = await fetch("./listarHorariosOrales/");
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
+  
+  async getElementosListaReservasEnSemanasLs(semana) {
+    try {
+      const response = await fetch(`./listarReservaSemanasLs/${semana}`);
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  
+  async getListaSemanas() {
+    try {
+      const response = await fetch("./listarSemanas/");
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async getExamenesEnFecha(fecha, tipo) {
     try {
       const response = await fetch(`./listarExamenesEnFecha/${fecha}&${tipo}`);
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  
+
+  async getExamenesEnSemana(semana) {
+    try {
+      const response = await fetch(`./listarExamenesEnSemana/${semana}`);
       const data = await response.json();
       return data;
     } catch (err) {

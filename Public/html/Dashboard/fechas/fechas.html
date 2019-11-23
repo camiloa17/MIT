@@ -4,7 +4,7 @@
     <div class="col s11 ">
         <h6 class="gris-texto clear-top-2 clear-bottom-1">Agregar fecha:</h6>
 
-        <ul id="chipsSeleccionDiaSemana">
+        <ul id="chipsSeleccionDiaSemanaAgregar">
             <li id="agregarChipDiaHora" class="chip">Día / Hora</li>
             <li id="agregarChipSemana" class="chip">Semana</li>
         </ul>
@@ -14,8 +14,20 @@
     </div>
 </div>
 
-<div class="row">
-    <div id="inputSelectarExamenes" class="input-field col l5 offset-l6">
+<div class="row margin-bottom-0 clear-top-1">
+    <div class="col s4 l4 m4 xl4 ">
+        <h6 class="gris-texto clear-top-2 clear-bottom-1">Ver y editar fecha:</h6>
+
+        <ul id="chipsSeleccionDiaSemanaEditar">
+            <li id="editarChipDiaHora" class="chip">Día / Hora</li>
+            <li id="editarChipSemana" class="chip">Semana</li>
+        </ul>
+
+        <div id="areaEditarFecha">
+        </div>
+    </div>
+
+    <div id="inputSelectarExamenes" class="input-field col l5 offset-l2 clear-top-3">
         <select id="selectarExamenes" multiple>
             <option value="" disabled>Seleccionar</option>
         </select>
@@ -25,6 +37,12 @@
             <i class="material-icons-outlined left secondary-content button-opacity pointer azul-texto">arrow_downward</i>Agregar
         </a>
     </div>
+
+
+</div>
+
+<div class="row">
+   
 </div>
 
 <div class="row">
@@ -42,6 +60,12 @@
         <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul">Guardar</a>
     </div>
 </div>
+
+<div class="row">
+    <div id="listadoReservasEnFechas" class="col clear-top-3">
+    </div>
+</div>
+
 
 
 
