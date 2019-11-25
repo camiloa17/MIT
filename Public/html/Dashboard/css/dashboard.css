@@ -335,10 +335,19 @@ input[type="number"] {
   padding-left: 3rem !important;
 }
 
+.margin-top-5px{
+  margin-top: 5px !important;
+}
+
 /*---------------------HEIGHT COLLECTION---------------------*/
 .height24rem {
   height: 24rem;
   overflow-y: auto;
+}
+
+/*---------------------TABLES---------------------*/
+td{
+  padding: 4px 2px !important;
 }
 
 /*---------------------DATEPICKER---------------------*/

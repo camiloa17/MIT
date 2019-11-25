@@ -112,14 +112,21 @@ class FechasVista {
           // Asigno a una variable temporal el ultimo id seleccionado (porque si apreto el scrollbar me deselecciona el elemento)
           this.lastExamSelected = idSelected;
           
-          if (tipoSelected === ("RW" || "LS")){
+          if (tipoSelected === "RW"){
             //console.log("es una fecha dia/hora")
             this.cleanEstadoListaExamen();
+            $('#inputSelectarExamenes').removeClass("hidden");
             this.generarListaDeExamenes(tipoSelected);
             this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);
+            this.generarListaReservaDiaRw(idSelected)
+          } else if(tipoSelected === "LS") {
+            this.cleanEstadoListaExamen();
+            $('#inputSelectarExamenes').addClass("hidden");
+            this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);          
           } else if(tipoSelected.length === 6 ){
             //console.log("es una semana")
-            this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);
+            this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);            
+            $('#inputSelectarExamenes').removeClass("hidden");
             this.generarListaDeExamenes("LS");
             this.generarListaReservaSemanaLs(idSelected);
           }
@@ -746,17 +753,6 @@ class FechasVista {
     this.habilitarFormSelect();
   }
 
-  templateLiVerTodos() {
-    return `<div id="verTodosLosExamenes" class="collection-item azul-texto weight700">
-    VER TODOS
-    </div>`;
-  }
-
-  templateLiEliminarFechaVacia() {
-    return `<li id="eliminarFechaVacia" class="collection-item azul-texto weight700">
-    Eliminar Fecha Vacía        X
-    </li>`;
-  }
 
   templateLiExamen(id, uuidExamen, uuidFecha, nombre, pausado) {
     return `
@@ -798,6 +794,12 @@ class FechasVista {
     console.log(reservaSemanas)
   }
 
+  async generarListaReservaDiaRw(idSelected) {
+    let reservaDiaRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected);
+    console.log(reservaDiaRw)
+  }
+  
+
   mostrarlistadoReservasEnFechasSemanasLs(){
     $('#listadoReservasEnFechas').empty();
     $('#listadoReservasEnFechas').append(
@@ -825,34 +827,45 @@ class FechasVista {
   mostrarElementosListReservasEnFEchasSemanasLs(reservasSemanaLs, diasOral){
     $('#bodyListadoReservasEnFechas').empty();
     
+    console.log(reservasSemanaLs)
+    
+
     reservasSemanaLs.forEach(reserva => {
+      console.log(reserva.dia_LS_uuid, reserva.dia_LS_fecha_examen)
       $('#bodyListadoReservasEnFechas').append(
           `<tr>
             <td class="th-width-short">
               <label>
-                <input type="checkbox" />
-                          <span></span>
+                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                          <span class="margin-top-5px"></span>
               </label>
             </td>
             <td>${reserva.alumno_nombre}</td>
             <td>${reserva.alumno_apellido}</td>
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
-            <td>${reserva.examen_en_dia_LS_uuid ? reserva.examen_en_dia_LS_uuid : "sin asignar"}</td>
+            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen) : "sin asignar"}</td>
           </tr>`)
     });
 
-    $('#bodyListadoReservasEnFechas').append(
-      `<div class="row">
-        <div class="col s12 l12 m12 xl12">
-          <span>Asignar Día de Oral a los seleccionados</span>
-          <div class="input-field col l8 clear-top-3">
+    $('#listadoReservasEnFechas').append(
+      `
+        <div class="col s12 m10 l8  xl5">
+      
+          <div class="input-field clear-top-3">
             <select id="listadoDiasOralesParaSemana">
           </select>
-          <label>Seleccionar Día Oral</label>
+          <label>Asignar Día de Oral a los seleccionados</label>
+
+          <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul">Asignar</a>
+
       </div>
         </div>
-      </div>`);
+
+        
+  
+
+     `);
       console.log(diasOral)
 
       $('#listadoDiasOralesParaSemana').append(
@@ -865,13 +878,43 @@ class FechasVista {
           `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} Cupo: ${diaHorario.cupo_maximo}</option>`
           )}
         );
+
             
       this.habilitarFormSelect();
+      this.asignarFuncionBotonAsignarDiaOralASemana();
 
     
   }
 
+  asignarFuncionBotonAsignarDiaOralASemana() {
+    $('#botonAsignarDiaOralASemana').on('click', () => {
+      this.asignarDiaASemanaExamenOral()
+    })
+  }
 
+
+  asignarDiaASemanaExamenOral(){  
+    // Obtengo el día del oral seleccionado
+    $("select").formSelect();
+    let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
+    let diaOralSeleccionado = instance.getSelectedValues();
+
+    // Obtengo las reservas de semana a las que se le debe asignar un día
+    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function() {
+      return this.id;
+    }).get();
+    
+    console.log(diaOralSeleccionado, reservasSeleccionadas)
+
+    let datos = {
+      fecha: diaOralSeleccionado,
+      reservas: reservasSeleccionadas,
+    }
+
+    this.fechasServicio.asignarDiaASemanaExamenOral(datos);
+  
+  }
+  
   
    
             

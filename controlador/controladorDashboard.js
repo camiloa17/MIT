@@ -417,9 +417,6 @@ async function agregarFechaSemanaEnDb(fechas) {
   let sql = "";
   let values = [];
   let connection;
-  let fechaHora;
-  
-  console.log(fechas)
 
   try {
     connection = await connectionToDb();
@@ -592,9 +589,10 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
     BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
-    BIN_TO_UUID(r.examen_en_dia_LS_uuid) as examen_dia_LS_uuid,
+    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
     BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_semana_LS_uuid,
     BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) as uuid_semana_LS,
+    dia_LS.fecha_Examen as dia_LS_fecha_examen,
     semana_LS.semana_examen as fecha_semana_examen,
     
     a.nombre as alumno_nombre,
@@ -608,6 +606,7 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
     LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
     LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
+    LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
     WHERE BIN_TO_UUID(semana_LS.uuid) = ${connection.escape(semana)};`;
 
     console.log("BUSCANDO RESERVAS")
@@ -619,13 +618,76 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
   }
 }
 
+async function listarReservaDiaRw(req, res) {
+  let fecha = req.params.fecha;
+  let data = await buscarEnDbReservaDiaRw(fecha);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbReservaDiaRw(fecha) {
+  let connection;
+  try {
+    connection = await connectionToDb();
+   
+    let query = `SELECT
+    BIN_TO_UUID(r.uuid) as reserva_uuid,
+    BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
+
+    a.nombre as alumno_nombre,
+    a.apellido as alumno_apellido,
+    a.documento as alumno_documento_id,
+    a.candidate_number as alumno_candidate_number,
+    a.genero as alumno_genero,
+    a.email as alumno_email
+    
+    from reserva r
+    LEFT JOIN alumno a on r.alumno_uuid = a.uuid
+    LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
+    LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
+    LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
+    LEFT JOIN examen_en_dia_RW on BIN_TO_UUID(examen_en_dia_RW.uuid) = BIN_TO_UUID(r.examen_en_dia_RW_uuid)
+    LEFT JOIN dia_RW on BIN_TO_UUID(dia_RW.uuid) = BIN_TO_UUID(examen_en_dia_RW.uuid)
+    WHERE BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid) = ${connection.escape(fecha)};`;
+
+    console.log("BUSCANDO RESERVAS DIA RW")
+
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
 
 
 
+async function asignarDiaASemanaExamenOral(req, res) {
+  console.log("LLEGAMO")
+  let cambios = req.body;
+  console.log(cambios)
+  let data = await asignarDiaASemanaExamenOralEnDB(cambios);
+  res.send(JSON.stringify(data));
+}
 
+async function asignarDiaASemanaExamenOralEnDB(cambios) {
+  let sql = "";
+  let connection;
 
+  try {
+    connection = await connectionToDb();
 
+    cambios.reservas.forEach( reserva => {
 
+      sql += `UPDATE reserva SET dia_LS_uuid=UUID_TO_BIN(${connection.escape(cambios.fecha)}) WHERE BIN_TO_UUID(uuid)=${connection.escape(reserva)};`;
+      console.log(sql)
+    });
+  
+    const data = await queryToDb(connection, sql);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
 
 
 
@@ -654,5 +716,8 @@ module.exports = {
   listarSemanas: listarSemanas,
   getExamenesEnSemana: getExamenesEnSemana,
   listarReservaSemanasLs: listarReservaSemanasLs,
+  listarReservaDiaRw: listarReservaDiaRw,
+
+  asignarDiaASemanaExamenOral: asignarDiaASemanaExamenOral,
   
 };

@@ -66,11 +66,38 @@ class FechasServicio {
     }
   }
 
+  async asignarDiaASemanaExamenOral(datos) {
+    try {
+      const response = await fetch(`./asignarDiaASemanaExamenOral/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+      const rta = await response.json();
+      console.log(response.body)
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
 
   
   async getElementosListaReservasEnSemanasLs(semana) {
     try {
       const response = await fetch(`./listarReservaSemanasLs/${semana}`);
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async getElementosListaReservasEnDiaRw(fecha) {
+    try {
+      const response = await fetch(`./listarReservaDiaRw/${fecha}`);
       const data = await response.json();
       return data;
     } catch (err) {
