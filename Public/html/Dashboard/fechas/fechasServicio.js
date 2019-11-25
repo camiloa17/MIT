@@ -105,7 +105,18 @@ class FechasServicio {
     }
   }
 
-  
+  async getElementosListaReservasEnDiaLs(fecha) {
+    try {
+      const response = await fetch(`./listarReservaDiaLs/${fecha}`);
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
+
   async getListaSemanas() {
     try {
       const response = await fetch("./listarSemanas/");

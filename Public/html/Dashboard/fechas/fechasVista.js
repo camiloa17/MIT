@@ -122,7 +122,8 @@ class FechasVista {
           } else if(tipoSelected === "LS") {
             this.cleanEstadoListaExamen();
             $('#inputSelectarExamenes').addClass("hidden");
-            this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);          
+            this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);    
+            this.generarListaReservaDiaLs(idSelected)      
           } else if(tipoSelected.length === 6 ){
             //console.log("es una semana")
             this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);            
@@ -591,6 +592,7 @@ class FechasVista {
   async mostrarListaDeHorarios() {
     let listaHorarios = await this.fechasServicio.getListaHorarios();
     $("#listaHorarios").empty();
+    console.log(listaHorarios)
 
     listaHorarios.forEach(horario => {
       $("#listaHorarios").append(`
@@ -604,11 +606,12 @@ class FechasVista {
                 }_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${
         horario.pausado ? "visibility_off" : "visibility"
       }</i>
-                <span class="badge cupos" data-badge-caption="cupos">${
+                <span class="badge cupos margin0" data-badge-caption="total">${
                   horario.cupo_maximo
                 }</span>
-                <span class="new badge background-azul" data-badge-caption="libres">24</span>
-                <span class="new badge blue-grey  lighten-2" data-badge-caption="">${
+                <span class="new badge background-azul margin0" data-badge-caption="ventas">${horario.ventas}</span>
+                <span class="new badge green margin0" data-badge-caption="libres">${horario.cupos_libres}</span>
+                <span class="new badge blue-grey margin0  lighten-2" data-badge-caption="">${
                   horario.source === "RW" ? "ESCR" : "ORAL"
                 }</span>
                 ${this.fechasServicio.stringDiaHoraEspanol(
@@ -624,6 +627,7 @@ class FechasVista {
     let listaSemanas = await this.fechasServicio.getListaSemanas();
     //console.log(listaSemanas);
     $("#listaHorarios").empty();
+    console.log(listaSemanas)
 
     listaSemanas.forEach(semana => {
       $("#listaHorarios").append(`
@@ -640,7 +644,8 @@ class FechasVista {
                 <span class="badge cupos" data-badge-caption="cupos">${
                   semana.cupo_maximo
                 }</span>
-                <span class="new badge background-azul" data-badge-caption="libres">24</span>
+                <span class="new badge background-azul" data-badge-caption="ventas">${semana.ventas}</span>
+                <span class="new badge green" data-badge-caption="libres">${semana.cupos_libres}</span>
                 ${this.armarStringSemanaAPartirDelPrimerDiaDeSemana(semana.yyyyss)}
                 
                
@@ -648,6 +653,9 @@ class FechasVista {
             `);
       this.asignarFuncionBotonPausa(semana.uuid)
     });
+
+
+
   }
 
   asignarFuncionBotonPausa(id) {
@@ -787,21 +795,32 @@ class FechasVista {
 
 
   async generarListaReservaSemanaLs(idSelected) {
+    $('#listadoReservasEnFechas').empty();
     let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected);
     let diasOral = await this.fechasServicio.getListaHorariosOrales();
+    
     this.mostrarlistadoReservasEnFechasSemanasLs();
     this.mostrarElementosListReservasEnFEchasSemanasLs(reservaSemanas, diasOral);
     console.log(reservaSemanas)
   }
 
   async generarListaReservaDiaRw(idSelected) {
+    $('#listadoReservasEnFechas').empty();
     let reservaDiaRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected);
+    this.mostrarlistadoReservasEnDiaRw();
+    this.mostrarElementosListReservasEnDiaRw(reservaDiaRw)
     console.log(reservaDiaRw)
+  }
+
+  async generarListaReservaDiaLs(idSelected) {
+    $('#listadoReservasEnFechas').empty();
+    let reservaDiaLs = await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected);
+    this.mostrarlistadoReservasEnDiaLs();
+    this.mostrarElementosListReservasEnDiaLs(reservaDiaLs)
   }
   
 
   mostrarlistadoReservasEnFechasSemanasLs(){
-    $('#listadoReservasEnFechas').empty();
     $('#listadoReservasEnFechas').append(
     `<table>
           <thead>
@@ -823,6 +842,91 @@ class FechasVista {
           <tbody id="bodyListadoReservasEnFechas"></tbody>
     </table>`)
   }
+
+  mostrarlistadoReservasEnDiaRw(){
+    $('#listadoReservasEnFechas').append(
+    `<table>
+          <thead>
+              <tr>
+                  <th class="th-width-short">
+                      <label>
+                          <input type="checkbox" />
+                          <span></span>
+                      </label>
+                  </th>
+                  <th>NOMBRE</th>
+                  <th>APELLIDO</th>
+                  <th>CANDIDATE NUMBER</th>
+                  <th>DOCUMENTO</th>
+              </tr>
+          </thead>
+
+          <tbody id="bodyListadoReservasEnFechas"></tbody>
+    </table>`)
+  }
+
+  mostrarElementosListReservasEnDiaRw(reservaDiaRw){
+    $('#bodyListadoReservasEnFechas').empty();
+
+    reservaDiaRw.forEach(reserva => {
+      $('#bodyListadoReservasEnFechas').append(
+          `<tr>
+            <td class="th-width-short">
+              <label>
+                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                          <span class="margin-top-5px"></span>
+              </label>
+            </td>
+            <td>${reserva.alumno_nombre}</td>
+            <td>${reserva.alumno_apellido}</td>
+            <td>${reserva.alumno_candidate_number}</td>
+            <td>${reserva.alumno_documento_id}</td>
+          </tr>`)
+    });
+  };
+
+  mostrarlistadoReservasEnDiaLs(){
+    $('#listadoReservasEnFechas').append(
+    `<table>
+          <thead>
+              <tr>
+                  <th class="th-width-short">
+                      <label>
+                          <input type="checkbox" />
+                          <span></span>
+                      </label>
+                  </th>
+                  <th>NOMBRE</th>
+                  <th>APELLIDO</th>
+                  <th>CANDIDATE NUMBER</th>
+                  <th>DOCUMENTO</th>
+              </tr>
+          </thead>
+
+          <tbody id="bodyListadoReservasEnFechas"></tbody>
+    </table>`)
+  }
+
+  mostrarElementosListReservasEnDiaLs(reservaDiaLs){
+    $('#bodyListadoReservasEnFechas').empty();
+
+    reservaDiaLs.forEach(reserva => {
+      $('#bodyListadoReservasEnFechas').append(
+          `<tr>
+            <td class="th-width-short">
+              <label>
+                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                          <span class="margin-top-5px"></span>
+              </label>
+            </td>
+            <td>${reserva.alumno_nombre}</td>
+            <td>${reserva.alumno_apellido}</td>
+            <td>${reserva.alumno_candidate_number}</td>
+            <td>${reserva.alumno_documento_id}</td>
+          </tr>`)
+    });
+  };
+
 
   mostrarElementosListReservasEnFEchasSemanasLs(reservasSemanaLs, diasOral){
     $('#bodyListadoReservasEnFechas').empty();
@@ -872,10 +976,10 @@ class FechasVista {
         `<option value="" disabled selected>Seleccionar</option>`
         )
 
-
+      
       diasOral.forEach( diaHorario => {
         $('#listadoDiasOralesParaSemana').append(
-          `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} Cupo: ${diaHorario.cupo_maximo}</option>`
+          `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${diaHorario.cupos_libres}</option>`
           )}
         );
 

@@ -79,6 +79,9 @@ app.get('/listarReservaSemanasLs/:semana', asyncErrorWrap(controladorDashboard.l
 
 app.get('/listarReservaDiaRw/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaRw))
 
+app.get('/listarReservaDiaLs/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaLs))
+
+
 app.use(errorHandler);
 
 

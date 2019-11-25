@@ -442,10 +442,31 @@ async function listarSemanas(req, res) {
 async function buscarEnDBListaSemanas() {
   let connection;
   try {
-    // YEARKEER(date, 3) segun ISO 8601 
-    const query =
-      "SELECT BIN_TO_UUID(uuid) as uuid, YEARWEEK(semana_Examen,3) AS yyyyss, cupo_maximo, finaliza_inscripcion, pausado, activo FROM semana_LS WHERE activo=1 ORDER BY semana_Examen;";
     connection = await connectionToDb();
+
+    // YEARKEER(date, 3) segun ISO 8601 
+    let query =
+      `SELECT 
+      BIN_TO_UUID(uuid) as uuid, 
+      BIN_TO_UUID(uuid) as this_uuid, 
+      
+      (SELECT count(*)  FROM reserva 
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas, 
+      
+      (cupo_maximo - (SELECT count(*) FROM reserva 
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid)
+      ) as cupos_libres,
+      
+      YEARWEEK(semana_Examen,3) AS yyyyss, 
+      cupo_maximo, finaliza_inscripcion, pausado, activo 
+      FROM semana_LS WHERE activo=1 ORDER BY semana_Examen ;`;
+
+     
+
   
     const data = await queryToDb(connection, query);
     return data;
@@ -465,7 +486,51 @@ async function buscarEnDBListaHorarios() {
   let connection;
   try {
     const query =
-      "SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'LS' as source FROM dia_LS UNION SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'RW' as source FROM dia_RW WHERE activo=1 ORDER BY fecha_Examen;";
+      `SELECT 
+      BIN_TO_UUID(uuid) as uuid, 
+      BIN_TO_UUID(uuid) as this_uuid, 
+      fecha_Examen, 
+      cupo_maximo, 
+      fecha_finalizacion, 
+      pausado, 
+      activo, 
+
+      (SELECT count(*)  FROM reserva 
+      LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+      LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
+      where BIN_TO_UUID(dia_RW.uuid)=this_uuid)  as ventas, 
+
+      (cupo_maximo - (SELECT count(*)  FROM reserva 
+      LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+      LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
+      where BIN_TO_UUID(dia_RW.uuid)=this_uuid)
+      ) as cupos_libres,
+
+      'RW' as source FROM dia_RW 
+      
+      UNION SELECT 
+      BIN_TO_UUID(uuid) as uuid,       
+      BIN_TO_UUID(uuid) as this_uuid, 
+      fecha_Examen, 
+      cupo_maximo, 
+      fecha_finalizacion, 
+      pausado, 
+      activo, 
+
+      (SELECT count(*)  FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
+
+      (cupo_maximo - (SELECT count(*)  FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid) 
+      ) as cupos_libres,
+
+      
+      'LS' as source FROM dia_LS 
+      
+      WHERE activo=1 ORDER BY fecha_Examen;`;
+
     connection = await connectionToDb();
   
     const data = await queryToDb(connection, query);
@@ -486,7 +551,26 @@ async function buscarEnDBListaHorariosOrales() {
   let connection;
   try {
     const query =
-      "SELECT BIN_TO_UUID(uuid) as uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 'LS' as source FROM dia_LS WHERE activo=1 ;";
+      `SELECT BIN_TO_UUID(uuid) as uuid, 
+      fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo, 
+      
+      
+      BIN_TO_UUID(uuid) as this_uuid, 
+      
+      (SELECT count(*)  FROM reserva 
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas, 
+      
+      (cupo_maximo - (SELECT count(*) FROM reserva 
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)
+      ) as cupos_libres,      
+      
+      
+      'LS' as source FROM dia_LS WHERE activo=1 
+      ORDER BY fecha_Examen;`;
     connection = await connectionToDb();
   
     const data = await queryToDb(connection, query);
@@ -661,6 +745,53 @@ async function buscarEnDbReservaDiaRw(fecha) {
 
 
 
+async function listarReservaDiaLs(req, res) {
+  let fecha = req.params.fecha;
+  let data = await buscarEnDbReservaDiaLs(fecha);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbReservaDiaLs(fecha) {
+  let connection;
+  try {
+    connection = await connectionToDb();
+   
+    let query = `SELECT
+    BIN_TO_UUID(r.uuid) as reserva_uuid,
+    BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
+    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+
+    a.nombre as alumno_nombre,
+    a.apellido as alumno_apellido,
+    a.documento as alumno_documento_id,
+    a.candidate_number as alumno_candidate_number,
+    a.genero as alumno_genero,
+    a.email as alumno_email
+    
+    from reserva r
+    LEFT JOIN alumno a on r.alumno_uuid = a.uuid
+    LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) =  BIN_TO_UUID(r.dia_LS_uuid)
+    WHERE BIN_TO_UUID(dia_LS.uuid) = ${connection.escape(fecha)};`;
+
+    console.log("BUSCANDO RESERVAS DIA RW")
+
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 async function asignarDiaASemanaExamenOral(req, res) {
   console.log("LLEGAMO")
   let cambios = req.body;
@@ -717,6 +848,7 @@ module.exports = {
   getExamenesEnSemana: getExamenesEnSemana,
   listarReservaSemanasLs: listarReservaSemanasLs,
   listarReservaDiaRw: listarReservaDiaRw,
+  listarReservaDiaLs: listarReservaDiaLs,
 
   asignarDiaASemanaExamenOral: asignarDiaASemanaExamenOral,
   
