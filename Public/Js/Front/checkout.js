@@ -1,3 +1,11 @@
+document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
+document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
+document.querySelectorAll('.button-checkout').forEach(button => {
+  button.addEventListener('click', step)
+})
+
+
+
 function openNav(item) {
     const clickItems = item.target.classList;
     if (clickItems.contains('right-side')) {
@@ -21,11 +29,7 @@ function closeNav(item) {
     }
 }
 
-document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
-document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
-document.querySelectorAll('.button-checkout').forEach(button=>{
-  button.addEventListener('click', step)
-})
+
 
 function step(item){
   const wrapper = item.target.parentElement.parentElement.parentElement;
@@ -48,6 +52,10 @@ function step(item){
     document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos == 4) ? 25 * (parseInt(wrapper.dataset.step) - 1) : 20 * (parseInt(wrapper.dataset.step) - 1)}%`;
   }
 }
+
+
+
+
 
 
 /*Codigo Stripe */

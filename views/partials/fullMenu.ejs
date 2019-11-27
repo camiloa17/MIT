@@ -4,10 +4,9 @@
         <nav class="right-side-menu" aria-label="menu-secundario">
             <ul class="secondary-menu-list" aria-label="company-menu">
                 <li class="secondary-menu-logo">Mit<span class="right-side">X</span></li>
-                <li class="secondary-menu-item"><a href="#">Quienes Somos</a></li>
-                <li class="secondary-menu-item"><a href="#">Certificaciones</a></li>
-                <li class="secondary-menu-item"><a href="#contacto">Contacto</a></li>
-                <li class="secondary-menu-item"><a href="#">FAQs</a></li>
+                <li class="secondary-menu-item"><a href="<%= team %>">Quienes Somos</a></li>
+                <li class="secondary-menu-item"><a href="<%= contacto%>">Contacto</a></li>
+                <li class="secondary-menu-item"><a href="/faqs">FAQs</a></li>
             </ul>
         </nav>
         <a href="#" class="mobile-logo-ham"><i class="large material-icons right-side">menu</i></a>
@@ -38,7 +37,7 @@
                                         <% modo.forEach((modo)=>{ %>
                                             <% if(modo.nivel==nivel.nivel){ %>
                                                 <%if(modo.modo !=null){ %>
-                                                    <li class="sub-item-modo"><a  href="/checkout/<%=materia.materias%>/<%=tipo.tipo%>/<%=nivel.nivel %>/<%= modo.modo %>"><%= modo.modo %></a></li>
+                                                    <li class="sub-item-modo"><a  href="/checkout/<%=materia.materias%>/<%=tipo.link%>/<%=nivel.link %>/<%= modo.link %>?id=<%= modo.id %>"><%= modo.modo %></a></li>
                                                 <% } %>
                                             <% } %>
                                         <% }) %>

@@ -1,0 +1,484 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;
+    color:#085796;
+}
+h1,
+h2,
+h3{
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+}
+
+/*-----------------------------------------------Menu-----------------------------------------------------------------------*/
+.secondary-menu-list,
+.primary-menu-logo,
+.upper-part-header,
+.secondary-menu-logo,
+.primary-menu-list,
+.right-side-menu,
+#team-wrapper{
+    display: flex;
+}
+
+
+.upper-part-header{
+    justify-content: space-between;
+    padding-left:30px;
+    padding-right:42px;
+    margin-top:20px;
+}
+
+/*Se pone posicion absoluta a la parte baja del header y se centran los botones en la pantalla*/
+.lower-part-header{
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 118px;
+    left:0;
+    right:0;
+    width:251px;
+}
+
+
+
+/*---------------------Estilos en comun de los side menus--------------------------------------*/
+
+/**/
+.brand-logo{
+    font-size: 40px;
+    line-height: 53px;
+    font-weight: bold;
+    color:#085796;
+    text-decoration: none;
+    
+}
+
+
+.brand-logo.logo-lower-part{
+        display: none;
+    }
+
+/*Se esconde el side menu y se saca del marcado con posiion fix y se pone por encima del contenido*/
+.right-side-menu,
+.left-side-menu{
+    width: 0;
+    height: 100%;
+    top:0;
+    position: fixed;
+    z-index: 100;
+    overflow-x: hidden;
+}
+
+/*Se quitan los estilos de las listas del menu*/
+.primary-menu-list,
+.secondary-menu-list{
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+
+.secondary-menu-list a,
+.primary-menu-list a{
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.primary-menu-logo,
+.secondary-menu-logo{
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.primary-menu-logo span,
+.secondary-menu-logo span{
+    font-weight: bold;
+    font-size: 20px;
+    margin-right:10%;
+    cursor: pointer;
+}
+
+/*Clase para mostrar el menu*/
+.active{
+    width:294px;
+    transition: 0.2s;
+}
+
+/*Clase que  agrega el estilo de overflow cuando sale el menu*/
+.overflow-menu{
+    top:0;
+    background-color: rgba(0,0,0,0.5);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 99;
+}
+/*---------------------FIN Estilos en comun de los side menus seccion--------------------------------------*/
+
+/*---------------------------------Menu Principal-------------------------------------------------------------*/
+
+/*Menu principal botones, se agregar su ubicacion y color*/
+.primary-menu-item{
+    width:251px;
+    height: 60px;
+    margin-bottom: 14px;
+    background: linear-gradient(90deg, #72C6EF 0%, #004E8F 100%);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/*Se agrega estilado al icono de hamburguesa*/
+.mobile-logo-ham i{
+    font-size: 40px;
+    font-weight: 200;
+    line-height: 60px;
+    color:#065494;
+}
+
+
+
+/*Se asigna la direccion izquierda al side menu y la posibilidad de scrollear al menu*/
+.left-side-menu{
+    background-color:#11609E;
+    right: auto;
+    left:0;
+    color:#FFFFFF;
+    overflow-y: auto;
+    list-style: none;
+    transition: 0.2s;
+}
+
+/*Se agrega direccion de columnas al flex*/
+.primary-menu-list{
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/*Se agregar margen a los items del menu de las materias.*/
+
+.titulo-materia{
+    margin-bottom: 39px;
+    align-self: center;
+    margin-top:15px;
+}
+
+/*Se agrega el espacio entre el tipo los tipos*/
+.materia-tipo{
+   
+    margin-bottom: 35.59px;
+}
+
+.materia-tipo>a,
+.sub-item-tipo>a{
+    width: 100%;
+    cursor: pointer;
+}
+
+
+.materia-tipo>a::after{
+    display:inline-block;
+    font-family: "Material Icons";
+    content: "\e5cc";
+    margin-left:20px;
+    transform: rotate(-90deg);
+    transition:0.2s;
+}
+
+.chevron{
+    display:inline-block;
+    width:15px;
+    height: 15px;
+}
+.sub-item-tipo>a::after{
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    font-family: "Material Icons";
+    content: "\e5cc";
+    transform: rotate(-90deg);
+    transition:0.2s;
+}
+
+
+/*Se esconden las listas que luego van a ser desplegadas con Javascript*/
+.materia-tipo>ul{
+    height:0;
+    transition:0.3s ease-out;
+    overflow: hidden;
+}
+
+.list-tipo{
+    list-style: none;
+}
+
+
+
+.tipo-activa>a::after{
+    transform: rotate(90deg);
+}
+
+/*Se esconden las listas que luego van a ser desplegadas con Javascript*/
+.sub-item-tipo>ul{
+    height:0;
+    transition: 0.3s ease-out;
+}
+
+/*Se agrega espacio en el margen izquierdo*/
+.left-side-menu li{
+    margin-left: 28px;
+    text-align: left;
+}
+
+/*se agrega colores al texto del menu principal*/
+.primary-menu-list a{
+    color:#FFFFFF;
+}
+
+/*Se agrega espacio entre el tipo y los niveles*/
+.materia-tipo>ul{
+    margin-top:12.59px;
+}
+/*Se agrega espacio entre los niveles*/
+.sub-item-tipo{
+    margin-bottom: 12.59px;
+}
+
+/*Se agrega el tamaño del texto de los niveles en el menu lateral*/
+.sub-item-tipo>a,
+.sub-item-modo>a{
+    font-weight: normal;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.modo{
+    overflow: hidden;
+    list-style: none;
+}
+
+/*Se agrega un espacio entre el titulo y la parte superior del contenedor*/
+.primary-menu-logo{
+    margin-top:22px;
+}
+
+.tarifas{
+    height: 60px;
+}
+
+.tarifas button{
+    background: #E5E5E5;
+    border-radius: 10px;
+    width: 162px;
+    height:35px;
+    border:none;
+    color:#065594;
+    font-size: 15px;
+    box-shadow: 0px 5px 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+
+/*---------------------------------Final Menu Principal-------------------------------------------------------------*/
+
+/*Menu Secundario--------------------------------------------*/
+/*Se asigna la direccion derecha al side menu*/
+.right-side-menu{
+    background-color: #F7F7F7;
+    left:auto;
+    right:0;
+}
+
+/*Se agregan margen y la direccion del flex al menu secundario*/
+.secondary-menu-list{
+    width: 100%;
+    margin-top:22px;
+    margin-left: 28px;
+    padding:0;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+/*Se agrega el color a los textos del menu secundario*/
+.secondary-menu-list a{
+    color:#085796;  
+}
+
+/*Se agrega espacio al logo para separarlo del contenidon*/
+.secondary-menu-logo{
+    margin-bottom: 37px;
+}
+
+/*Se agrega espacio entre los items del menu secundario*/
+
+.secondary-menu-item{
+    margin-bottom: 23px;
+}
+/*Final Menu secundario*/
+
+
+/*-----------------------------------------------Fin de estilos Menu-----------------------------------------------------------------------*/
+/*Footer-----------------------------------------------------------------------*/
+/*footer politicas*/
+ #lower-footer{
+     background-color:#000;
+     color: #FFFFFF;
+     display:flex;
+     flex-direction: column;
+     align-items: center;
+     padding:20px 0;
+     text-align: center;
+     font-size: 9px;
+ }
+
+ #lower-footer div{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+#lower-footer p{
+    width: 150px;
+}
+
+ #lower-footer ul{
+     list-style: none;
+ }
+ #lower-footer ul>li{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+ #lower-footer a{
+     color: #FFFFFF;
+     text-decoration: none;
+ }
+
+
+ /*Fin footer------------------------------------------------------------------------*/
+
+
+ @media only screen and (min-width:991px){
+      /*-----------------------Seccion menu desktop--------------------------------------------------*/
+    /*Se esconde el logo superior, los logos de el menu lateral*/
+    .mobile-logo-ham,
+    .secondary-menu-logo,
+    .brand-logo{
+        display:none;
+    }
+    /*Se quita el overflow en caso que se quede el side menu abierto y se agrande la pantalla*/
+    .overflow-menu{
+     background-color: transparent;
+    }
+    /*----Menu Principal desktop------------------------------------------------------------------------------------*/
+
+    .brand-logo.logo-lower-part{
+        display: inline-block;
+        margin-left: 115px;
+    }
+    
+
+    .lower-part-header{
+        position: relative;
+        width: 100%;
+        height:103px;
+        top:0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .primary-menu-wrapper{
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        margin-right:15px;
+    }
+    .primary-menu-list{
+        flex-direction: row;
+        background: linear-gradient(90deg, #72C6EF 0%, #004E8F 100%);
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .primary-menu-item{
+        background:transparent;
+        box-shadow: none;
+        margin:0;
+    }
+
+    /*----Final Menu Principal desktop------------------------------------------------------------------------------------*/
+
+    /*-------------------------Menu Secundario Desktop---------------------------------------------*/
+    /*Se mueve agrega el color al header azul y se quita el margen superior de mobile*/
+    .upper-part-header{
+        background-color: #004E8F;
+        margin-top:0;
+    }
+    /*El area superior del header se vuelve del tamaño para desktop*/
+    .upper-part-header,
+    .right-side-menu{
+        height:41px;
+    }
+
+    /*se le da el mismo ancho al menu que su contenedor, se agregar la posicion relativa para incluirlo en el markup y se quita la transicion*/
+    .right-side-menu{
+        width: 100%;
+        position: relative;
+        margin-left:115px;
+        background-color: transparent;
+    }
+    /*Make the text go to the center of the row*/
+    .secondary-menu-list{
+        margin:0;
+        flex-direction: row;
+        align-items: center;
+    }
+    /*Makes the items of the menu move away from each other */
+    .secondary-menu-item{
+        margin:0;
+        margin-right:36px;
+    }
+    /*Gives the white color to the text*/
+    .right-side-menu li>a{
+        color:white;
+    }
+    /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
+
+    /*-----------------------Fin de Seccion menu desktop--------------------------------------------------*/
+    /*Lower footer- privacidad*/
+     #lower-footer{
+        flex-direction: row;
+        justify-content: space-between;
+        padding:20px 0;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    #lower-footer div{
+        width: auto;
+    }
+    #lower-footer p{
+        margin-left:30px;
+        width:300px;
+    }
+
+    #lower-footer ul>li{
+        display: inline-block;
+    }
+
+    #lower-footer ul>li:nth-child(2){
+        border-left: 2px solid #fff;
+        border-right: 2px solid #fff;
+    }
+   /*end-lower footer privacidad*/
+ }
