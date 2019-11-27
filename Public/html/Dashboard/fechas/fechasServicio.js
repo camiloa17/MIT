@@ -29,7 +29,7 @@ class FechasServicio {
     }
   }
 
-  async agregarFechaSemana(datos) {
+  async agregarFechaSemana(datos, exito, error, clean, id) {
     try {
       const response = await fetch(`./agregarFechaSemana/`, {
         method: "POST",
@@ -39,8 +39,16 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
+      
+      if(rta.error) {
+        error(id)
+      } else {
+        clean();
+        exito(id);
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(id) : null;
     }
   }
 

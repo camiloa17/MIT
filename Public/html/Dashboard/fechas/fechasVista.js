@@ -5,18 +5,12 @@ class FechasVista {
     this.traerListaDeExamenesDb();
     this.examenesFromDB = [];
 
-    this.habilitarSelectableChipDiaSemanaAgregar(
-      $("#chipsSeleccionDiaSemanaAgregar")
-    );
+    this.habilitarSelectableChipDiaSemanaAgregar($("#chipsSeleccionDiaSemanaAgregar"));
+    this.habilitarSelectableChipDiaSemanaEditar($("#chipsSeleccionDiaSemanaEditar"));
+
     this.habilitarSelectableFechas($("#listaHorarios"));
     this.habilitarSelectableExamenes($("#listaExamenes"));
-
-    this.habilitarSelectableChipDiaSemanaEditar(
-      $("#chipsSeleccionDiaSemanaEditar")
-    );
-
-    this.botonAgregarExamenesAFecha();
-
+    this.botonAgregarExamenesAFecha();  // sacar de aca
     this.habilitarBotonGuardarExamenesEnFecha();
 
     /// Agregar Examenes a Fecha día:
@@ -27,8 +21,56 @@ class FechasVista {
     this.lastExamSelected = [];
   }
 
-  habilitarFormSelect() {
-    $("select").formSelect();
+  async traerListaDeExamenesDb() {
+    this.examenesFromDB = await this.fechasServicio.getListaExamenes();
+    this.establecerOrdenListaExamenes(this.examenesFromDB);
+  }
+
+  establecerOrdenListaExamenes(listaExamenes) {
+    //Ordeno la lista de examenes primero por Materia, luego Tipo, luego Nivel, luego Modalidad.
+    listaExamenes.sort(function (objA, objB) {
+      let ordenMateriaA = objA.orden_materia;
+      let ordenMateriaB = objB.orden_materia;
+
+      // Se ordenan primero por orden materia
+      if (ordenMateriaA > ordenMateriaB) {
+        return 1;
+      } else if (ordenMateriaA < ordenMateriaB) {
+        return -1;
+      } else {
+        // Dentro de las mismas materias, ordenamos por tipo
+        let ordenTipoA = objA.orden_tipo;
+        let ordenTipoB = objB.orden_tipo;
+
+        if (ordenTipoA > ordenTipoB) {
+          return 1;
+        } else if (ordenTipoA < ordenTipoB) {
+          return -1;
+        } else {
+          // Dentro de las mismos tipos, ordenamos por nivel
+          let ordenNivalA = objA.orden_nivel;
+          let ordenNivalB = objB.orden_nivel;
+
+          if (ordenNivalA > ordenNivalB) {
+            return 1;
+          } else if (ordenNivalA < ordenNivalB) {
+            return -1;
+          } else {
+            // Dentro de las mismos niveles, ordenamos por modalidad
+            let ordenModalidadA = objA.orden_modalidad;
+            let ordenModalidadB = objB.orden_modalidad;
+
+            if (ordenModalidadA > ordenModalidadB) {
+              return 1;
+            } else if (ordenModalidadA < ordenModalidadB) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }
+        }
+      }
+    });
   }
 
   habilitarSelectableChipDiaSemanaAgregar(ulChips) {
@@ -49,9 +91,7 @@ class FechasVista {
           .attr("id");
 
         // Selecciono una Chip y me muestra lo solicitado
-        idSelected === "agregarChipDiaHora"
-          ? this.mostrarAgregarDiaHora()
-          : null;
+        idSelected === "agregarChipDiaHora" ? this.mostrarAgregarDiaHora() : null;
 
         idSelected === "agregarChipSemana" ? this.mostrarAgregarSemana() : null;
       }
@@ -76,9 +116,7 @@ class FechasVista {
           .attr("id");
 
         // Selecciono una Chip y me muestra lo solicitado
-        idSelected === "editarChipDiaHora"
-          ? this.mostrarListaDeHorarios()
-          : null;
+        idSelected === "editarChipDiaHora" ? this.mostrarListaDeHorarios() : null;
 
         idSelected === "editarChipSemana" ? this.mostrarListaDeSemanas() : null;
       }
@@ -103,30 +141,29 @@ class FechasVista {
             .removeClass("ui-selected");
 
           // Obtengo el tipo de dia si es una fecha (RW o LS) o un numero de 6 cifras si es una semana YYYYSS          
-          
+
           let tipoSelected = $(event.target)
             .children(".ui-selected")
             .attr("tipo");
 
-       
           // Asigno a una variable temporal el ultimo id seleccionado (porque si apreto el scrollbar me deselecciona el elemento)
           this.lastExamSelected = idSelected;
-          
-          if (tipoSelected === "RW"){
-            //console.log("es una fecha dia/hora")
+
+          if (tipoSelected === "RW") {
             this.cleanEstadoListaExamen();
             $('#inputSelectarExamenes').removeClass("hidden");
             this.generarListaDeExamenes(tipoSelected);
             this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);
             this.generarListaReservaDiaRw(idSelected)
-          } else if(tipoSelected === "LS") {
+
+          } else if (tipoSelected === "LS") {
             this.cleanEstadoListaExamen();
             $('#inputSelectarExamenes').addClass("hidden");
-            this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected);    
-            this.generarListaReservaDiaLs(idSelected)      
-          } else if(tipoSelected.length === 6 ){
-            //console.log("es una semana")
-            this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);            
+            this.generarListaReservaDiaLs(idSelected)
+
+          } else if (tipoSelected.length === 6) {
+            // Selecciono una semana (yyyyss tiene un length de 6)
+            this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);
             $('#inputSelectarExamenes').removeClass("hidden");
             this.generarListaDeExamenes("LS");
             this.generarListaReservaSemanaLs(idSelected);
@@ -141,39 +178,46 @@ class FechasVista {
     });
   }
 
+
+  habilitarSelectableExamenes(lista) {
+    lista.selectable({
+      // Cuando selecciono un examen y tengo cambios pendientes, asigno una clase noSelectable a los chips y debo ejecutar listaX.selectable("disable")
+      cancel: ".noSelectable",
+
+      stop: (event, ui) => {
+        // Evito que se seleccionen multiples examenes. Quedará solo seleccionado el primero si hay una selección de más de un chip
+        $(event.target)
+          .children(".ui-selected")
+          .not(":first")
+          .removeClass("ui-selected");
+
+        // Obtengo examen seleccionado
+        let idSelected = $(event.target)
+          .children(".ui-selected")
+          .attr("id");
+      }
+    });
+  }
+
   cleanEstadoListaExamen() {
     this.addExamenesFechaDia = [];
     this.removeExamenesFechaDia = [];
     this.cambioPausaExamenesFechaDia = [];
   }
 
-  habilitarSelectableExamenes(lista) {
-    lista.selectable({
-      // Cuando selecciono un chip y tengo cambios pendientes, asigno una clase noSelectable a los chips y debo ejecutar listaX.selectable("disable")
-      cancel: ".noSelectable",
+  habilitarFormSelect() {
+    $("select").formSelect();
+  }
 
-      stop: (event, ui) => {
-        // Evito que se seleccionen multiples chips. Quedará solo seleccionado el primero si hay una selección de más de un chip
-        $(event.target)
-          .children(".ui-selected")
-          .not(":first")
-          .removeClass("ui-selected");
-
-        // Obtengo chip seleccionado
-        let idSelected = $(event.target)
-          .children(".ui-selected")
-          .attr("id");
-
-        //console.log(idSelected);
-      }
-    });
+  ddmmyyyyToYyyymmdd(date) {
+    return date.split("-").reverse().join("-");
   }
 
   mostrarAgregarDiaHora() {
     $("#areaAgregarFecha").empty();
     $("#areaAgregarFecha").append(this.selectorDiaEscritoUOral());
     $("#areaAgregarFecha").append(this.seleccionarDiaYHora());
-    this.inicializarDateTimePicker();
+    this.inicializarDateTimePickerDia();
     this.aceptarSoloNumerosEnInput("inputCupoAgregarDia");
     this.inicializarListenerBotonAgregarDia();
   }
@@ -224,18 +268,18 @@ class FechasVista {
       
     <div class="row margin0">
         <div class="col clear-top-2">
-            <a id="botonAgregaDia" class="waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
+            <a id="botonAgregaDia"  class="disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
         </div>
-        <span id="estadoAgregarDia"></span>
+        <span id="estadoAgregarDia" class="" ></span>
     </div>
     `;
   }
 
   inicializarListenerBotonAgregarDia() {
+    this.chequearInformacionInputDia();
+
     $("#botonAgregaDia").on("click", () => {
-      let fechaDateTime = `${$("#inputFechaAgregarDia").val()} ${$(
-        "#inputHoraAgregarDia"
-      ).val()}`;
+      let fechaDateTime = `${$("#inputFechaAgregarDia").val()} ${$("#inputHoraAgregarDia").val()}`;
 
       let agregarDia = {
         uuid: this.fechasServicio.uuid(),
@@ -254,211 +298,84 @@ class FechasVista {
     });
   }
 
-  mostrarAgregarSemana() {
-    $("#areaAgregarFecha").empty();
-    $("#areaAgregarFecha").append(this.selectorSemanas());
+  //////////////////////////////////////////////////
+  chequearInformacionInputDia() {
+    $('#inputCupoAgregarDia').on('input', () => {
+      if (!$('#inputCupoAgregarDia').val()) {
+        $("#botonAgregaDia").addClass("disabled");
+      }
 
-    this.aceptarSoloNumerosEnInput("inputCupoAgregarSemana");
-    this.semanasProximoAno();
-    this.habilitarFormSelect();
-    this.inicializarListenerBotonAgregarSemana();
-  }
-
-  selectorSemanas() {
-    return `
-    <div class="row">
-      <div class="input-field col l5 clear-top-3">
-          <select id="listadoSemanas">
-          </select>
-          <label>Seleccionar Semana</label>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="input-field col s5 m4 l3 xl2">
-          <input id="inputCupoAgregarSemana" type="number" autocomplete="off" >
-          <label for="inputCupoAgregarSemana">Cupo</label>
-      </div>
-
-      <div class="col s5 m4 l3 xl2">
-        <input id="finalizaAgregarSemana" type="text" class="datepicker" disabled>
-        <label class="gris-texto">FINALIZA inscripción</label>
-      </div>
-    </div>
-
-    <div class="row margin0">
-      <div class="col clear-top-2">
-          <a id="botonAgregaSemana" class="waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
-      </div>
-      <span id="estadoAgregarSemana"></span>
-    </div>
-  </div>`;
-  }
-
-  inicializarListenerBotonAgregarSemana() {
-    $("#botonAgregaSemana").on("click", () => {
-      var instanceSemana = M.FormSelect.getInstance($("#listadoSemanas"));
-      //var semanaSeleccionada = instanceSemana.getSelectedValues();
-
-      let agregarSemana = {
-        uuid: this.fechasServicio.uuid(),
-        cupo: $("#inputCupoAgregarSemana").val(),
-        semana: this.getDateFirstDayOfWeek(
-          $("#listadoSemanas option:selected").attr("semana"),
-          $("#listadoSemanas option:selected").attr("ano")
-        ),
-        finaliza: $("#finalizaAgregarSemana").val()
-      };
-      //console.log(agregarSemana);
-      this.fechasServicio.agregarFechaSemana(agregarSemana);
+      if ($("#inputCupoAgregarDia").val() > 0 && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
+      }
     });
-  }
-
-  getDateFirstDayOfWeek(weekNo, y) {
-    var d1, numOfdaysPastSinceLastMonday, rangeIsFrom;
-    d1 = new Date("" + y + "");
-    numOfdaysPastSinceLastMonday = d1.getDay() - 1;
-    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
-    d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
-    rangeIsFrom = `${d1.getFullYear()}-${d1.getMonth() + 1}-${d1.getDate()}`;
-    return rangeIsFrom;
-  }
-
-  semanasProximoAno() {
-    let listadoSemanas = $("#listadoSemanas");
-
-    Date.prototype.getWeek = function() {
-      var date = new Date(this.getTime());
-      date.setHours(0, 0, 0, 0);
-      // Thursday in current week decides the year.
-      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-      // January 4 is always in week 1.
-      var week1 = new Date(date.getFullYear(), 0, 4);
-      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-      return (
-        1 +
-        Math.round(
-          ((date.getTime() - week1.getTime()) / 86400000 -
-            3 +
-            ((week1.getDay() + 6) % 7)) /
-            7
-        )
-      );
-    };
-
-    Date.prototype.getWeekYear = function() {
-      var date = new Date(this.getTime());
-      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-      return date.getFullYear();
-    };
-
-    function getISOWeeks(y) {
-      var d, isLeap;
-
-      d = new Date(y, 0, 1);
-      isLeap = new Date(y, 1, 29).getMonth() === 1;
-
-      //check for a Jan 1 that's a Thursday or a leap year that has a
-      //Wednesday jan 1. Otherwise it's 52
-      return d.getDay() === 4 || (isLeap && d.getDay() === 3) ? 53 : 52;
-    }
-
-    function getDateRangeOfWeek(weekNo, y) {
-      var d1, numOfdaysPastSinceLastMonday, rangeIsFrom, rangeIsTo;
-      d1 = new Date("" + y + "");
-      numOfdaysPastSinceLastMonday = d1.getDay() - 1;
-      d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
-      d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
-      rangeIsFrom =
-        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
-      d1.setDate(d1.getDate() + 6);
-      rangeIsTo =
-        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
-      return rangeIsFrom + " a " + rangeIsTo;
-    }
 
 
-    const fechaHoy = new Date();
-    const anioActual = () => fechaHoy.getWeekYear();
-    const semanaActual = () => fechaHoy.getWeek();
-    const semanasTotalAnioActual = () => getISOWeeks(anioActual);
+    $('#inputFechaAgregarDia').on("change", () => {
+      if (this.chequearSiFechaFinalizacionEsPosterior()) {
+        if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+          $("#botonAgregaDia").removeClass("disabled");
+        } else {
+          $("#botonAgregaDia").addClass("disabled");
+        }           
+      }
+    });
+    
 
-    for (let i = 53, sem = semanaActual(), ano = anioActual(); i >= 1; i--) {
-      listadoSemanas.append(
-        `<option value="${sem} ${ano}" semana="${sem}" ano="${ano}">Semana ${sem} de ${ano} de ${getDateRangeOfWeek(
-          sem,
-          ano
-        )}</option>`
-      );
-
-      if (sem < semanasTotalAnioActual()) {
-        sem++;
+    $('#inputHoraAgregarDia').on("change", () => {
+      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
       } else {
-        sem = 1;
-        ano++;
+        $("#botonAgregaDia").addClass("disabled");
+      }          
+    });
+
+
+    $("#finalizaAgregarDia").on("change", () => {
+      if (this.chequearSiFechaFinalizacionEsPosterior()) {
+        if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+          $("#botonAgregaDia").removeClass("disabled");
+        } else {
+          $("#botonAgregaDia").addClass("disabled");
+        }           
+      }
+    });
+
+    $('#inputRWAgregarDia').on("change", () => {
+      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
+      } else {
+        $("#botonAgregaDia").addClass("disabled");
+      } 
+    })
+
+    $('#inputLSAgregarDia').on("change", () => {
+      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
+      } else {
+        $("#botonAgregaDia").addClass("disabled");
+      } 
+    })
+
+
+  }
+
+  chequearSiFechaFinalizacionEsPosterior() {
+    if ($("#finalizaAgregarDia").val().length > 0 && $("#inputFechaAgregarDia").val().length > 0 ) {
+      if ($("#inputFechaAgregarDia").val() > $("#finalizaAgregarDia").val()) {
+        $("#estadoAgregarDia").text("");
+        return true;
+      } else {
+        $("#estadoAgregarDia").empty().append(
+          '<div class="rojo-texto padding-top2-5">La Fecha de Finalización de Inscripción debe ser anterior a la fecha de Examen.</div>'
+        );
+        $("#botonAgregaDia").addClass("disabled");
       }
     }
   }
-  
-
-  armarStringSemanaAPartirDelPrimerDiaDeSemana(fecha) {
-    //Las semanas en la base de datos se guardan escribiiendo el primer dia. 
-    //Esta funcion me devuelve el string de la semana elegida dado el lunes de cada semana.
-    //console.log(fecha)
-
-    Date.prototype.getWeek = function() {
-      var date = new Date(this.getTime());
-      date.setHours(0, 0, 0, 0);
-      // Thursday in current week decides the year.
-      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-      // January 4 is always in week 1.
-      var week1 = new Date(date.getFullYear(), 0, 4);
-      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-      return (
-        1 +
-        Math.round(
-          ((date.getTime() - week1.getTime()) / 86400000 -
-            3 +
-            ((week1.getDay() + 6) % 7)) /
-            7
-        )
-      );
-    };
-
-    Date.prototype.getWeekYear = function() {
-      var date = new Date(this.getTime());
-      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-      return date.getFullYear();
-    };
-
-    function getDateRangeOfWeek(weekNo, y) {
-      var d1, numOfdaysPastSinceLastMonday, rangeIsFrom, rangeIsTo;
-      d1 = new Date("" + y + "");
-      numOfdaysPastSinceLastMonday = d1.getDay() - 1;
-      d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
-      d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
-      rangeIsFrom =
-        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
-      d1.setDate(d1.getDate() + 6);
-      rangeIsTo =
-        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
-      return rangeIsFrom + " a " + rangeIsTo;
-    }
 
 
-    let semana = fecha.toString().substring(4,6)
-
-    let ano = fecha.toString().substring(0,4)
-    //console.log(semana, ano)
-
-    let stringSemana = `Semana ${semana} de ${ano} de ${getDateRangeOfWeek(semana, ano)}`
-    //console.log(stringSemana)
-    return stringSemana
-  
-
-  }
-
-  inicializarDateTimePicker() {
+  inicializarDateTimePickerDia() {
     $(".timepicker").timepicker({
       twelveHour: false,
       autoClose: true
@@ -468,7 +385,7 @@ class FechasVista {
       firstDay: 1,
       minDate: new Date(),
       autoClose: true,
-      format: "yyyy-mm-dd",
+      format: "dd-mm-yyyy",
       i18n: {
         months: [
           "Enero",
@@ -522,7 +439,7 @@ class FechasVista {
       firstDay: 1,
       minDate: new Date(),
       autoClose: true,
-      format: "yyyy-mm-dd",
+      format: "dd-mm-yyyy",
       i18n: {
         months: [
           "Enero",
@@ -571,23 +488,376 @@ class FechasVista {
     });
   }
 
-  chequearSiFechaFinalizacionEsPosterior() {
-    if ($("#finalizaAgregarDia").val().length > 0) {
-      $("#inputFechaAgregarDia").val() < $("#finalizaAgregarDia").val()
-        ? $("#estadoAgregarDia").text("")
-        : $("#estadoAgregarDia").text(
-            "La Fecha de Finalización de Inscripción debe ser anterior a la fecha de Examen."
-          );
+
+  mostrarAgregarSemana() {
+    $("#areaAgregarFecha").empty();
+    $("#areaAgregarFecha").append(this.selectorSemanas());
+
+    this.aceptarSoloNumerosEnInput("inputCupoAgregarSemana");
+    this.semanasProximoAno();
+    this.habilitarFormSelect();
+    this.inicializarDateTimePickerSemana();
+    this.inicializarListenerBotonAgregarSemana();
+  }
+
+  selectorSemanas() {
+    return `
+    <div class="row">
+      <div id="listadoSemanasListenChange" class="input-field col l5 clear-top-3">
+          <select id="listadoSemanas">
+          </select>
+          <label>Seleccionar Semana</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s5 m4 l3 xl2">
+          <input id="inputCupoAgregarSemana" type="number" autocomplete="off" >
+          <label for="inputCupoAgregarSemana">Cupo</label>
+      </div>
+
+      <div class="col s5 m4 l3 xl2">
+        <input id="finalizaAgregarSemana" type="text" class="datepicker" >
+        <label class="gris-texto">FINALIZA inscripción</label>
+      </div>
+    </div>
+
+    <div class="row margin0">
+      <div class="col clear-top-2">
+          <a id="botonAgregaSemana" class="disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
+      </div>
+      <span class="col clear-top-2" id="estadoAgregarSemana"></span>
+    </div>
+  </div>`;
+  }
+
+
+
+
+  inicializarListenerBotonAgregarSemana() {
+    // Se prepara la informacion a enviar
+    this.chequearInformacionInputSemana();
+    $("#botonAgregaSemana").on("click", () => {
+      let agregarSemana = {
+        uuid: this.fechasServicio.uuid(),
+        cupo: $("#inputCupoAgregarSemana").val(),
+        semana: this.getDateFirstDayOfWeek(
+          $("#listadoSemanas option:selected").attr("semana"),
+          $("#listadoSemanas option:selected").attr("ano")
+        ),
+        finaliza: this.ddmmyyyyToYyyymmdd($("#finalizaAgregarSemana").val())
+      };
+
+      let id = $('#estadoAgregarSemana')
+      // Se envia la informacion
+      this.fechasServicio.agregarFechaSemana(agregarSemana, this.accionExitosa, this.huboUnError, this.cleanSemanaValues, id);
+      id.append(this.preloader());
+
+    });
+  }
+
+  chequearInformacionInputSemana() {
+    $("#inputCupoAgregarSemana").on("input", () => {
+      if (!$('#inputCupoAgregarSemana').val()) {
+        $("#botonAgregaSemana").addClass("disabled");
+      }
+
+      if ($("#inputCupoAgregarSemana").val() > 0) {
+        this.chequearSiFechaFinalizacionEsPosteriorSemana() ? $("#botonAgregaSemana").removeClass("disabled") : $("#botonAgregaSemana").addClass("disabled");
+      }
+    });
+
+    $("#finalizaAgregarSemana").on("change", () => {
+      if ($("#inputCupoAgregarSemana").val() > 0) {
+        this.chequearSiFechaFinalizacionEsPosteriorSemana() ? $("#botonAgregaSemana").removeClass("disabled") : $("#botonAgregaSemana").addClass("disabled");
+      }
+    });
+
+    $('#listadoSemanasListenChange').on("change", () => {
+      if (this.chequearSiFechaFinalizacionEsPosteriorSemana()) {
+        ($("#inputCupoAgregarSemana").val() > 0) ? $("#botonAgregaSemana").removeClass("disabled") : $("#botonAgregaSemana").addClass("disabled");
+      }
+    });
+  }
+
+  chequearSiFechaFinalizacionEsPosteriorSemana() {
+    if ($("#finalizaAgregarSemana").val().length > 0) {
+      let semanaElegida = this.getDateFirstDayOfWeek($("#listadoSemanas option:selected").attr("semana"), $("#listadoSemanas option:selected").attr("ano"))
+      let semanaElegidaDate = new Date(semanaElegida.slice(0, 4), semanaElegida.slice(5, 7)-1, semanaElegida.slice(8, 11));
+
+      let fechaElegida = this.ddmmyyyyToYyyymmdd($("#finalizaAgregarSemana").val())
+      let fechaElegidaDate = new Date(fechaElegida.slice(0, 4), fechaElegida.slice(5, 7)-1, fechaElegida.slice(8, 11));
+
+      console.log(semanaElegidaDate, fechaElegidaDate)
+      if (semanaElegidaDate > fechaElegidaDate) {
+        $("#estadoAgregarSemana").text("")
+        return true;
+      } else {
+        $("#botonAgregaSemana").addClass("disabled");
+        $("#estadoAgregarSemana").empty().append(
+          '<div class="rojo-texto padding-top0-6">La Fecha de Finalización de Inscripción debe ser anterior a la fecha de Examen.</div>'
+        );
+        return false;
+      }
     }
   }
 
+  cleanSemanaValues() {
+    $("#finalizaAgregarSemana").val('');
+    $("#inputCupoAgregarSemana").val('');
+    ($("#finalizaAgregarSemana").val() && $("#finalizaAgregarSemana").val()) ? $("#botonAgregaSemana").removeClass("disabled") : $("#botonAgregaSemana").addClass("disabled")
+  }
+
+  accionExitosa(id) {
+    id.empty();
+    id.append('<div class="azul-texto">Se realizaron los cambios</div>');
+    setTimeout(() => id.empty(), 4000)
+  }
+
+  huboUnError(id) {
+    id.empty();
+    id.append('<div class="rojo-texto">Hubo un error. Contactate con personal técnico.</div>');
+    setTimeout(() => id.empty(), 6000)
+  }
+
+
+  preloader() {
+    return `
+    <div class="preloader-wrapper small active">
+      <div class="spinner-layer spinner-yellow-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+         </div>
+      </div>
+    </div>    
+    `
+  }
+
+  getDateFirstDayOfWeek(weekNo, y) {
+    var d1, numOfdaysPastSinceLastMonday, rangeIsFrom;
+    d1 = new Date("" + y + "");
+    numOfdaysPastSinceLastMonday = d1.getDay() - 1;
+    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+    d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
+    rangeIsFrom = `${d1.getFullYear()}-${d1.getMonth() + 1}-${d1.getDate()}`;
+    return rangeIsFrom;
+  }
+
+  semanasProximoAno() {
+    let listadoSemanas = $("#listadoSemanas");
+
+    Date.prototype.getWeek = function () {
+      var date = new Date(this.getTime());
+      date.setHours(0, 0, 0, 0);
+      // Thursday in current week decides the year.
+      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+      // January 4 is always in week 1.
+      var week1 = new Date(date.getFullYear(), 0, 4);
+      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+      return (
+        1 +
+        Math.round(
+          ((date.getTime() - week1.getTime()) / 86400000 -
+            3 +
+            ((week1.getDay() + 6) % 7)) /
+          7
+        )
+      );
+    };
+
+    Date.prototype.getWeekYear = function () {
+      var date = new Date(this.getTime());
+      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+      return date.getFullYear();
+    };
+
+    function getISOWeeks(y) {
+      var d, isLeap;
+
+      d = new Date(y, 0, 1);
+      isLeap = new Date(y, 1, 29).getMonth() === 1;
+
+      //check for a Jan 1 that's a Thursday or a leap year that has a
+      //Wednesday jan 1. Otherwise it's 52
+      return d.getDay() === 4 || (isLeap && d.getDay() === 3) ? 53 : 52;
+    }
+
+    //Esta funcion obedece la orden de dd/mm/yyyy
+    function getDateRangeOfWeek(weekNo, y) {
+      var d1, numOfdaysPastSinceLastMonday, rangeIsFrom, rangeIsTo;
+      d1 = new Date("" + y + "");
+      numOfdaysPastSinceLastMonday = d1.getDay() - 1;
+      d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+      d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
+      rangeIsFrom =
+        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
+      d1.setDate(d1.getDate() + 6);
+      rangeIsTo =
+        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
+      return rangeIsFrom + " a " + rangeIsTo;
+    }
+
+
+
+    const fechaHoy = new Date();
+    const anioActual = () => fechaHoy.getWeekYear();
+    const semanaActual = () => fechaHoy.getWeek();
+    const semanasTotalAnioActual = () => getISOWeeks(anioActual);
+
+    for (let i = 53, sem = semanaActual(), ano = anioActual(); i >= 1; i--) {
+      listadoSemanas.append(
+        `<option value="${sem} ${ano}" semana="${sem}" ano="${ano}">Semana ${sem} de ${ano} de ${getDateRangeOfWeek(
+          sem,
+          ano
+        )}</option>`
+      );
+
+      if (sem < semanasTotalAnioActual()) {
+        sem++;
+      } else {
+        sem = 1;
+        ano++;
+      }
+    }
+  }
+
+
+  armarStringSemanaAPartirDelPrimerDiaDeSemana(fecha) {
+    //Las semanas en la base de datos se guardan escribiiendo el primer dia. 
+    //Esta funcion me devuelve el string de la semana elegida dado el lunes de cada semana.
+    //console.log(fecha)
+
+    Date.prototype.getWeek = function () {
+      var date = new Date(this.getTime());
+      date.setHours(0, 0, 0, 0);
+      // Thursday in current week decides the year.
+      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+      // January 4 is always in week 1.
+      var week1 = new Date(date.getFullYear(), 0, 4);
+      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+      return (
+        1 +
+        Math.round(
+          ((date.getTime() - week1.getTime()) / 86400000 -
+            3 +
+            ((week1.getDay() + 6) % 7)) /
+          7
+        )
+      );
+    };
+
+    Date.prototype.getWeekYear = function () {
+      var date = new Date(this.getTime());
+      date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+      return date.getFullYear();
+    };
+
+    function getDateRangeOfWeek(weekNo, y) {
+      var d1, numOfdaysPastSinceLastMonday, rangeIsFrom, rangeIsTo;
+      d1 = new Date("" + y + "");
+      numOfdaysPastSinceLastMonday = d1.getDay() - 1;
+      d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+      d1.setDate(d1.getDate() + 7 * (weekNo - d1.getWeek()));
+      rangeIsFrom =
+        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
+      d1.setDate(d1.getDate() + 6);
+      rangeIsTo =
+        d1.getDate() + "/" + (d1.getMonth() + 1) + "/" + d1.getFullYear();
+      return rangeIsFrom + " a " + rangeIsTo;
+    }
+
+
+    let semana = fecha.toString().substring(4, 6)
+
+    let ano = fecha.toString().substring(0, 4)
+
+    let stringSemana = `Semana ${semana} de ${ano} de ${getDateRangeOfWeek(semana, ano)}`
+
+    return stringSemana
+  }
+
+
+  inicializarDateTimePickerSemana() {
+    $("#finalizaAgregarSemana").datepicker({
+      firstDay: 1,
+      minDate: new Date(),
+      autoClose: true,
+      format: "dd-mm-yyyy",
+      i18n: {
+        months: [
+          "Enero",
+          "Febrero",
+          "Marzo",
+          "Abril",
+          "Mayo",
+          "Junio",
+          "Julio",
+          "Agosto",
+          "Septiembre",
+          "Octubre",
+          "Noviembre",
+          "Diciembre"
+        ],
+        monthsShort: [
+          "Ene",
+          "Feb",
+          "Mar",
+          "Abr",
+          "May",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Oct",
+          "Nov",
+          "Dic"
+        ],
+        weekdays: [
+          "Domingo",
+          "Lunes",
+          "Martes",
+          "Miércoles",
+          "Jueves",
+          "Viernes",
+          "Sábado"
+        ],
+        weekdaysShort: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+        weekdaysAbbrev: ["D", "L", "M", "M", "J", "V", "S"]
+      },
+
+      onClose: () => {
+        this.chequearSiFechaFinalizacionEsPosteriorSemana();
+      }
+    });
+  }
+
+
   aceptarSoloNumerosEnInput(input) {
-    $(`#${input}`).on("keydown", function(e) {
+    $(`#${input}`).on("keydown", function (e) {
       if (e.which == 69 || e.which == 107 || e.which == 109) {
         e.preventDefault();
       }
     });
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   async mostrarListaDeHorarios() {
     let listaHorarios = await this.fechasServicio.getListaHorarios();
@@ -598,25 +868,25 @@ class FechasVista {
       $("#listaHorarios").append(`
             <li id="${horario.uuid}" tipo="${horario.source}" pausado="${
         horario.pausado
-      }" class="collection-item azul-texto cursorPointer hoverGrey ${
+        }" class="collection-item azul-texto cursorPointer hoverGrey ${
         horario.pausado ? "inputInactivo" : ""
-      }">
+        }">
                 <i id="${
-                  horario.uuid
-                }_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${
+        horario.uuid
+        }_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${
         horario.pausado ? "visibility_off" : "visibility"
-      }</i>
+        }</i>
                 <span class="badge cupos margin0" data-badge-caption="total">${
-                  horario.cupo_maximo
-                }</span>
+        horario.cupo_maximo
+        }</span>
                 <span class="new badge background-azul margin0" data-badge-caption="ventas">${horario.ventas}</span>
                 <span class="new badge green margin0" data-badge-caption="libres">${horario.cupos_libres}</span>
-                <span class="new badge blue-grey margin0  lighten-2" data-badge-caption="">${
-                  horario.source === "RW" ? "ESCR" : "ORAL"
-                }</span>
+                <span class="new badge margin0 ${horario.source === "RW" ? "light-blue " : "orange "}   " data-badge-caption="">${
+        horario.source === "RW" ? "ESCR" : "ORAL"
+        }</span>
                 ${this.fechasServicio.stringDiaHoraEspanol(
-                  horario.fecha_Examen
-                )}
+          horario.fecha_Examen
+        )}
             </li>
             `);
       this.asignarFuncionBotonPausa(horario.uuid);
@@ -633,17 +903,17 @@ class FechasVista {
       $("#listaHorarios").append(`
             <li id="${semana.uuid}" tipo="${semana.yyyyss}" pausado="${
         semana.pausado
-      }" class="collection-item azul-texto cursorPointer hoverGrey ${
+        }" class="collection-item azul-texto cursorPointer hoverGrey ${
         semana.pausado ? "inputInactivo" : ""
-      }">
+        }">
                 <i id="${
-                  semana.uuid
-                }_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${
+        semana.uuid
+        }_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${
         semana.pausado ? "visibility_off" : "visibility"
-      }</i>
+        }</i>
                 <span class="badge cupos" data-badge-caption="cupos">${
-                  semana.cupo_maximo
-                }</span>
+        semana.cupo_maximo
+        }</span>
                 <span class="new badge background-azul" data-badge-caption="ventas">${semana.ventas}</span>
                 <span class="new badge green" data-badge-caption="libres">${semana.cupos_libres}</span>
                 ${this.armarStringSemanaAPartirDelPrimerDiaDeSemana(semana.yyyyss)}
@@ -679,57 +949,8 @@ class FechasVista {
     });
   }
 
-  async traerListaDeExamenesDb() {
-    this.examenesFromDB = await this.fechasServicio.getListaExamenes();
-    this.establecerOrdenListaExamenes(this.examenesFromDB);
-  }
 
-  establecerOrdenListaExamenes(listaExamenes) {
-    //Ordeno la lista de examenes primero por Materia, luego Tipo, luego Nivel, luego Modalidad.
-    listaExamenes.sort(function(objA, objB) {
-      let ordenMateriaA = objA.orden_materia;
-      let ordenMateriaB = objB.orden_materia;
 
-      // Se ordenan primero por orden materia
-      if (ordenMateriaA > ordenMateriaB) {
-        return 1;
-      } else if (ordenMateriaA < ordenMateriaB) {
-        return -1;
-      } else {
-        // Dentro de las mismas materias, ordenamos por tipo
-        let ordenTipoA = objA.orden_tipo;
-        let ordenTipoB = objB.orden_tipo;
-
-        if (ordenTipoA > ordenTipoB) {
-          return 1;
-        } else if (ordenTipoA < ordenTipoB) {
-          return -1;
-        } else {
-          // Dentro de las mismos tipos, ordenamos por nivel
-          let ordenNivalA = objA.orden_nivel;
-          let ordenNivalB = objB.orden_nivel;
-
-          if (ordenNivalA > ordenNivalB) {
-            return 1;
-          } else if (ordenNivalA < ordenNivalB) {
-            return -1;
-          } else {
-            // Dentro de las mismos niveles, ordenamos por modalidad
-            let ordenModalidadA = objA.orden_modalidad;
-            let ordenModalidadB = objB.orden_modalidad;
-
-            if (ordenModalidadA > ordenModalidadB) {
-              return 1;
-            } else if (ordenModalidadA < ordenModalidadB) {
-              return -1;
-            } else {
-              return 0;
-            }
-          }
-        }
-      }
-    });
-  }
 
   generarListaDeExamenes(oralOEscrito) {
     //Genero la lista de opciones para el dropdown de examenes teniendo en cuenta si la fecha de examen corresponde a LS o a RW
@@ -768,7 +989,7 @@ class FechasVista {
       <span>${nombre}</span>
       <i id="${id}_visibility" class="material-icons-outlined azul-texto right button-opacity">${
       pausado ? "visibility_off" : "visibility"
-    }</i>
+      }</i>
     </li>
     `;
   }
@@ -777,8 +998,8 @@ class FechasVista {
     $("#botonGuardarExamenesEnFecha").on("click", () => {
       let datos = {
         tipoDeLista: $("#listaHorarios")
-        .find(".ui-selected")
-        .attr("tipo"),
+          .find(".ui-selected")
+          .attr("tipo"),
         estadoListaExamenesDia: this.obtenerListaDeExamenesDeUl(),
         addExamenesFechaDia: this.addExamenesFechaDia,
         removeExamenesFechaDia: this.removeExamenesFechaDia,
@@ -798,7 +1019,7 @@ class FechasVista {
     $('#listadoReservasEnFechas').empty();
     let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected);
     let diasOral = await this.fechasServicio.getListaHorariosOrales();
-    
+
     this.mostrarlistadoReservasEnFechasSemanasLs();
     this.mostrarElementosListReservasEnFEchasSemanasLs(reservaSemanas, diasOral);
     console.log(reservaSemanas)
@@ -818,16 +1039,16 @@ class FechasVista {
     this.mostrarlistadoReservasEnDiaLs();
     this.mostrarElementosListReservasEnDiaLs(reservaDiaLs)
   }
-  
 
-  mostrarlistadoReservasEnFechasSemanasLs(){
+
+  mostrarlistadoReservasEnFechasSemanasLs() {
     $('#listadoReservasEnFechas').append(
-    `<table>
+      `<table>
           <thead>
               <tr>
-                  <th class="th-width-short">
+                  <th class="">
                       <label>
-                          <input type="checkbox" />
+                          <input type="checkbox" id="ckbCheckAll" />
                           <span></span>
                       </label>
                   </th>
@@ -843,14 +1064,14 @@ class FechasVista {
     </table>`)
   }
 
-  mostrarlistadoReservasEnDiaRw(){
+  mostrarlistadoReservasEnDiaRw() {
     $('#listadoReservasEnFechas').append(
-    `<table>
+      `<table>
           <thead>
               <tr>
                   <th class="th-width-short">
                       <label>
-                          <input type="checkbox" />
+                          <input type="checkbox" id="ckbCheckAll" />
                           <span></span>
                       </label>
                   </th>
@@ -865,15 +1086,15 @@ class FechasVista {
     </table>`)
   }
 
-  mostrarElementosListReservasEnDiaRw(reservaDiaRw){
+  mostrarElementosListReservasEnDiaRw(reservaDiaRw) {
     $('#bodyListadoReservasEnFechas').empty();
 
     reservaDiaRw.forEach(reserva => {
       $('#bodyListadoReservasEnFechas').append(
-          `<tr>
+        `<tr>
             <td class="th-width-short">
               <label>
-                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass" type="checkbox"   />
                           <span class="margin-top-5px"></span>
               </label>
             </td>
@@ -883,16 +1104,23 @@ class FechasVista {
             <td>${reserva.alumno_documento_id}</td>
           </tr>`)
     });
+    this.habilitarToggleCheckboxAll()
   };
 
-  mostrarlistadoReservasEnDiaLs(){
+  habilitarToggleCheckboxAll() {
+    $("#ckbCheckAll").click(function () {
+      $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+    });
+  }
+
+  mostrarlistadoReservasEnDiaLs() {
     $('#listadoReservasEnFechas').append(
-    `<table>
+      `<table>
           <thead>
               <tr>
                   <th class="th-width-short">
                       <label>
-                          <input type="checkbox" />
+                          <input type="checkbox" id="ckbCheckAll"/>
                           <span></span>
                       </label>
                   </th>
@@ -907,15 +1135,15 @@ class FechasVista {
     </table>`)
   }
 
-  mostrarElementosListReservasEnDiaLs(reservaDiaLs){
+  mostrarElementosListReservasEnDiaLs(reservaDiaLs) {
     $('#bodyListadoReservasEnFechas').empty();
 
     reservaDiaLs.forEach(reserva => {
       $('#bodyListadoReservasEnFechas').append(
-          `<tr>
+        `<tr>
             <td class="th-width-short">
               <label>
-                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
                           <span class="margin-top-5px"></span>
               </label>
             </td>
@@ -925,22 +1153,24 @@ class FechasVista {
             <td>${reserva.alumno_documento_id}</td>
           </tr>`)
     });
+
+    this.habilitarToggleCheckboxAll()
   };
 
 
-  mostrarElementosListReservasEnFEchasSemanasLs(reservasSemanaLs, diasOral){
+  mostrarElementosListReservasEnFEchasSemanasLs(reservasSemanaLs, diasOral) {
     $('#bodyListadoReservasEnFechas').empty();
-    
+
     console.log(reservasSemanaLs)
-    
+
 
     reservasSemanaLs.forEach(reserva => {
       console.log(reserva.dia_LS_uuid, reserva.dia_LS_fecha_examen)
       $('#bodyListadoReservasEnFechas').append(
-          `<tr>
+        `<tr>
             <td class="th-width-short">
               <label>
-                <input id="${reserva.reserva_uuid}" type="checkbox"   />
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
                           <span class="margin-top-5px"></span>
               </label>
             </td>
@@ -970,24 +1200,26 @@ class FechasVista {
   
 
      `);
-      console.log(diasOral)
+    console.log(diasOral)
 
+    $('#listadoDiasOralesParaSemana').append(
+      `<option value="" disabled selected>Seleccionar</option>`
+    )
+
+
+    diasOral.forEach(diaHorario => {
       $('#listadoDiasOralesParaSemana').append(
-        `<option value="" disabled selected>Seleccionar</option>`
-        )
+        `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${diaHorario.cupos_libres}</option>`
+      )
+    }
+    );
 
-      
-      diasOral.forEach( diaHorario => {
-        $('#listadoDiasOralesParaSemana').append(
-          `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${diaHorario.cupos_libres}</option>`
-          )}
-        );
 
-            
-      this.habilitarFormSelect();
-      this.asignarFuncionBotonAsignarDiaOralASemana();
+    this.habilitarFormSelect();
+    this.asignarFuncionBotonAsignarDiaOralASemana();
+    this.habilitarToggleCheckboxAll()
 
-    
+
   }
 
   asignarFuncionBotonAsignarDiaOralASemana() {
@@ -997,17 +1229,17 @@ class FechasVista {
   }
 
 
-  asignarDiaASemanaExamenOral(){  
+  asignarDiaASemanaExamenOral() {
     // Obtengo el día del oral seleccionado
     $("select").formSelect();
     let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
     let diaOralSeleccionado = instance.getSelectedValues();
 
     // Obtengo las reservas de semana a las que se le debe asignar un día
-    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function() {
+    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function () {
       return this.id;
     }).get();
-    
+
     console.log(diaOralSeleccionado, reservasSeleccionadas)
 
     let datos = {
@@ -1016,12 +1248,12 @@ class FechasVista {
     }
 
     this.fechasServicio.asignarDiaASemanaExamenOral(datos);
-  
+
   }
-  
-  
-   
-            
+
+
+
+
 
 
 
@@ -1101,7 +1333,7 @@ class FechasVista {
       );
     });
   }
-  
+
 
   async mostrarExamenesDeSemanaEnListaFromDB(idSelected) {
     let examenes = await this.fechasServicio.getExamenesEnSemana(idSelected);
@@ -1128,7 +1360,7 @@ class FechasVista {
   obtenerListaDeExamenesDeUl() {
     let examenesEnUl = [];
 
-    $("#listaExamenes li").each(function() {
+    $("#listaExamenes li").each(function () {
       examenesEnUl.push({
         uuid: $(this)
           .attr("id")
@@ -1153,7 +1385,7 @@ class FechasVista {
   convertirUuidExamenEnTexto(uuidExamen) {
     let nombreSegunUuid;
 
-    this.examenesFromDB.forEach(function(item) {
+    this.examenesFromDB.forEach(function (item) {
       if (item.uuid === uuidExamen) {
         nombreSegunUuid = `${item.materia} / ${item.tipo} / ${item.nivel} / ${item.modalidad}`;
       }

@@ -53,6 +53,10 @@ body {
   color: #085796 !important;
 }
 
+.rojo-texto {
+  color: #961108 !important;
+}
+
 .gris-texto {
   color: #5a5a5a !important;
 }
@@ -181,8 +185,8 @@ input[type=number]:not(.browser-default):focus:not([readonly]),
 input[type=search]:not(.browser-default):focus:not([readonly]), 
 textarea.materialize-textarea:focus:not([readonly]){
   box-shadow: 0 1px 0 0 #085796 !important;
-  border-bottom: 1px solid #085796;
-  -webkit-box-shadow: 0 1px 0 0 #085796 ;
+  border-bottom: 1px solid #085796 !important;
+  -webkit-box-shadow: 0 1px 0 0 #085796 !important;
 }
 
 /* Input Precio Modalidad Label */
@@ -317,6 +321,14 @@ input[type="number"] {
 
 .padding0 {
   padding: 0 !important;
+}
+
+.padding-top0-6{
+  padding-top: 0.6rem;
+}
+
+.padding-top2-5{
+  padding-top: 2.5rem;
 }
 
 .padding0-7rem {

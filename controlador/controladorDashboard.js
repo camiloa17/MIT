@@ -449,7 +449,7 @@ async function buscarEnDBListaSemanas() {
       `SELECT 
       BIN_TO_UUID(uuid) as uuid, 
       BIN_TO_UUID(uuid) as this_uuid, 
-      
+
       (SELECT count(*)  FROM reserva 
       LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
       LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
@@ -458,7 +458,7 @@ async function buscarEnDBListaSemanas() {
       (cupo_maximo - (SELECT count(*) FROM reserva 
       LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
       LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)
       ) as cupos_libres,
       
       YEARWEEK(semana_Examen,3) AS yyyyss, 
@@ -558,15 +558,13 @@ async function buscarEnDBListaHorariosOrales() {
       BIN_TO_UUID(uuid) as this_uuid, 
       
       (SELECT count(*)  FROM reserva 
-      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
-      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas, 
-      
-      (cupo_maximo - (SELECT count(*) FROM reserva 
-      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
-      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)
-      ) as cupos_libres,      
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
+
+      (cupo_maximo - (SELECT count(*)  FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid) 
+      ) as cupos_libres,
       
       
       'LS' as source FROM dia_LS WHERE activo=1 
@@ -645,7 +643,7 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
         query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_RW_uuid) as fecha_uuid, pausado FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
       break;
       case "LS":
-        query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;
+        // query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;
       break;
     }
     const values = [fecha];
@@ -846,6 +844,7 @@ module.exports = {
   agregarFechaSemana: agregarFechaSemana,
   listarSemanas: listarSemanas,
   getExamenesEnSemana: getExamenesEnSemana,
+  
   listarReservaSemanasLs: listarReservaSemanasLs,
   listarReservaDiaRw: listarReservaDiaRw,
   listarReservaDiaLs: listarReservaDiaLs,
