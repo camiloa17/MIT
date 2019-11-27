@@ -213,6 +213,7 @@ class FechasVista {
     return date.split("-").reverse().join("-");
   }
 
+  //////////////////////////////////  AGREGAR DIA RW O DIA LS
   mostrarAgregarDiaHora() {
     $("#areaAgregarFecha").empty();
     $("#areaAgregarFecha").append(this.selectorDiaEscritoUOral());
@@ -268,24 +269,29 @@ class FechasVista {
       
     <div class="row margin0">
         <div class="col clear-top-2">
-            <a id="botonAgregaDia"  class="disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
+            <a id="botonAgregaDia"  class="col disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
+            <span id="estadoAgregarDia" class="" ></span>
         </div>
-        <span id="estadoAgregarDia" class="" ></span>
+        
     </div>
     `;
   }
 
   inicializarListenerBotonAgregarDia() {
     this.chequearInformacionInputDia();
-
+       
     $("#botonAgregaDia").on("click", () => {
-      let fechaDateTime = `${$("#inputFechaAgregarDia").val()} ${$("#inputHoraAgregarDia").val()}`;
+      let fechaExamen= this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
+      let fechaFinaliza= this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
+      
+      // DateTime pongo primero el dia luego la hora
+      let fechaDateTime = `${fechaExamen} ${$("#inputHoraAgregarDia").val()}`;
 
       let agregarDia = {
         uuid: this.fechasServicio.uuid(),
         cupo: $("#inputCupoAgregarDia").val(),
         fecha: fechaDateTime,
-        finaliza: $("#finalizaAgregarDia").val(),
+        finaliza: fechaFinaliza,
         tipo:
           $("#inputRWAgregarDia")
             .filter(":checked")
@@ -294,11 +300,25 @@ class FechasVista {
             : "LS"
       };
 
-      this.fechasServicio.agregarFechaDia(agregarDia);
+
+      let id = $('#estadoAgregarDia')
+      // Se envia la informacion
+      this.fechasServicio.agregarFechaDia(agregarDia, this.accionExitosa, this.huboUnError, this.cleanAgregarDiaValues, id);
+      id.append(this.preloader());
+
     });
   }
 
-  //////////////////////////////////////////////////
+  cleanAgregarDiaValues() {
+    $('#inputFechaAgregarDia').val('');    
+    $('#inputHoraAgregarDia').val('');
+    $('#inputCupoAgregarDia').val('');
+    $("#inputRWAgregarDia").prop("checked", false)
+    $("#inputLSAgregarDia").prop("checked", false);
+    $('#finalizaAgregarDia').val('');
+    $('#botonAgregaDia').addClass('disabled');
+  }
+
   chequearInformacionInputDia() {
     $('#inputCupoAgregarDia').on('input', () => {
       if (!$('#inputCupoAgregarDia').val()) {
@@ -360,9 +380,14 @@ class FechasVista {
 
   }
 
+  
   chequearSiFechaFinalizacionEsPosterior() {
-    if ($("#finalizaAgregarDia").val().length > 0 && $("#inputFechaAgregarDia").val().length > 0 ) {
-      if ($("#inputFechaAgregarDia").val() > $("#finalizaAgregarDia").val()) {
+    let fechaExamen= this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
+    let fechaFinaliza= this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
+    console.log(fechaExamen, fechaFinaliza)
+
+    if (fechaExamen.length > 0 && fechaFinaliza.length > 0 ) {      
+      if ( fechaExamen > fechaFinaliza  ) {
         $("#estadoAgregarDia").text("");
         return true;
       } else {
@@ -488,7 +513,7 @@ class FechasVista {
     });
   }
 
-
+  //////////////////////////////////  AGREGAR SEMANA LS
   mostrarAgregarSemana() {
     $("#areaAgregarFecha").empty();
     $("#areaAgregarFecha").append(this.selectorSemanas());
@@ -550,7 +575,7 @@ class FechasVista {
 
       let id = $('#estadoAgregarSemana')
       // Se envia la informacion
-      this.fechasServicio.agregarFechaSemana(agregarSemana, this.accionExitosa, this.huboUnError, this.cleanSemanaValues, id);
+      this.fechasServicio.agregarFechaSemana(agregarSemana, this.accionExitosa, this.huboUnError, this.cleanAgregarSemanaValues, id);
       id.append(this.preloader());
 
     });
@@ -602,28 +627,29 @@ class FechasVista {
     }
   }
 
-  cleanSemanaValues() {
+  cleanAgregarSemanaValues() {
     $("#finalizaAgregarSemana").val('');
     $("#inputCupoAgregarSemana").val('');
-    ($("#finalizaAgregarSemana").val() && $("#finalizaAgregarSemana").val()) ? $("#botonAgregaSemana").removeClass("disabled") : $("#botonAgregaSemana").addClass("disabled")
+    $("#botonAgregaSemana").addClass("disabled")
   }
+
 
   accionExitosa(id) {
     id.empty();
-    id.append('<div class="azul-texto">Se realizaron los cambios</div>');
+    id.append('<div class="azul-texto estadoMensaje">Se realizaron los cambios</div>');
     setTimeout(() => id.empty(), 4000)
   }
 
   huboUnError(id) {
     id.empty();
-    id.append('<div class="rojo-texto">Hubo un error. Contactate con personal técnico.</div>');
+    id.append('<div class="rojo-texto estadoMensaje">Hubo un error. Contactate con personal técnico.</div>');
     setTimeout(() => id.empty(), 6000)
   }
 
 
   preloader() {
     return `
-    <div class="preloader-wrapper small active">
+    <div class="preloader-wrapper small active ">
       <div class="spinner-layer spinner-yellow-only">
         <div class="circle-clipper left">
           <div class="circle"></div>
@@ -703,8 +729,6 @@ class FechasVista {
       return rangeIsFrom + " a " + rangeIsTo;
     }
 
-
-
     const fechaHoy = new Date();
     const anioActual = () => fechaHoy.getWeekYear();
     const semanaActual = () => fechaHoy.getWeek();
@@ -772,13 +796,9 @@ class FechasVista {
       return rangeIsFrom + " a " + rangeIsTo;
     }
 
-
     let semana = fecha.toString().substring(4, 6)
-
     let ano = fecha.toString().substring(0, 4)
-
     let stringSemana = `Semana ${semana} de ${ano} de ${getDateRangeOfWeek(semana, ano)}`
-
     return stringSemana
   }
 
@@ -855,9 +875,7 @@ class FechasVista {
 
 
 
-
-
-
+  //////////////////////////////////  MOSTRAR HORARIOS
 
   async mostrarListaDeHorarios() {
     let listaHorarios = await this.fechasServicio.getListaHorarios();

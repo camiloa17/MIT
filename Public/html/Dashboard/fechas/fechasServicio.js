@@ -1,22 +1,8 @@
 class FechasServicio {
-  async agregarFechaDia(dataNuevaFecha) {
+
+  async agregarFechaDia(datos, exito, error, clean, id) {
     try {
       const response = await fetch(`./agregarFechaDia/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dataNuevaFecha)
-      });
-      const rta = await response.json();
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async agregarExamenFechaDia(datos) {
-    try {
-      const response = await fetch(`./agregarExamenFechaDia/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -24,10 +10,20 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
+
+      if(rta.error) {
+        error(id)
+      } else {
+        clean();
+        exito(id);
+      }
+
     } catch (err) {
+      err ? error(id) : null;
       console.log(err);
     }
   }
+
 
   async agregarFechaSemana(datos, exito, error, clean, id) {
     try {
@@ -49,8 +45,30 @@ class FechasServicio {
 
     } catch (err) {
       err ? error(id) : null;
+      console.log(err);
     }
   }
+
+
+
+
+
+  async agregarExamenFechaDia(datos) {
+    try {
+      const response = await fetch(`./agregarExamenFechaDia/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+      const rta = await response.json();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
 
   // Me trae horarios de Orales y Escritos
   async getListaHorarios() {

@@ -427,3 +427,10 @@ td{
 .hoverGrey:hover{
   background-color: #e0e0e0;
 }
+
+
+.estadoMensaje {
+  padding-left: 7rem !important;
+  margin-top: 0.6rem !important;
+  width: 50rem !important;
+}
