@@ -640,7 +640,17 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
 
     switch (tipo) {
       case "RW":
-        query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_RW_uuid) as fecha_uuid, pausado FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
+        query = `SELECT BIN_TO_UUID(uuid) AS uuid, 
+              BIN_TO_UUID(uuid) AS this_uuid, 
+              BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, 
+              BIN_TO_UUID(dia_RW_uuid) as fecha_uuid, 
+              pausado,
+              
+              (SELECT count(*) FROM reserva LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+              where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid) as ventas
+
+              FROM examen_en_dia_RW 
+              WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
       break;
       case "LS":
         // query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;

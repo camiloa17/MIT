@@ -12,6 +12,10 @@ body {
   display: none;
 }
 
+.notVisible {
+  visibility: hidden;
+}
+
 /*---------------------PRELOADER---------------------*/
 .progress {
   background-color: #d4ecff;
@@ -287,6 +291,18 @@ input[type="number"] {
   margin: 0 !important;
 }
 
+.margin-top-0{
+  margin-top: 0 !important;
+}
+
+.margin-left-0-15{
+  margin-left: 0.15rem !important;
+}
+
+.margin-right-1{
+  margin-right: 1rem !important;
+}
+
 .margin-bottom-0 {
   margin-bottom: 0 !important;
 }
@@ -305,6 +321,10 @@ input[type="number"] {
 
 .clear-top-3 {
   margin-top: 3rem !important;
+}
+
+.clear-top-6 {
+  margin-top: 6rem !important;
 }
 
 .clear-bottom-1 {
@@ -433,4 +453,19 @@ td{
   padding-left: 7rem !important;
   margin-top: 0.6rem !important;
   width: 50rem !important;
+}
+
+.heigth78px{
+  height: 78px !important;
+  margin-top: -50px !important;
+}
+
+@media screen and (max-width: 992px) {
+  .margin-bottom22 {
+    margin-bottom: 8rem;
+  }
+}
+
+.ww{
+  margin-bottom: -2rem !important;
 }
