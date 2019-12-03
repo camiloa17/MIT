@@ -68,6 +68,81 @@ class FechasServicio {
     }
   }
 
+  async elminarFechaSemana(fecha, exito, error, id) {
+    let datos= { fecha: fecha }
+    
+    try {
+      const response = await fetch(`./elminarFechaSemana/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+
+      const rta = await response.json();
+
+      if(rta.error) {
+        error(id)
+      } else {        
+        exito(id);
+      }
+
+    } catch (err) {
+      err ? error(id) : null;
+    }
+  }
+
+  async elminarFechaDiaLs(fecha, exito, error, id) {
+    let datos= { fecha: fecha }
+    
+    try {
+      const response = await fetch(`./elminarFechaDiaLs/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+
+      const rta = await response.json();
+
+      if(rta.error) {
+        error(id)
+      } else {        
+        exito(id);
+      }
+
+    } catch (err) {
+      err ? error(id) : null;
+    }
+  }
+
+  async elminarFechaDiaRw(fecha, exito, error, id) {
+    console.log("llegamos a servicio")
+    let datos= { fecha: fecha }
+    
+    try {
+      const response = await fetch(`./elminarFechaDiaRw/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+
+      const rta = await response.json();
+
+      if(rta.error) {
+        error(id)
+      } else {        
+        exito(id);
+      }
+
+    } catch (err) {
+      err ? error(id) : null;
+    }
+  }
 
 
   // Me trae horarios de Orales y Escritos

@@ -507,6 +507,7 @@ async function buscarEnDBListaHorarios() {
       ) as cupos_libres,
 
       'RW' as source FROM dia_RW 
+      WHERE activo=1 
       
       UNION SELECT 
       BIN_TO_UUID(uuid) as uuid,       
@@ -801,9 +802,7 @@ async function buscarEnDbReservaDiaLs(fecha) {
 
 
 async function asignarDiaASemanaExamenOral(req, res) {
-  console.log("LLEGAMO")
   let cambios = req.body;
-  console.log(cambios)
   let data = await asignarDiaASemanaExamenOralEnDB(cambios);
   res.send(JSON.stringify(data));
 }
@@ -827,6 +826,80 @@ async function asignarDiaASemanaExamenOralEnDB(cambios) {
     if (connection) connection.release();
   }
 }
+
+
+
+async function elminarFechaSemana(req, res) {
+  let fecha = req.body.fecha;
+  let data = await elminarFechaSemanaEnDB(fecha);
+  res.send(JSON.stringify(data));
+}
+
+async function elminarFechaSemanaEnDB(fecha) {
+  let sql = "";
+  let connection;
+
+  try {
+    connection = await connectionToDb();
+
+    sql += `UPDATE semana_LS SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(fecha)};`;
+    sql += `UPDATE examen_en_semana_LS SET activo=0 WHERE BIN_TO_UUID(semana_LS_uuid)=${connection.escape(fecha)};`;
+  
+    const data = await queryToDb(connection, sql);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+async function elminarFechaDiaRw(req, res) {
+  let fecha = req.body.fecha;
+  console.log(fecha)
+  let data = await elminarFechaDiaRwEnDB(fecha);
+  res.send(JSON.stringify(data));
+}
+
+async function elminarFechaDiaRwEnDB(fecha) {
+  let sql = "";
+  let connection;
+
+  try {
+    connection = await connectionToDb();
+
+    sql += `UPDATE dia_RW SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(fecha)};`;
+    sql += `UPDATE examen_en_dia_RW SET activo=0 WHERE BIN_TO_UUID(dia_RW_uuid)=${connection.escape(fecha)};`;
+
+    console.log(sql)
+  
+    const data = await queryToDb(connection, sql);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+async function elminarFechaDiaLs(req, res) {
+  let fecha = req.body.fecha;
+  let data = await elminarFechaDiaLsEnDB(fecha);
+  res.send(JSON.stringify(data));
+}
+
+async function elminarFechaDiaLsEnDB(fecha) {
+  let sql = "";
+  let connection;
+
+  try {
+    connection = await connectionToDb();
+
+    sql += `UPDATE dia_LS SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(fecha)};`;
+  
+    const data = await queryToDb(connection, sql);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 
 
 
@@ -860,5 +933,9 @@ module.exports = {
   listarReservaDiaLs: listarReservaDiaLs,
 
   asignarDiaASemanaExamenOral: asignarDiaASemanaExamenOral,
+
+  elminarFechaSemana:elminarFechaSemana,
+  elminarFechaDiaLs: elminarFechaDiaLs,
+  elminarFechaDiaRw: elminarFechaDiaRw,
   
 };

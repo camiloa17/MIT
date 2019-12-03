@@ -9,14 +9,14 @@ class FechasVista {
     this.habilitarSelectableChipDiaSemanaEditar($("#chipsSeleccionDiaSemanaEditar"));
 
  
-
-
     /// Agregar Examenes a Fecha día:
     this.addExamenesFechaDia = [];
     this.removeExamenesFechaDia = [];
     this.cambioPausaExamenesFechaDia = [];
 
     this.lastExamSelected = [];
+
+    this.fechaAEliminar = {uuid: "", lista: ""}
   }
 
   async traerListaDeExamenesDb() {
@@ -699,10 +699,10 @@ class FechasVista {
     </div>
 
     <div class="row margin0">
-      <div class="col clear-top-2">
+      <div class="col clear-top-2 valign-wrapper">
           <a id="botonAgregaSemana" class="disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
-      </div>
-      <span class="col clear-top-2" id="estadoAgregarSemana"></span>
+          <span class="col" id="estadoAgregarSemana"></span>
+      </div>      
     </div>
   </div>`;
   }
@@ -787,13 +787,13 @@ class FechasVista {
 
   accionExitosa(id) {
     id.empty();
-    id.append('<div class="azul-texto estadoMensaje">Se realizaron los cambios</div>');
+    id.append('<div class="azul-texto">Se realizaron los cambios</div>');
     setTimeout(() => id.empty(), 4000)
   }
 
   huboUnError(id) {
     id.empty();
-    id.append('<div class="rojo-texto estadoMensaje">Hubo un error. Contactate con personal técnico.</div>');
+    id.append('<div class="rojo-texto">Hubo un error. Contactate con personal técnico.</div>');
     setTimeout(() => id.empty(), 6000)
   }
 
@@ -1076,9 +1076,9 @@ class FechasVista {
     </div>
 
     <div class="row">
-      <div class="col s6 m6 l6 xl6 offset-l6 offset-xl6">
+      <div class="col s6 m6 l6 xl6 offset-l6 offset-xl6 valign-wrapper">
         <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul">Guardar</a>
-        <span id="estadoCambiosFechaExamenes"></span>
+        <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>
       </div>
     </div>
 
@@ -1111,15 +1111,18 @@ class FechasVista {
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${horario.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${horario.cupos_libres}</span>
-                    <i id="${horario.uuid}_remover" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!horario.ventas ? "delete" : ""}</i>
+                    <i href="#modalEliminarFecha" id="${horario.uuid}_remover" class="modal-trigger material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!horario.ventas ? "delete" : ""}</i>
                   </div>
                 </div>
               </div>
             </li>
             `);
       this.asignarFuncionBotonPausa(horario.uuid);
+      this.asignarFuncionEliminarFecha(horario.uuid, horario.source);
     });
   }
+
+ 
 
   mostrarInputsCambioDia(idSelected){
     let cupo=$(`#${idSelected}`).attr("cupo");
@@ -1158,17 +1161,43 @@ class FechasVista {
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${semana.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${semana.cupos_libres}</span>
-                    <i id="${semana.uuid}_remover" class="material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!semana.ventas ? "delete" : ""}</i>
+                    <i href="#modalEliminarFecha" id="${semana.uuid}_remover" class="modal-trigger material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!semana.ventas ? "delete" : ""}</i>
                   </div>
                 </div>
               </div>              
             </li>
             `);
-      this.asignarFuncionBotonPausa(semana.uuid)
+      this.asignarFuncionBotonPausa(semana.uuid);
+      this.asignarFuncionEliminarFecha(semana.uuid, "semana");
     });
+  }
 
-    // <span class="badge cupos" data-badge-caption="cupos">${semana.cupo_maximo}</span>
+  asignarFuncionEliminarFecha(id, lista) {
+    $(`#${id}_remover`).on("click", () => {
+      this.fechaAEliminar.uuid= id;
+      this.fechaAEliminar.lista= lista;
+      });
+  }
 
+  async eliminarFecha(){   
+    let idEstado = $('#estadoCambiosFechaExamenes')
+    console.log(this.fechaAEliminar.lista)
+
+    switch (this.fechaAEliminar.lista) {
+      case "semana":
+        await this.fechasServicio.elminarFechaSemana(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
+        await this.mostrarListaDeSemanas();
+      break;
+      case "RW":
+        console.log("enremos rw", this.fechaAEliminar.uuid)
+        await this.fechasServicio.elminarFechaDiaRw(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
+        await this.mostrarListaDeHorarios();
+      break;
+      case "LS":
+        await this.fechasServicio.elminarFechaDiaLs(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
+        await this.mostrarListaDeHorarios();
+      break;
+    } 
 
   }
 

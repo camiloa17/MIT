@@ -81,6 +81,10 @@ app.get('/listarReservaDiaRw/:fecha', asyncErrorWrap(controladorDashboard.listar
 
 app.get('/listarReservaDiaLs/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaLs))
 
+app.post('/elminarFechaSemana/', asyncErrorWrap(controladorDashboard.elminarFechaSemana))
+app.post('/elminarFechaDiaRw/', asyncErrorWrap(controladorDashboard.elminarFechaDiaRw))
+app.post('/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFechaDiaLs))
+
 
 app.use(errorHandler);
 
