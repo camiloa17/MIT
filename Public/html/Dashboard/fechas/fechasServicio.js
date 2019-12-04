@@ -119,7 +119,6 @@ class FechasServicio {
   }
 
   async elminarFechaDiaRw(fecha, exito, error, id) {
-    console.log("llegamos a servicio")
     let datos= { fecha: fecha }
     
     try {

@@ -611,7 +611,16 @@ async function buscarEnDbExamenesEnSemana(semana_uuid) {
   let connection;
   try {
     connection = await connectionToDb();
-    let query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(semana_LS_uuid) as semana_uuid, pausado FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `; 
+    let query = `SELECT BIN_TO_UUID(uuid) AS uuid, 
+                  BIN_TO_UUID(uuid) AS this_uuid, 
+                  BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, 
+                  BIN_TO_UUID(semana_LS_uuid) as semana_uuid, 
+                  pausado,
+
+                  (SELECT count(*) FROM reserva LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+                  where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid) as ventas
+                  
+                  FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `; 
 
     console.log(query)
     
@@ -621,10 +630,6 @@ async function buscarEnDbExamenesEnSemana(semana_uuid) {
     if (connection) connection.release();
   }
 }
-
-
-
-
 
 async function getExamenesEnFecha(req, res) {
   let fecha = req.params.fecha;

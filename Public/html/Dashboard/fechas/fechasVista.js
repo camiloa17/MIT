@@ -906,7 +906,6 @@ class FechasVista {
   armarStringSemanaAPartirDelPrimerDiaDeSemana(fecha) {
     //Las semanas en la base de datos se guardan escribiiendo el primer dia. 
     //Esta funcion me devuelve el string de la semana elegida dado el lunes de cada semana.
-    //console.log(fecha)
 
     Date.prototype.getWeek = function () {
       var date = new Date(this.getTime());
@@ -1181,7 +1180,6 @@ class FechasVista {
 
   async eliminarFecha(){   
     let idEstado = $('#estadoCambiosFechaExamenes')
-    console.log(this.fechaAEliminar.lista)
 
     switch (this.fechaAEliminar.lista) {
       case "semana":
@@ -1189,7 +1187,6 @@ class FechasVista {
         await this.mostrarListaDeSemanas();
       break;
       case "RW":
-        console.log("enremos rw", this.fechaAEliminar.uuid)
         await this.fechasServicio.elminarFechaDiaRw(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
         await this.mostrarListaDeHorarios();
       break;
@@ -1601,6 +1598,8 @@ class FechasVista {
     );
     $("#listaExamenes").empty();
 
+    
+
     examenes.forEach(examen => {
        let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid);
 
@@ -1624,6 +1623,8 @@ class FechasVista {
     let examenes = await this.fechasServicio.getExamenesEnSemana(idSelected);
     $("#listaExamenes").empty();
 
+    console.log(examenes)
+
 
     examenes.forEach(examen => {
       let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid);
@@ -1634,7 +1635,8 @@ class FechasVista {
           examen.modalidad_uuid,
           examen.fecha_uuid,
           nombre,
-          examen.pausado
+          examen.pausado,
+          examen.ventas
         )
       );
     });
