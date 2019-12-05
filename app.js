@@ -36,8 +36,10 @@ app.get('/', asyncErrorWrap(async (req,res) => {
 
 app.get('/checkout/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap (async(req, res) => {
     const stylesheet = '/css/Front/checkoutStyle.css';
-    const examenModalidad = await controller.consultaExamenCheckout(req.query.id);
-    res.render('checkout', { stylesheet: stylesheet, tipo:examenModalidad.tipo,nivel:examenModalidad.nivel,modo:examenModalidad.modalidad,precio:examenModalidad.precio,descripcion:examenModalidad.descripcion})
+    const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
+    const horarios = await controller.consultaHorarios(req.params.modalidad, req.query.id);
+    
+    res.render('checkout', { stylesheet: stylesheet, tipo:datosExamenModalidad.tipo,nivel:datosExamenModalidad.nivel,modo:datosExamenModalidad.modalidad,precio:datosExamenModalidad.precio,descripcion:datosExamenModalidad.descripcion,horario:horarios})
 }));
 
 app.get('/faqs',asyncErrorWrap(async (req,res)=>{

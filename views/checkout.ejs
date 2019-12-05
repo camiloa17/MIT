@@ -40,21 +40,21 @@
                 <h2>DISPONIBILIDAD</h2>
                 <p>Selecciona la fecha que esten disponibles para rendir el examen</p>
                 <div class="horario-wrapper">
-
-                    <input type="radio" name="horario-selector" id="h1">
-                    <input type="radio" name="horario-selector" id="h2">
-                    <input type="radio" name="horario-selector" id="h3">
-
-                    <label for="h1" class="horario-label" id="l1">Semana 40 - 6 al 14 de Octubre</label>
-                    <label for="h2" class="horario-label" id="l2">Semana 44 - 10 al 17 de Noviembre</label>
-                    <label for="h3" class="horario-label" id="l3">Semana 51 - 13 al 20 De Diciembre</label>
+                    <% if(modo== 'Reading & Writing' || 'Listening & Speaking'){ %>
+                    <% horario.horarios.forEach((opcion,index)=> {%>
+                    <input type="radio" name="horario-selector" id="h<%= index+1 %>">
+                    <label for="h<%= index+1 %>" class="horario-label" id="l<%= index+1 %>"><%=horario.text[index]%></label>
+                    <%})%>
+                    <%}%>
                     <div class="button-wrap">
-                        <a class="button-checkout backwards"  href="#">Regresar</a>
+                        <a class="button-checkout backwards" href="#">Regresar</a>
                         <a class="button-checkout next" href="#">Siguiente</a>
                     </div>
                 </div>
-        
             </div>
+            
+
+
 
             <div class="pago next" data-step="3">
                 <div id="person-information">
@@ -140,10 +140,7 @@
                         <a class="button-checkout next" href="#" >Siguiente</a>
                     </div>
                 </div>
-                <div class="button-wrap">
-                    <a class="button-checkout backwards" href="#">Regresar</a>
-                    <a class="button-checkout next" href="#">Siguiente</a>
-                </div>
+                
 
             </div>
             <div id="congrats" data-step="4">
