@@ -1580,28 +1580,3 @@ async function updateNivelModalidad(cambios) {
     console.log(err);
   }
 }
-
-// //////////////////// ESTO LO VI CON ANGEL EN CLASE, PARA DESACOPLAR LA VISTA DEL SERVICIO
-// async function getMateria( callback ) {
-//   try {
-//     const response = await fetch("./materia");
-//     const data = {};
-//     data.respone = await response.json();
-//     data.listaMateria = 0;
-//     callback(null, data);
-//   } catch (err) {
-//     callback(err);
-//   }
-// }
-
-// getMateria( visualizarLista );
-
-// function visualizarLista (error, data) {
-//   if (error) {
-//     //muestro el span
-//     return
-//   }
-
-//   // aca se desarrolla la funcion de la vista. de esta manera se desacopla la vista del servicio.
-
-// }

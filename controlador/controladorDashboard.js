@@ -4,7 +4,7 @@ const process = require("process");
 
 function connectionToDb() {
   return new Promise((resolve, reject) => {
-    con.getConnection(function(error, connection) {
+    con.getConnection(function (error, connection) {
       if (error) {
         reject(error);
       } else {
@@ -16,7 +16,7 @@ function connectionToDb() {
 
 function queryToDb(connection, query, values) {
   return new Promise((resolve, reject) => {
-    connection.query(query, values, function(error, data, fields) {
+    connection.query(query, values, function (error, data, fields) {
       if (error) {
         reject(error);
       } else {
@@ -214,22 +214,22 @@ async function updateEnDbExamenesCambios(cambios) {
             values.push(
               !cambios.materia
                 ? [
-                    uuidToBin,
-                    element.orden,
-                    element.nombre,
-                    element.activo,
-                    element.mostrar_cliente,
-                    element.edita_user_secundario
-                  ]
+                  uuidToBin,
+                  element.orden,
+                  element.nombre,
+                  element.activo,
+                  element.mostrar_cliente,
+                  element.edita_user_secundario
+                ]
                 : [
-                    uuidToBin,
-                    element.orden,
-                    element.nombre,
-                    element.activo,
-                    element.mostrar_cliente,
-                    element.edita_user_secundario,
-                    cambiosMateria
-                  ]
+                  uuidToBin,
+                  element.orden,
+                  element.nombre,
+                  element.activo,
+                  element.mostrar_cliente,
+                  element.edita_user_secundario,
+                  cambiosMateria
+                ]
             );
           }
         });
@@ -267,8 +267,8 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
     if (cambios.addNivel) {
       sql += `INSERT INTO nivel (uuid, orden, tipo_uuid, nombre, descripcion, activo, mostrar_cliente, pdf, imagen, edita_user_secundario) VALUES 
     (UUID_TO_BIN(${connection.escape(
-      cambios.uuid
-    )}), '0',  UUID_TO_BIN(${connection.escape(
+        cambios.uuid
+      )}), '0',  UUID_TO_BIN(${connection.escape(
         cambios.tipo_uuid
       )}), ${connection.escape(cambios.nombre)}, ${connection.escape(
         cambios.descripcion
@@ -289,7 +289,7 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
       });
     }
 
-    if(cambios.cambioModalidades){
+    if (cambios.cambioModalidades) {
       if (cambios.removeModalidades.length) {
         cambios.removeModalidades.forEach(element => {
           sql += `UPDATE modalidad SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(element)};`;
@@ -304,7 +304,8 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 
       if (cambios.cambioModalidades) {
         cambios.modalidades.forEach(element => {
-          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;      });
+          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
+        });
       }
     }
 
@@ -319,52 +320,91 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 
 
 
-async function agregarExamenFechaDia(req, res) {
+async function updateExamenesEnFecha(req, res) {
   let cambios = req.body;
-  let data = await agregarExamenFechaDiaEnDb(cambios);
+  let data = await updateExamenesEnFechaEnDb(cambios);
   res.send(JSON.stringify(data));
 }
 
-async function agregarExamenFechaDiaEnDb(cambios) {
+async function updateExamenesEnFechaEnDb(cambios) {
   let sql = "";
   let values = [];
   let connection;
 
-  console.log(cambios)
-  
+  //console.log(cambios)
+
   try {
     connection = await connectionToDb();
+    let tipoLista = cambios.tipoDeLista
 
-    console.log(cambios.addExamenesFechaDia.length, cambios.addExamenesFechaDia)
+    if (tipoLista === "RW") {
+      console.log("es un RW")
+      if (cambios.cambioPausadoFecha) {
+        sql += `UPDATE dia_RW SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
+      }
 
-    if(cambios.addExamenesFechaDia.length && cambios.tipoDeLista === "RW"){
-      console.log("guardamos un RW")
-      cambios.addExamenesFechaDia.forEach( (uuidExamen) => {
-        console.log(uuidExamen)
-        cambios.estadoListaExamenesDia.map(element => {
-          if(element.examen === uuidExamen){
-            sql += `INSERT INTO examen_en_dia_RW (uuid, dia_RW_uuid, modalidad_uuid, activo, pausado) VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
-          }
-        });     
-      });
-    }
+      if (cambios.cambioInputFecha) {
+        sql += `UPDATE dia_RW SET cupo_maximo=${connection.escape(cambios.fechaCupo)}, fecha_Examen=${connection.escape(cambios.fechaExamen)}, fecha_finalizacion=${connection.escape(cambios.fechaFinaliza)}
+        WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
+      }
 
-      if(cambios.addExamenesFechaDia.length && cambios.tipoDeLista.length === 6){
-        console.log("guardamos una SEMANA")
-        cambios.addExamenesFechaDia.forEach( (uuidExamen) => {
-          console.log(uuidExamen)
-          cambios.estadoListaExamenesDia.map(element => {
-            if(element.examen === uuidExamen){
-              sql += `INSERT INTO examen_en_semana_LS (uuid, semana_LS_uuid, modalidad_uuid, activo, pausado) VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
-            }
-          });     
+      if (cambios.removeExamenesFechaDia) {
+        cambios.removeExamenesFechaDia.forEach(fecha => {
+          sql += `UPDATE examen_en_dia_RW SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(fecha)};`;
         });
       }
-    
- 
+
+      if (cambios.addExamenesFechaDia) {
+        cambios.addExamenesFechaDia.forEach(examenAFecha => {
+          cambios.estadoListaExamenesDia.map(element => {
+            if (element.uuid === examenAFecha) {
+              sql += `INSERT INTO examen_en_dia_RW (uuid, dia_RW_uuid, modalidad_uuid, activo, pausado) 
+                  VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
+            }
+          })
+        });
+      };
+
+      if (cambios.cambioPausadoExamenes) {
+
+      }
+      
+      console.log(sql)
+
+
+
+
+
+    } else if (tipoLista === "LS") {
+      console.log("es un LS")
+      if (cambios.cambioPausadoFecha) {
+        sql += `UPDATE dia_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.cambioPausadoFecha)};`;
+      }
+
+      if (cambios.cambioInputFecha) {
+        sql += `UPDATE dia_LS SET cupo_maximo=${connection.escape(cambios.fechaCupo)}, fecha_Examen=${connection.escape(cambios.fechaExamen)}, fecha_finalizacion=${connection.escape(cambios.fechaFinaliza)}
+        WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
+      }
+
+    } else if (tipoLista.length === 6) {
+      console.log("es una semana")
+      if (cambios.cambioPausadoFecha) {
+        sql += `UPDATE semana_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.cambioPausadoFecha)};`;
+      }
+    }
+
+
+    if ((cambios.cambioPausadoFecha || cambios.cambioInputFecha || cambios.cambioPausadoExamenes || cambios.removeExamenesFechaDia.length > 0 || cambios.addExamenesFechaDia.length > 0)) {
+      console.log("GUARDAR CAMBIOS");
+    } else {
+      console.log("NO HAY CAMBIOS PARA GUARDAR");
+    }
 
     const data = await queryToDb(connection, sql, values);
     return data;
+
+
+
   } finally {
     if (connection) connection.release();
   }
@@ -381,7 +421,7 @@ async function agregarFechaDiaEnDb(fechas) {
   let values = [];
   let connection;
   let fechaHora;
-  
+
   console.log(fechas)
 
   try {
@@ -397,7 +437,7 @@ async function agregarFechaDiaEnDb(fechas) {
 
       case "RW":
         fechaHora = `${fechas.dia} ${fechas.hora}`;
-        sql += `INSERT INTO dia_RW (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES (UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.fecha)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`;        break;
+        sql += `INSERT INTO dia_RW (uuid, fecha_Examen, cupo_maximo, fecha_finalizacion, pausado, activo) VALUES (UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.fecha)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`; break;
     }
 
     const data = await queryToDb(connection, sql, values);
@@ -420,10 +460,10 @@ async function agregarFechaSemanaEnDb(fechas) {
 
   try {
     connection = await connectionToDb();
- 
+
 
     sql += `INSERT INTO semana_LS (uuid, semana_Examen, cupo_maximo, finaliza_inscripcion, pausado, activo) VALUES ( UUID_TO_BIN(${connection.escape(fechas.uuid)}) , ${connection.escape(fechas.semana)}, ${connection.escape(fechas.cupo)}, ${connection.escape(fechas.finaliza)}, '0', '1');`;
-       
+
 
     const data = await queryToDb(connection, sql, values);
     return data;
@@ -465,9 +505,9 @@ async function buscarEnDBListaSemanas() {
       cupo_maximo, finaliza_inscripcion, pausado, activo 
       FROM semana_LS WHERE activo=1 ORDER BY semana_Examen ;`;
 
-     
 
-  
+
+
     const data = await queryToDb(connection, query);
     return data;
   } finally {
@@ -533,7 +573,7 @@ async function buscarEnDBListaHorarios() {
       WHERE activo=1 ORDER BY fecha_Examen;`;
 
     connection = await connectionToDb();
-  
+
     const data = await queryToDb(connection, query);
     return data;
   } finally {
@@ -571,7 +611,7 @@ async function buscarEnDBListaHorariosOrales() {
       'LS' as source FROM dia_LS WHERE activo=1 
       ORDER BY fecha_Examen;`;
     connection = await connectionToDb();
-  
+
     const data = await queryToDb(connection, query);
     return data;
   } finally {
@@ -588,7 +628,7 @@ async function buscarEnDBListaExamenes() {
   let connection;
   try {
     const query =
-      "select m.nombre as materia, m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, mo.examen_rw as rw, mo.examen_ls as ls, BIN_TO_UUID(mo.uuid) as uuid from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid where ((m.mostrar_cliente = 1 or m.mostrar_cliente is NULL) and (t.mostrar_cliente=1 or t.mostrar_cliente is NULL) and(n.mostrar_cliente=1 or n.mostrar_cliente is NULL) and (mo.mostrar_cliente=1 or mo.mostrar_cliente is NULL)) AND((m.activo is NULL or m.activo = 1) and(t.activo is NULL or t.activo = 1) and (n.activo is NULL or n.activo = 1) and (mo.activo is NULL or mo.activo = 1));";
+      "select m.nombre as materia, m.orden as orden_materia, m.activo as activo_materia, m.mostrar_cliente as mostrarCliente_materia, t.nombre as tipo, t.orden as orden_tipo, t.activo as activo_tipo, t.mostrar_cliente as mostrarCliente_tipo, n.nombre as nivel, n.orden as orden_nivel, n.activo as activo_nivel, n.mostrar_cliente as mostrarCliente_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, mo.activo as activo_modalidad, mo.mostrar_cliente as mostrarCliente_modalidad, mo.examen_rw as rw, mo.examen_ls as ls, BIN_TO_UUID(mo.uuid) as uuid from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid ;";
 
     connection = await connectionToDb();
     const data = await queryToDb(connection, query);
@@ -614,16 +654,16 @@ async function buscarEnDbExamenesEnSemana(semana_uuid) {
     let query = `SELECT BIN_TO_UUID(uuid) AS uuid, 
                   BIN_TO_UUID(uuid) AS this_uuid, 
                   BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, 
-                  BIN_TO_UUID(semana_LS_uuid) as semana_uuid, 
+                  BIN_TO_UUID(semana_LS_uuid) as fecha_uuid, 
                   pausado,
 
                   (SELECT count(*) FROM reserva LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
                   where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid) as ventas
                   
-                  FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `; 
+                  FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `;
 
     console.log(query)
-    
+
     const data = await queryToDb(connection, query);
     return data;
   } finally {
@@ -642,7 +682,7 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
   let connection;
   try {
     connection = await connectionToDb();
-    let query; 
+    let query;
 
     switch (tipo) {
       case "RW":
@@ -655,15 +695,15 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
               (SELECT count(*) FROM reserva LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
               where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid) as ventas
 
-              FROM examen_en_dia_RW 
-              WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
-      break;
+             
+              FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
+        break;
       case "LS":
         // query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;
-      break;
+        break;
     }
     const values = [fecha];
-    
+
     const data = await queryToDb(connection, query, values);
     return data;
   } finally {
@@ -682,7 +722,7 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
   let connection;
   try {
     connection = await connectionToDb();
-   
+
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
@@ -726,7 +766,7 @@ async function buscarEnDbReservaDiaRw(fecha) {
   let connection;
   try {
     connection = await connectionToDb();
-   
+
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
@@ -769,7 +809,7 @@ async function buscarEnDbReservaDiaLs(fecha) {
   let connection;
   try {
     connection = await connectionToDb();
-   
+
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
@@ -819,12 +859,12 @@ async function asignarDiaASemanaExamenOralEnDB(cambios) {
   try {
     connection = await connectionToDb();
 
-    cambios.reservas.forEach( reserva => {
+    cambios.reservas.forEach(reserva => {
 
       sql += `UPDATE reserva SET dia_LS_uuid=UUID_TO_BIN(${connection.escape(cambios.fecha)}) WHERE BIN_TO_UUID(uuid)=${connection.escape(reserva)};`;
       console.log(sql)
     });
-  
+
     const data = await queryToDb(connection, sql);
     return data;
   } finally {
@@ -849,7 +889,7 @@ async function elminarFechaSemanaEnDB(fecha) {
 
     sql += `UPDATE semana_LS SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(fecha)};`;
     sql += `UPDATE examen_en_semana_LS SET activo=0 WHERE BIN_TO_UUID(semana_LS_uuid)=${connection.escape(fecha)};`;
-  
+
     const data = await queryToDb(connection, sql);
     return data;
   } finally {
@@ -875,7 +915,7 @@ async function elminarFechaDiaRwEnDB(fecha) {
     sql += `UPDATE examen_en_dia_RW SET activo=0 WHERE BIN_TO_UUID(dia_RW_uuid)=${connection.escape(fecha)};`;
 
     console.log(sql)
-  
+
     const data = await queryToDb(connection, sql);
     return data;
   } finally {
@@ -897,7 +937,7 @@ async function elminarFechaDiaLsEnDB(fecha) {
     connection = await connectionToDb();
 
     sql += `UPDATE dia_LS SET activo=0 WHERE BIN_TO_UUID(uuid)=${connection.escape(fecha)};`;
-  
+
     const data = await queryToDb(connection, sql);
     return data;
   } finally {
@@ -910,7 +950,7 @@ async function elminarFechaDiaLsEnDB(fecha) {
 
 
 // Este codigo te permite atajar un error no contemplado y evita que te tire el server abajo.
-process.on("uncaughtException", function(err) {
+process.on("uncaughtException", function (err) {
   console.log(err);
 });
 
@@ -928,19 +968,19 @@ module.exports = {
   listarHorariosOrales: listarHorariosOrales,
   listarExamenes: listarExamenes,
   getExamenesEnFecha: getExamenesEnFecha,
-  agregarExamenFechaDia: agregarExamenFechaDia,
+  updateExamenesEnFecha: updateExamenesEnFecha,
   agregarFechaSemana: agregarFechaSemana,
   listarSemanas: listarSemanas,
   getExamenesEnSemana: getExamenesEnSemana,
-  
+
   listarReservaSemanasLs: listarReservaSemanasLs,
   listarReservaDiaRw: listarReservaDiaRw,
   listarReservaDiaLs: listarReservaDiaLs,
 
   asignarDiaASemanaExamenOral: asignarDiaASemanaExamenOral,
 
-  elminarFechaSemana:elminarFechaSemana,
+  elminarFechaSemana: elminarFechaSemana,
   elminarFechaDiaLs: elminarFechaDiaLs,
   elminarFechaDiaRw: elminarFechaDiaRw,
-  
+
 };

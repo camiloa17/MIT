@@ -8,15 +8,17 @@ class FechasVista {
     this.habilitarSelectableChipDiaSemanaAgregar($("#chipsSeleccionDiaSemanaAgregar"));
     this.habilitarSelectableChipDiaSemanaEditar($("#chipsSeleccionDiaSemanaEditar"));
 
- 
+
     /// Agregar Examenes a Fecha día:
     this.addExamenesFechaDia = [];
     this.removeExamenesFechaDia = [];
-    this.cambioPausaExamenesFechaDia = [];
+    this.cambioInputFecha = false; // para cambios de input fecha (hora,dia,finalizacion, cupo o pausado de la fecha)
+    this.cambioPausadoFecha= false;
+    this.cambioPausadoExamenes= false;
 
     this.lastExamSelected = [];
 
-    this.fechaAEliminar = {uuid: "", lista: ""}
+    this.fechaAEliminar = { uuid: "", lista: "" }
   }
 
   async traerListaDeExamenesDb() {
@@ -88,7 +90,7 @@ class FechasVista {
           .children(".ui-selected")
           .attr("id");
 
-        if (idSelected === "agregarChipDiaHora" ||  idSelected === "agregarChipSemana" ){
+        if (idSelected === "agregarChipDiaHora" || idSelected === "agregarChipSemana") {
           $('#areaEditarFecha').empty();
         }
 
@@ -117,9 +119,9 @@ class FechasVista {
           .children(".ui-selected")
           .attr("id");
 
-        if (idSelected === "editarChipDiaHora" || idSelected === "editarChipSemana"){
+        if (idSelected === "editarChipDiaHora" || idSelected === "editarChipSemana") {
           $('#areaAgregarFecha').empty();
-          $('#areaEditarFecha').empty().append( this.mostrarAreaEdicionFechas() )
+          $('#areaEditarFecha').empty().append(this.mostrarAreaEdicionFechas())
           this.habilitarSelectableFechas($("#listaHorarios"));
           this.habilitarSelectableExamenes($("#listaExamenes"));
           this.botonAgregarExamenesAFecha();
@@ -169,7 +171,8 @@ class FechasVista {
             this.mostrarInputsCambioDia(idSelected);
             this.inicializarDateTimePickerDiaCambios();
             $("#estadoCambiosFechaExamenes").empty()
-            
+            this.escucharCambioEnInputs();
+
           } else if (tipoSelected === "LS") {
             $("#listaExamenes").empty();
             this.cleanEstadoListaExamen();
@@ -178,8 +181,10 @@ class FechasVista {
             this.mostrarInputsCambioDia(idSelected);
             this.inicializarDateTimePickerDiaCambios();
             $("#estadoCambiosFechaExamenes").empty()
+            this.escucharCambioEnInputs();
 
           } else if (tipoSelected.length === 6) {
+            this.cleanEstadoListaExamen();
             // Selecciono una semana (yyyyss tiene un length de 6)
             this.mostrarExamenesDeSemanaEnListaFromDB(idSelected);
             $('#inputSelectarExamenes').removeClass("notVisible");
@@ -187,6 +192,7 @@ class FechasVista {
             this.generarListaReservaSemanaLs(idSelected);
             this.inicializarDateTimePickerDiaCambios();
             $("#estadoCambiosFechaExamenes").empty()
+            this.escucharCambioEnInputs();
           }
         } else {
           // Si apreto en el scrollbar, no tengo ningun ID seleccionado. Como me deselecciona el elemento, le vuelvo a aplicar la clase ui-selected.
@@ -198,7 +204,7 @@ class FechasVista {
     });
   }
 
-  
+
 
 
   habilitarSelectableExamenes(lista) {
@@ -224,7 +230,9 @@ class FechasVista {
   cleanEstadoListaExamen() {
     this.addExamenesFechaDia = [];
     this.removeExamenesFechaDia = [];
-    this.cambioPausaExamenesFechaDia = [];
+    this.cambioInputFecha = false;
+    this.cambioPausadoExamenes = false;
+    this.cambioPausadoFecha = false;    
   }
 
   habilitarFormSelect() {
@@ -301,11 +309,11 @@ class FechasVista {
 
   inicializarListenerBotonAgregarDia() {
     this.chequearInformacionInputDia();
-       
+
     $("#botonAgregaDia").on("click", () => {
-      let fechaExamen= this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
-      let fechaFinaliza= this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
-      
+      let fechaExamen = this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
+      let fechaFinaliza = this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
+
       // DateTime pongo primero el dia luego la hora
       let fechaDateTime = `${fechaExamen} ${$("#inputHoraAgregarDia").val()}`;
 
@@ -332,7 +340,7 @@ class FechasVista {
   }
 
   cleanAgregarDiaValues() {
-    $('#inputFechaAgregarDia').val('');    
+    $('#inputFechaAgregarDia').val('');
     $('#inputHoraAgregarDia').val('');
     $('#inputCupoAgregarDia').val('');
     $("#inputRWAgregarDia").prop("checked", false)
@@ -355,60 +363,60 @@ class FechasVista {
 
     $('#inputFechaAgregarDia').on("change", () => {
       if (this.chequearSiFechaFinalizacionEsPosterior()) {
-        if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        if ($('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
           $("#botonAgregaDia").removeClass("disabled");
         } else {
           $("#botonAgregaDia").addClass("disabled");
-        }           
+        }
       }
     });
-    
+
 
     $('#inputHoraAgregarDia').on("change", () => {
-      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+      if ($('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
         this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
       } else {
         $("#botonAgregaDia").addClass("disabled");
-      }          
+      }
     });
 
 
     $("#finalizaAgregarDia").on("change", () => {
       if (this.chequearSiFechaFinalizacionEsPosterior()) {
-        if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+        if ($('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
           $("#botonAgregaDia").removeClass("disabled");
         } else {
           $("#botonAgregaDia").addClass("disabled");
-        }           
+        }
       }
     });
 
     $('#inputRWAgregarDia').on("change", () => {
-      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+      if ($('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
         this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
       } else {
         $("#botonAgregaDia").addClass("disabled");
-      } 
+      }
     })
 
     $('#inputLSAgregarDia').on("change", () => {
-      if ( $('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
+      if ($('#inputCupoAgregarDia').val() && $('#inputFechaAgregarDia').val() && $('#inputHoraAgregarDia').val() && $("#finalizaAgregarDia").val() && ($('#inputRWAgregarDia').filter(":checked").val() || $('#inputLSAgregarDia').filter(":checked").val())) {
         this.chequearSiFechaFinalizacionEsPosterior() ? $("#botonAgregaDia").removeClass("disabled") : $("#botonAgregaDia").addClass("disabled");
       } else {
         $("#botonAgregaDia").addClass("disabled");
-      } 
+      }
     })
 
 
   }
 
-  
-  chequearSiFechaFinalizacionEsPosterior() {
-    let fechaExamen= this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
-    let fechaFinaliza= this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
 
-    if (fechaExamen.length > 0 && fechaFinaliza.length > 0 ) {      
-      if ( fechaExamen > fechaFinaliza  ) {
+  chequearSiFechaFinalizacionEsPosterior() {
+    let fechaExamen = this.ddmmyyyyToYyyymmdd($("#inputFechaAgregarDia").val());
+    let fechaFinaliza = this.ddmmyyyyToYyyymmdd($("#finalizaAgregarDia").val());
+
+    if (fechaExamen.length > 0 && fechaFinaliza.length > 0) {
+      if (fechaExamen > fechaFinaliza) {
         $("#estadoAgregarDia").text("");
         return true;
       } else {
@@ -421,13 +429,13 @@ class FechasVista {
   }
 
   chequearSiFechaFinalizacionEsPosteriorEnCambios() {
-    let fechaExamen= this.ddmmyyyyToYyyymmdd($("#diaExamenCambio").val());
-    let fechaFinaliza= this.ddmmyyyyToYyyymmdd($("#finalizaDiaInscripcionCambio").val());
+    let fechaExamen = this.ddmmyyyyToYyyymmdd($("#diaExamenCambio").val());
+    let fechaFinaliza = this.ddmmyyyyToYyyymmdd($("#finalizaDiaInscripcionCambio").val());
 
-    if (fechaExamen.length > 0 && fechaFinaliza.length > 0 ) {      
+    if (fechaExamen.length > 0 && fechaFinaliza.length > 0) {
       console.log(fechaExamen, fechaFinaliza)
-      console.log(fechaExamen > fechaFinaliza   )
-      if ( fechaExamen > fechaFinaliza  ) {
+      console.log(fechaExamen > fechaFinaliza)
+      if (fechaExamen > fechaFinaliza) {
         $("#estadoCambiosFechaExamenes").text("");
         return true;
       } else {
@@ -605,7 +613,7 @@ class FechasVista {
         weekdaysShort: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
         weekdaysAbbrev: ["D", "L", "M", "M", "J", "V", "S"]
       },
-     
+
       onClose: () => {
         this.chequearSiFechaFinalizacionEsPosteriorEnCambios();
       }
@@ -707,6 +715,27 @@ class FechasVista {
   </div>`;
   }
 
+  escucharCambioEnInputs() {
+    $('#diaExamenCambio').on('change', () => {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      this.cambioInputFecha = true;
+    });
+
+    $('#horaExamenCambio').on('change', () => {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      this.cambioInputFecha = true;
+    });
+
+    $('#finalizaDiaInscripcionCambio').on('change', () => {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      this.cambioInputFecha = true;
+    });
+
+    $('#inputCupoCambio').on('change', () => {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      this.cambioInputFecha = true;
+    });
+  }
 
 
 
@@ -759,10 +788,10 @@ class FechasVista {
   chequearSiFechaFinalizacionEsPosteriorSemana() {
     if ($("#finalizaAgregarSemana").val().length > 0) {
       let semanaElegida = this.getDateFirstDayOfWeek($("#listadoSemanas option:selected").attr("semana"), $("#listadoSemanas option:selected").attr("ano"))
-      let semanaElegidaDate = new Date(semanaElegida.slice(0, 4), semanaElegida.slice(5, 7)-1, semanaElegida.slice(8, 11));
+      let semanaElegidaDate = new Date(semanaElegida.slice(0, 4), semanaElegida.slice(5, 7) - 1, semanaElegida.slice(8, 11));
 
       let fechaElegida = this.ddmmyyyyToYyyymmdd($("#finalizaAgregarSemana").val())
-      let fechaElegidaDate = new Date(fechaElegida.slice(0, 4), fechaElegida.slice(5, 7)-1, fechaElegida.slice(8, 11));
+      let fechaElegidaDate = new Date(fechaElegida.slice(0, 4), fechaElegida.slice(5, 7) - 1, fechaElegida.slice(8, 11));
 
       console.log(semanaElegidaDate, fechaElegidaDate)
       if (semanaElegidaDate > fechaElegidaDate) {
@@ -1076,7 +1105,7 @@ class FechasVista {
 
     <div class="row">
       <div class="col s6 m6 l6 xl6 offset-l6 offset-xl6 valign-wrapper">
-        <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul">Guardar</a>
+        <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
         <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>
       </div>
     </div>
@@ -1106,7 +1135,7 @@ class FechasVista {
                 </div>
                 <div class"col s6 m6 l6 xl6">
                   <div class="secondary-content right">  
-                    <i id="${horario.uuid}_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity noSelectable">${horario.pausado ? "visibility_off" : "visibility"}</i>
+                    <i id="${horario.uuid}_pausa" class="material-icons-outlined secondary-content right white-text button-opacity noSelectable">${horario.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${horario.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${horario.cupos_libres}</span>
@@ -1121,13 +1150,13 @@ class FechasVista {
     });
   }
 
- 
 
-  mostrarInputsCambioDia(idSelected){
-    let cupo=$(`#${idSelected}`).attr("cupo");
-    let dia=$(`#${idSelected}`).attr("fechaExamen").toString().substring(0,10);
-    let hora=$(`#${idSelected}`).attr("fechaExamen").toString().substring(11,16);
-    let finaliza=$(`#${idSelected}`).attr("fechaFinalizacion").toString().substring(0,10);
+
+  mostrarInputsCambioDia(idSelected) {
+    let cupo = $(`#${idSelected}`).attr("cupo");
+    let dia = $(`#${idSelected}`).attr("fechaExamen").toString().substring(0, 10);
+    let hora = $(`#${idSelected}`).attr("fechaExamen").toString().substring(11, 16);
+    let finaliza = $(`#${idSelected}`).attr("fechaFinalizacion").toString().substring(0, 10);
     $('#inputCupoCambio').val(`${cupo}`);
     M.updateTextFields();
 
@@ -1156,7 +1185,7 @@ class FechasVista {
                 </div>
                 <div class"col s5 m5 l5 xl5">
                   <div class="secondary-content right">  
-                    <i id="${semana.uuid}_pausa" class="material-icons-outlined secondary-content right azul-texto button-opacity noSelectable">${semana.pausado ? "visibility_off" : "visibility"}</i>
+                    <i id="${semana.uuid}_pausa" class="material-icons-outlined secondary-content right white-text button-opacity noSelectable">${semana.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${semana.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${semana.cupos_libres}</span>
@@ -1173,64 +1202,88 @@ class FechasVista {
 
   asignarFuncionEliminarFecha(id, lista) {
     $(`#${id}_remover`).on("click", () => {
-      this.fechaAEliminar.uuid= id;
-      this.fechaAEliminar.lista= lista;
-      });
+      this.fechaAEliminar.uuid = id;
+      this.fechaAEliminar.lista = lista;
+    });
   }
 
-  async eliminarFecha(){   
+  async eliminarFecha() {
     let idEstado = $('#estadoCambiosFechaExamenes')
 
     switch (this.fechaAEliminar.lista) {
       case "semana":
         await this.fechasServicio.elminarFechaSemana(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
         await this.mostrarListaDeSemanas();
-      break;
+        break;
       case "RW":
         await this.fechasServicio.elminarFechaDiaRw(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
         await this.mostrarListaDeHorarios();
-      break;
+        break;
       case "LS":
         await this.fechasServicio.elminarFechaDiaLs(this.fechaAEliminar.uuid, this.accionExitosa, this.huboUnError, idEstado);
         await this.mostrarListaDeHorarios();
-      break;
-    } 
+        break;
+    }
 
   }
+
 
   asignarFuncionBotonPausa(id) {
     $(`#${id}_pausa`).on("click", () => {
-      this.seGeneroUnCambioPausaEnExamen = true;
-
-      // Si esta la visibilidad en false, el input se ve inactivo
-      $(`#${id} div div span`).not('.badge').toggleClass("inputInactivo");
-
-      // Cuando presiono boton visibilidad, cambia su icono
-      $(`#${id}_pausa`).text(
-        $(`#${id}_pausa`)
-          .text()
-          .trim() == "visibility"
-          ? "visibility_off"
-          : "visibility"
-      );
-
-      // Si presioné el icono de visibilidad, cambio el atributo html mostrar_cliente y pongo en true el aviso que ocurrio un cambio
-      $(`#${id}`).attr("pausado", (index, attr) => (attr == 1 ? 0 : 1));
+      let atributoTipo = $(`#${id}`).attr('tipo');
+      // Si esta seleccionada una fecha LS, RW o semana, es que tiene un atributo
+      if (atributoTipo) {
+        // Si esa fecha que tiene un atributo, esta seleccionado, me permite poner pausa
+        if ((atributoTipo === "RW" || atributoTipo === "LS" || atributoTipo.length === 6) && $(`#${id}`).hasClass('ui-selected')) {
+          this.funcionalidadBotonPausa(id);
+          this.cambioPausadoFecha= true;
+        }
+      } else {
+        // Si no es una fecha, es que es un examen. El examen no debe cumplir ninguna condicion para poder pausarse
+        this.funcionalidadBotonPausa(id);
+        this.cambioPausadoExamenes=true;
+      }
     });
   }
 
+  funcionalidadBotonPausa(id) {
+    // Si esta la visibilidad en false, el input se ve inactivo
+    $(`#${id} div div span`).not('.badge').toggleClass("inputInactivo");
+
+    // Cuando presiono boton visibilidad, cambia su icono
+    $(`#${id}_pausa`).text(
+      $(`#${id}_pausa`)
+        .text()
+        .trim() == "visibility"
+        ? "visibility_off"
+        : "visibility"
+    );
+
+    // Si presioné el icono de visibilidad, cambio el atributo html mostrar_cliente y pongo en true el aviso que ocurrio un cambio
+    $(`#${id}`).attr("pausado", (index, attr) => (attr == 1 ? 0 : 1));
+
+    // Cambia el atributo dirty del LI que tiene cambios para que se actualize en la DB
+    $(`#${id}`).attr("dirty", 1);
+
+    //Habilito la opcion de guardado
+    $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+    this.deshabilitarBotonesCuandoHayCambiosPendientes();
+  }
+
+  deshabilitarBotonesCuandoHayCambiosPendientes() {
+    console.log("deshabilitar ")
+  }
 
 
 
   generarListaDeExamenes(oralOEscrito) {
     //Genero la lista de opciones para el dropdown de examenes teniendo en cuenta si la fecha de examen corresponde a LS o a RW
-
     $("#selectarExamenes").empty();
 
     switch (oralOEscrito) {
       case "RW":
         this.examenesFromDB.forEach(examen => {
-          if (examen.uuid && examen.rw && !examen.ls) {
+          if (examen.uuid && examen.rw && !examen.ls && examen.activo_materia && examen.activo_tipo && examen.activo_nivel && examen.activo_modalidad) {
             $("#selectarExamenes").append(`
               <option value="${examen.uuid}">${examen.materia} / ${examen.tipo} / ${examen.nivel} / ${examen.modalidad}</option>
               `);
@@ -1239,7 +1292,7 @@ class FechasVista {
         break;
       case "LS":
         this.examenesFromDB.forEach(examen => {
-          if (examen.uuid && !examen.rw && examen.ls) {
+          if (examen.uuid && !examen.rw && examen.ls && examen.activo_materia && examen.activo_tipo && examen.activo_nivel && examen.activo_modalidad) {
             $("#selectarExamenes").append(`
               <option value="${examen.uuid}">${examen.materia} / ${examen.tipo} / ${examen.nivel} / ${examen.modalidad}</option>
               `);
@@ -1252,9 +1305,9 @@ class FechasVista {
   }
 
 
-  templateLiExamen(id, uuidExamen, uuidFecha, nombre, pausado, ventas) {
+  templateLiExamen(id, uuidExamen, uuidFecha, nombre, pausado, ventas, activo, mostrarCliente) {
     return `
-    <li id="${id}" uuidExamen="${uuidExamen}" uuidFecha="${uuidFecha}" pausado="${pausado}" class="collection-item azul-texto cursorPointer hoverGrey">
+    <li id="${id}" uuidExamen="${uuidExamen}" uuidFecha="${uuidFecha}" pausado="${pausado}" dirty="0" class="collection-item azul-texto cursorPointer hoverGrey">
       <div class="row margin0">
         <div class="col s7 m7 l7 xl7 padding0">
           <span class="title ${pausado ? "inputInactivo" : ""}">${nombre}</span>
@@ -1265,6 +1318,8 @@ class FechasVista {
             <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${ventas}</span>
             <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
             <i id="${id}_remove" class="material-icons-outlined secondary-content azul-texto right button-opacity margin0 noSelectable">${ventas ? "" : "delete"}</i>
+            ${activo ? '<a class="tooltipped" data-position="bottom" data-tooltip="Este examen no está siendo mostrado en la web del cliente debido a que fue eliminado desde la sección Exámenes."><span class="new badge red black-text margin-left-0-15" data-badge-caption="eliminado"></span></a>' : ""} 
+            ${mostrarCliente ? '<a class="tooltipped" data-position="bottom" data-tooltip="Este examen no está siendo mostrado en la web del cliente. Dirígase a la sección Exámenes y active su visibilidad."><span class="new badge pink black-text margin-left-0-15" data-badge-caption="inactivo"></span></a>' : ""} 
           </div>
         </div>
       </div>
@@ -1274,20 +1329,46 @@ class FechasVista {
 
   habilitarBotonGuardarExamenesEnFecha() {
     $("#botonGuardarExamenesEnFecha").on("click", () => {
-      let datos = {
-        tipoDeLista: $("#listaHorarios")
-          .find(".ui-selected")
-          .attr("tipo"),
-        estadoListaExamenesDia: this.obtenerListaDeExamenesDeUl(),
-        addExamenesFechaDia: this.addExamenesFechaDia,
-        removeExamenesFechaDia: this.removeExamenesFechaDia,
-        cambioPausaExamenesFechaDia: this.cambioPausaExamenesFechaDia,
-        uuidFechaDia: $("#listaHorarios")
-          .find(".ui-selected")
-          .attr("id")
-      };
+      let tipoDeLista = $("#listaHorarios").find(".ui-selected").attr("tipo");
+      let fechaDateTime;
 
-      this.fechasServicio.agregarExamenFechaDia(datos);
+      if ( tipoDeLista === "RW" || tipoDeLista === "LS") {
+        let fechaExamen = this.ddmmyyyyToYyyymmdd($("#diaExamenCambio").val());
+        fechaDateTime = `${fechaExamen} ${$("#horaExamenCambio").val()}`;
+      } 
+      else if( tipoDeLista.length === 6 ){
+        fechaDateTime = "completar"
+      }
+
+      let fechaFinaliza = this.ddmmyyyyToYyyymmdd($("#finalizaDiaInscripcionCambio").val()); 
+      
+      let datos = {
+        tipoDeLista: tipoDeLista,
+        
+        uuidFecha: $("#listaHorarios")
+        .find(".ui-selected")
+        .attr("id"),
+
+        fechaPausada: $("#listaHorarios")
+        .find(".ui-selected")
+        .attr("pausado"),
+        cambioPausadoFecha: this.cambioPausadoFecha,
+        
+        fechaCupo: $('#inputCupoCambio').val() , 
+        fechaExamen: fechaDateTime,
+        fechaFinaliza: fechaFinaliza,
+        cambioInputFecha: this.cambioInputFecha,
+
+        removeExamenesFechaDia: this.removeExamenesFechaDia,
+        addExamenesFechaDia: this.addExamenesFechaDia,
+        estadoListaExamenesDia: this.obtenerListaDeExamenesDeUl(),
+        cambioPausadoExamenes: this.cambioPausadoExamenes,
+      };
+      console.log(datos)
+      
+   
+      this.fechasServicio.updateExamenesEnFecha(datos);
+      this.cleanEstadoListaExamen();  // esto pasa si es un exito el guardado de datos
     });
   }
 
@@ -1559,11 +1640,6 @@ class FechasVista {
         element => !examenesYaEnLista.some(el => element === el.examen)
       );
 
-      // Agrego al array el examen agregado, asi luego se actualiza la DB
-      examenesSelecionadosQueNoEstanEnLista.forEach(examen =>
-        this.addExamenesFechaDia.push(examen)
-      );
-
       //Reinicia los valores seleccionados
       $("form input").val("");
       $("select").val("None");
@@ -1573,7 +1649,32 @@ class FechasVista {
     });
   }
 
+  asignarFuncionalidadBotonEliminarExamen(id) {
+    $(`#${id}_remove`).on('click', () => {
+      let examen = $(`#${id}`).attr("id");
+
+      // Chequeo si el examen fue agregado en una instancia antes de ser guardado en la DB
+      let examenEnAdd = this.addExamenesFechaDia.some(element => element === examen);
+
+      // Si el exanen esta pendiente por agregarse a la DB, lo elimino. Si el examen ya esta agregado a la DB, lo pongo en el array para eliminarlo
+      if (examenEnAdd) {
+        let newAddArray = this.addExamenesFechaDia.filter(element => element != examen)
+        this.addExamenesFechaDia = newAddArray;
+      } else {
+        this.removeExamenesFechaDia.push(examen);
+      }
+
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+
+      $(`#${id}`).remove();
+    });
+  }
+
   mostrarExamenesNuevosEnLista(examenes) {
+    if (examenes.length > 0) {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+    }
+
     examenes.forEach(examen => {
       let nombreCompleto = this.convertirUuidExamenEnTexto(examen);
       let pausado = 0;
@@ -1582,13 +1683,23 @@ class FechasVista {
         .find(".ui-selected")
         .attr("id");
       let ventas = 0;
+      let activo = 0;
+      let mostrarCliente = 0;
 
       $("#listaExamenes").append(
-        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas)
+        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, activo, mostrarCliente)
       );
-    });
+      
+      this.habilitarToolTips();
+      this.addExamenesFechaDia.push(uuid)
+      this.asignarFuncionBotonPausa(uuid);
+      this.asignarFuncionalidadBotonEliminarExamen(uuid);
 
-    this.asignarFuncionBotonPausa(uuid);
+    });
+  }
+
+  habilitarToolTips() {
+      $('.tooltipped').tooltip();
   }
 
   async mostrarExamenesEnListaFromDB(idSelected, tipoSelected) {
@@ -1597,12 +1708,26 @@ class FechasVista {
       tipoSelected
     );
     $("#listaExamenes").empty();
-
-    
+    console.log("esamenes")
+    console.log(examenes)
 
     examenes.forEach(examen => {
-       let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid);
+      let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid);
+      let activo;
+      let mostrarCliente;
 
+      this.examenesFromDB.map( exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          activo = !(exam.activo_materia & exam.activo_tipo & exam.activo_nivel & exam.activo_modalidad) ? true : false;
+        }
+      })
+
+      this.examenesFromDB.map( exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          mostrarCliente = !(exam.mostrarCliente_materia & exam.mostrarCliente_tipo & exam.mostrarCliente_nivel & exam.mostrarCliente_modalidad) ? true : false;
+        }
+      })
+      
       $("#listaExamenes").append(
         this.templateLiExamen(
           examen.uuid,
@@ -1610,11 +1735,13 @@ class FechasVista {
           examen.fecha_uuid,
           nombre,
           examen.pausado,
-          examen.ventas
+          examen.ventas, activo, mostrarCliente
         )
       );
 
+      this.habilitarToolTips();
       this.asignarFuncionBotonPausa(examen.uuid);
+      this.asignarFuncionalidadBotonEliminarExamen(examen.uuid);
     });
   }
 
@@ -1622,9 +1749,6 @@ class FechasVista {
   async mostrarExamenesDeSemanaEnListaFromDB(idSelected) {
     let examenes = await this.fechasServicio.getExamenesEnSemana(idSelected);
     $("#listaExamenes").empty();
-
-    console.log(examenes)
-
 
     examenes.forEach(examen => {
       let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid);
@@ -1639,6 +1763,10 @@ class FechasVista {
           examen.ventas
         )
       );
+
+      this.habilitarToolTips();
+      this.asignarFuncionBotonPausa(examen.uuid);
+      this.asignarFuncionalidadBotonEliminarExamen(examen.uuid);
     });
   }
 
@@ -1653,15 +1781,12 @@ class FechasVista {
         examen: $(this)
           .attr("uuidExamen")
           .trim(),
-        fecha: $(this)
-          .attr("uuidFecha")
-          .trim(),
-        nombreCompleto: $(this)
-          .find("span")
-          .text(),
         pausado: $(this)
           .attr("pausado")
-          .trim()
+          .trim(),
+        fecha: $(this)
+        .attr("uuidfecha")
+        .trim(),
       });
     });
     return examenesEnUl;

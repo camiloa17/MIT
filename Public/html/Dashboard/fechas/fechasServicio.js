@@ -53,9 +53,10 @@ class FechasServicio {
 
 
 
-  async agregarExamenFechaDia(datos) {
+  async updateExamenesEnFecha(datos) {
+    console.log("estamos en servicio")
     try {
-      const response = await fetch(`./agregarExamenFechaDia/`, {
+      const response = await fetch(`./updateExamenesEnFecha/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

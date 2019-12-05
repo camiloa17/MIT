@@ -66,7 +66,7 @@ app.get('/listarExamenes/',  asyncErrorWrap(controladorDashboard.listarExamenes)
 
 app.get('/listarExamenesEnFecha/:fecha&:tipo',  asyncErrorWrap(controladorDashboard.getExamenesEnFecha))
 
-app.post('/agregarExamenFechaDia/',  asyncErrorWrap(controladorDashboard.agregarExamenFechaDia))
+app.post('/updateExamenesEnFecha/',  asyncErrorWrap(controladorDashboard.updateExamenesEnFecha))
 
 app.post('/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
 
