@@ -331,12 +331,11 @@ async function updateExamenesEnFechaEnDb(cambios) {
   let values = [];
   let connection;
 
-  //console.log(cambios)
-
   try {
     connection = await connectionToDb();
     let tipoLista = cambios.tipoDeLista
 
+    // -----------UPDATE CAMBIOS DIA RW 
     if (tipoLista === "RW") {
       console.log("es un RW")
       if (cambios.cambioPausadoFecha) {
@@ -366,19 +365,16 @@ async function updateExamenesEnFechaEnDb(cambios) {
       };
 
       if (cambios.cambioPausadoExamenes) {
-
+        cambios.estadoListaExamenesDia.forEach(examenEnFecha => {
+          sql += `UPDATE examen_en_dia_RW SET pausado=${connection.escape(examenEnFecha.pausado)} WHERE BIN_TO_UUID(uuid) =${connection.escape(examenEnFecha.uuid)} ;`;
+        })
       }
-      
-      console.log(sql)
 
-
-
-
-
+    // -----------UPDATE CAMBIOS DIA LS 
     } else if (tipoLista === "LS") {
       console.log("es un LS")
       if (cambios.cambioPausadoFecha) {
-        sql += `UPDATE dia_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.cambioPausadoFecha)};`;
+        sql += `UPDATE dia_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
       }
 
       if (cambios.cambioInputFecha) {
@@ -386,6 +382,9 @@ async function updateExamenesEnFechaEnDb(cambios) {
         WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
       }
 
+      console.log(sql)
+
+      // -----------UPDATE CAMBIOS SEMANA LS
     } else if (tipoLista.length === 6) {
       console.log("es una semana")
       if (cambios.cambioPausadoFecha) {
@@ -402,8 +401,6 @@ async function updateExamenesEnFechaEnDb(cambios) {
 
     const data = await queryToDb(connection, sql, values);
     return data;
-
-
 
   } finally {
     if (connection) connection.release();
@@ -697,9 +694,6 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
 
              
               FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
-        break;
-      case "LS":
-        // query = `SELECT BIN_TO_UUID(uuid) AS uuid, BIN_TO_UUID(modalidad_uuid) AS modalidad_uuid, BIN_TO_UUID(dia_LS_uuid) as fecha_uuid, pausado FROM examen_en_dia_LS WHERE activo=1 AND BIN_TO_UUID(dia_LS_uuid)= ? `;
         break;
     }
     const values = [fecha];
