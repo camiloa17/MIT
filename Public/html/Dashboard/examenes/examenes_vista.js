@@ -128,7 +128,7 @@ function mostrarNivelNuevo() {
 function nuevoNivelTemplate() {
   return [
     {
-      uuid: uuid(),
+      uuid: uuidv4(),
       nombre: "Nuevo Nivel",
       descripcion: "Descripcion del Nivel",
       activo: 1,
@@ -297,7 +297,7 @@ function nuevaModalidad(nivel) {
   console.log(nivel);
 
   return {
-    uuid: uuid(),
+    uuid: uuidv4(),
     nombre: $(`#${nivel}_modalidad`).val(),
     precio: $(`#${nivel}_modalidad_precio`).val(),
     mostrar_cliente: true,
@@ -415,7 +415,7 @@ function inicializarNuevoInputEnLi(lista, input) {
 function agregarNuevoElemento(e, lista, input) {
   if (e.which == 13 && e.target.value.length > 0) {
     const elemento = {
-      uuid: uuid(),
+      uuid: uuidv4(),
       nombre: e.target.value,
       activo: 1,
       mostrar_cliente: 1,
@@ -541,6 +541,7 @@ function asignarFuncionalidadBotonAgregarNivel() {
 }
 
 ////////////////////  Acciones visuales al generar cambios en listas Materia o Tipo
+// si ya se hizo un cambio, es true y no acumulo tostadas al hacer click
 let yaSeHizoUnCambio = false;
 
 function seGeneroUnCambioEnLista(lista) {
@@ -1455,24 +1456,6 @@ function ingresarNuevoInputValue(uuid) {
   }
 }
 
-//////////////////// Obtiene un UUID (!!!!!!!! Con webpack debemos incluir un generador de uuid final.)
-function uuid() {
-  var uuid = "",
-    i,
-    random;
-  for (i = 0; i < 32; i++) {
-    random = (Math.random() * 16) | 0;
-
-    if (i == 8 || i == 12 || i == 16 || i == 20) {
-      uuid += "-";
-    }
-
-    uuid += (i == 12 ? 4 : i == 16 ? (random & 3) | 8 : random).toString(16);
-  }
-  return uuid;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////// CONSULTAS GET AL SERVIDOR
 async function getMateria() {

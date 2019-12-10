@@ -146,13 +146,19 @@ class FechasServicio {
 
 
   // Me trae horarios de Orales y Escritos
-  async getListaHorarios() {
+  async getListaHorarios(exito, error, id) {
     try {
       const response = await fetch("./listarHorarios/");
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(id)
+      } else {        
+        exito(rta)
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(id) : null;
     }
   }
 
@@ -296,21 +302,5 @@ class FechasServicio {
 
     let stringDia = `${weekday[numeroDia]} ${dia} de ${meses[mes]} ${anio} - ${hora} hs`;
     return stringDia;
-  }
-
-  uuid() {
-    var uuid = "",
-      i,
-      random;
-    for (i = 0; i < 32; i++) {
-      random = (Math.random() * 16) | 0;
-
-      if (i == 8 || i == 12 || i == 16 || i == 20) {
-        uuid += "-";
-      }
-
-      uuid += (i == 12 ? 4 : i == 16 ? (random & 3) | 8 : random).toString(16);
-    }
-    return uuid;
   }
 }

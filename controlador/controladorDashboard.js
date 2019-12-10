@@ -382,15 +382,45 @@ async function updateExamenesEnFechaEnDb(cambios) {
         WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
       }
 
-      console.log(sql)
 
       // -----------UPDATE CAMBIOS SEMANA LS
     } else if (tipoLista.length === 6) {
       console.log("es una semana")
       if (cambios.cambioPausadoFecha) {
-        sql += `UPDATE semana_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.cambioPausadoFecha)};`;
+        sql += `UPDATE semana_LS SET pausado=${connection.escape(cambios.fechaPausada)} WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
       }
+
+      if (cambios.cambioInputFecha) {
+        sql += `UPDATE semana_LS SET cupo_maximo=${connection.escape(cambios.fechaCupo)}, semana_Examen=${connection.escape(cambios.fechaExamen)}, finaliza_inscripcion=${connection.escape(cambios.fechaFinaliza)}
+        WHERE BIN_TO_UUID(uuid)=${connection.escape(cambios.uuidFecha)};`;
+      }
+
+      if (cambios.removeExamenesFechaDia) {
+        cambios.removeExamenesFechaDia.forEach(fecha => {
+          sql += `UPDATE examen_en_semana_LS SET activo=0 WHERE BIN_TO_UUID(uuid) = ${connection.escape(fecha)};`;
+        });
+      }
+
+      if (cambios.addExamenesFechaDia) {
+        cambios.addExamenesFechaDia.forEach(examenAFecha => {
+          cambios.estadoListaExamenesDia.map(element => {
+            if (element.uuid === examenAFecha) {
+              sql += `INSERT INTO examen_en_semana_LS (uuid, semana_LS_uuid, modalidad_uuid, activo, pausado) 
+                  VALUES ( UUID_TO_BIN(${connection.escape(element.uuid)}) ,  UUID_TO_BIN(${connection.escape(element.fecha)}), UUID_TO_BIN(${connection.escape(element.examen)}), 1 , ${connection.escape(element.pausado)});`;
+            }
+          })
+        });
+      };
+
+      if (cambios.cambioPausadoExamenes) {
+        cambios.estadoListaExamenesDia.forEach(examenEnFecha => {
+          sql += `UPDATE examen_en_semana_LS SET pausado=${connection.escape(examenEnFecha.pausado)} WHERE BIN_TO_UUID(uuid) =${connection.escape(examenEnFecha.uuid)} ;`;
+        })
+      }
+
     }
+
+    console.log(sql)
 
 
     if ((cambios.cambioPausadoFecha || cambios.cambioInputFecha || cambios.cambioPausadoExamenes || cambios.removeExamenesFechaDia.length > 0 || cambios.addExamenesFechaDia.length > 0)) {
