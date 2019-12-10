@@ -90,7 +90,6 @@ class FechasVista {
     ulChips.find("li").each(function () {
       $(this).addClass("noSelectable");
     });
-    $('.ui-selected').removeClass("noSelectable");
   }
 
   removerClaseNoSelectableChips(ulChips) {
@@ -154,10 +153,12 @@ class FechasVista {
           this.botonAgregarExamenesAFecha();
         }
 
+        let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
+      
         // Selecciono una Chip y me muestra lo solicitado
-        idSelected === "editarChipDiaHora" ? this.mostrarListaDeHorarios() : null;
+        idSelected === "editarChipDiaHora" ? this.mostrarListaDeHorarios(null, fechasAntiguas) : null;
 
-        idSelected === "editarChipSemana" ? this.mostrarListaDeSemanas() : null;
+        idSelected === "editarChipSemana" ? this.mostrarListaDeSemanas(null, fechasAntiguas) : null;
       }
     });
   }
@@ -262,8 +263,6 @@ class FechasVista {
               // muestro un mensajes diciendo que la fecha fue rendida
               this.areaCambiosFechaRendida()
             }
-
-
 
             // genero la lista de reservas a esa fecha seleccionada
             this.generarListaReservaDiaRw(idSelected)
@@ -1012,7 +1011,6 @@ class FechasVista {
 
   seProdujoUnCambio() {
     if (!this.yaSeHizoUnCambio) {
-      console.log("!")
       this.aplicarClaseNoSelectableChips($('#chipsSeleccionDiaSemanaAgregar'));
       this.aplicarClaseNoSelectableChips($('#chipsSeleccionDiaSemanaEditar'));
       this.aplicarClaseNoSelectableChips($('#listaHorarios'));
@@ -1027,6 +1025,10 @@ class FechasVista {
     this.removerClaseNoSelectableChips($('#chipsSeleccionDiaSemanaEditar'));
     this.removerClaseNoSelectableChips($('#listaHorarios'));
     this.yaSeHizoUnCambio = false;
+
+    $('#botonGuardarExamenesEnFecha').addClass('disabled');
+    $('#resetExamenesEnFecha').addClass('disabled');
+
   }
 
   escucharCambioEnInputs() {
@@ -1516,14 +1518,14 @@ class FechasVista {
   }
 
 
-  async mostrarListaDeHorarios() {
-    let id= $("#listaHorarios")
-    await this.fechasServicio.getListaHorarios(this.renderHorarios, this.huboUnError, id);
+  async mostrarListaDeHorarios(accionLuegoDeGuardar, fechasAntiguas) {
+    let id = $("#listaHorarios")
+    await this.fechasServicio.getListaHorarios(this.renderHorarios, this.huboUnError, id, accionLuegoDeGuardar, fechasAntiguas);
   }
 
-  renderHorarios = (listaHorarios) =>{
+  renderHorarios = (listaHorarios) => {
     $("#listaHorarios").empty();
-  
+
     //obtengo la fecha seleccionada y chequeo si es editable o no (true o false) segun si es una fecha anterior a la actual o posterior
     listaHorarios.forEach(horario => {
       $("#listaHorarios").append(`
@@ -1550,7 +1552,7 @@ class FechasVista {
             </li>
             `);
 
-            this.formatoFechaEditable(horario.uuid)
+      this.formatoFechaEditable(horario.uuid)
       this.asignarFuncionBotonPausa(horario.uuid);
       this.asignarFuncionEliminarFecha(horario.uuid, horario.source);
     });
@@ -1604,11 +1606,13 @@ class FechasVista {
     $('#finalizaDiaInscripcionCambio').val(`${this.ddmmyyyyToYyyymmdd(finaliza)}`)
   }
 
-  async mostrarListaDeSemanas() {
-    let listaSemanas = await this.fechasServicio.getListaSemanas();
+  async mostrarListaDeSemanas(accionLuegoDeGuardar, fechasAntiguas) {
+    let id = $("#listaHorarios")
+    await this.fechasServicio.getListaSemanas(this.renderHorariosSemana, this.huboUnError, id, accionLuegoDeGuardar, fechasAntiguas);
+  }
 
+  renderHorariosSemana = (listaSemanas) => {
     $("#listaHorarios").empty();
-
     listaSemanas.forEach(semana => {
       $("#listaHorarios").append(`
             <li id="${semana.uuid}" tipo="${semana.yyyyss}" pausado="${semana.pausado}" cupo="${semana.cupo_maximo}" fechaFinalizacion="${semana.finaliza_inscripcion}" class="collection-item azul-texto weight700 cursorPointer hoverGrey ${semana.pausado ? "inputInactivo" : ""}">
@@ -1634,8 +1638,6 @@ class FechasVista {
       this.formatoFechaEditableSemana(semana.uuid)
       this.asignarFuncionBotonPausa(semana.uuid);
       this.asignarFuncionEliminarFecha(semana.uuid, "semana");
-
-
     });
   }
 
@@ -1721,11 +1723,6 @@ class FechasVista {
     //Habilito la opcion de guardado
     $('#botonGuardarExamenesEnFecha').removeClass('disabled');
     $('#resetExamenesEnFecha').removeClass('disabled');
-    this.deshabilitarBotonesCuandoHayCambiosPendientes();
-  }
-
-  deshabilitarBotonesCuandoHayCambiosPendientes() {
-    console.log("deshabilitar ")
   }
 
 
@@ -1754,7 +1751,6 @@ class FechasVista {
         });
         break;
     }
-
     this.habilitarFormSelect();
   }
 
@@ -1819,34 +1815,30 @@ class FechasVista {
         estadoListaExamenesDia: this.obtenerListaDeExamenesDeUl(),
         cambioPausadoExamenes: this.cambioPausadoExamenes,
       };
-      console.log(datos)
 
-
-      this.fechasServicio.updateExamenesEnFecha(datos);
-
-      // esto pasa si es un exito el guardado de datos
-
-
-
-      setTimeout(() => {
-        if (tipoDeLista === "RW" || tipoDeLista === "LS") {
-          this.mostrarListaDeHorarios();
-        }
-        else if (tipoDeLista.length === 6) {
-          this.mostrarListaDeSemanas();
-        }
-
-      }, 1500);
-
-      setTimeout(() => {
-        $(`#${this.lastExamSelected}`).addClass("ui-selected")
-      }, 2000);
-
-      this.cleanEstadoListaExamen();
-      this.seGuardoOReseteo();
-      $('#resetExamenesEnFecha').addClass('disabled');
+      let id = $('#estadoCambiosFechaExamenes')
+      this.fechasServicio.updateExamenesEnFecha(datos, tipoDeLista, this.guardadoExitoso, this.huboUnError, id);
     });
   }
+
+  guardadoExitoso = (tipoDeLista) => {
+    console.log(tipoDeLista)
+    if (tipoDeLista === "RW" || tipoDeLista === "LS") {
+      this.mostrarListaDeHorarios(this.accionesLuegoDeGuardadoExitoso);
+    }
+    else if (tipoDeLista.length === 6) {
+      this.mostrarListaDeSemanas(this.accionesLuegoDeGuardadoExitoso);
+    }
+  };
+
+  accionesLuegoDeGuardadoExitoso = () => {
+    $(`#${this.lastExamSelected}`).addClass("ui-selected")
+    this.cleanEstadoListaExamen();
+    this.seGuardoOReseteo();
+    let id = $('#estadoCambiosFechaExamenes')
+    this.accionExitosa(id)
+  }
+
 
   habilitarBotonResetExamenesEnFecha() {
     $("#resetExamenesEnFecha").on("click", () => {
@@ -1857,36 +1849,34 @@ class FechasVista {
       if (tipoDeLista === "RW") {
         let fechaExamen = $(`#${id}`).attr("fechaexamen")
         let fechaEditable = this.chequearSiEsFechaEditable(fechaExamen);
-        this.mostrarListaDeHorarios();
+        this.mostrarListaDeHorarios(this.accionLuegoDeReseteo);
         this.mostrarExamenesEnListaFromDB(id, tipoDeLista, fechaEditable)
         this.mostrarInputsCambioDia(id);
       }
       else if (tipoDeLista === "LS") {
         let fechaExamen = $(`#${id}`).attr("fechaexamen")
         let fechaEditable = this.chequearSiEsFechaEditable(fechaExamen);
-        this.mostrarListaDeHorarios();
-        this.mostrarExamenesEnListaFromDB(id, tipoDeLista, fechaEditable)
+        this.mostrarListaDeHorarios(this.accionLuegoDeReseteo);
+        //this.mostrarExamenesEnListaFromDB(id, tipoDeLista, fechaEditable)
         this.mostrarInputsCambioDia(id);
       }
       else if (tipoDeLista.length === 6) {
         let fechaExamen = $(`#${id}`).attr("tipo")
         let fechaEditable = this.chequearSiEsFechaEditable(fechaExamen);
         console.log(fechaEditable)
-        this.mostrarListaDeSemanas();
+        this.mostrarListaDeSemanas(this.accionLuegoDeReseteo);
         this.mostrarExamenesDeSemanaEnListaFromDB(id, fechaEditable);
         this.mostrarInputsCambioSemana(id);
       }
-
-      setTimeout(() => {
-        $(`#${this.lastExamSelected}`).addClass("ui-selected")
-      }, 2000);
-
-      this.cleanEstadoListaExamen();
-      this.seGuardoOReseteo();
-
-      $('#botonGuardarExamenesEnFecha').addClass('disabled');
-      $('#resetExamenesEnFecha').addClass('disabled');
     });
+  }
+
+  accionLuegoDeReseteo = () => {
+    $(`#${this.lastExamSelected}`).addClass("ui-selected")
+    this.cleanEstadoListaExamen();
+    this.seGuardoOReseteo();
+    $('#botonGuardarExamenesEnFecha').addClass('disabled');
+    $('#resetExamenesEnFecha').addClass('disabled');
   }
 
 
@@ -2218,7 +2208,12 @@ class FechasVista {
   }
 
   async mostrarExamenesEnListaFromDB(idSelected, tipoSelected, fechaEditable) {
-    let examenes = await this.fechasServicio.getExamenesEnFecha(idSelected, tipoSelected);
+    let id = $("#listaExamenes");
+    await this.fechasServicio.getExamenesEnFecha(idSelected, tipoSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
+  }
+
+
+  renderExamenesEnLista = (fechaEditable, examenes) => {
     $("#listaExamenes").empty();
     if (examenes.length === 0) {
       $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
@@ -2292,7 +2287,12 @@ class FechasVista {
 
 
   async mostrarExamenesDeSemanaEnListaFromDB(idSelected, fechaEditable) {
-    let examenes = await this.fechasServicio.getExamenesEnSemana(idSelected);
+    let id = $("#listaExamenes");
+    await this.fechasServicio.getExamenesEnSemana(idSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
+  }
+
+
+  renderExamenesSemanaEnLista = (fechaEditable, examenes) => {
     $("#listaExamenes").empty();
 
     // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.

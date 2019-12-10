@@ -300,6 +300,10 @@ input[type="number"] {
   margin-left: 0.15rem !important;
 }
 
+.margin-Left-neg08{
+  margin-left: -0.8rem !important;
+}
+
 .margin-right-1{
   margin-right: 1rem !important;
 }
@@ -310,6 +314,10 @@ input[type="number"] {
 
 .margin-bottom-0-4 {
   margin-bottom: 0.4rem !important;
+}
+
+.clear-top-05 {
+  margin-top: 0.5rem !important;
 }
 
 .clear-top-1 {
@@ -460,4 +468,3 @@ td{
     margin-bottom: 8rem;
   }
 }
-

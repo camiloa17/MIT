@@ -54,7 +54,7 @@ app.post('/examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.
 // SOLAPA FECHAS
 app.post('/agregarFechaDia/',  asyncErrorWrap(controladorDashboard.agregarFechaDia))
 
-app.get('/listarHorarios/',  asyncErrorWrap(controladorDashboard.listarHorarios))
+app.get('/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
 
 app.get('/listarHorariosOrales/',  asyncErrorWrap(controladorDashboard.listarHorariosOrales))
 
@@ -70,7 +70,7 @@ app.post('/updateExamenesEnFecha/',  asyncErrorWrap(controladorDashboard.updateE
 
 app.post('/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
 
-app.get('/listarSemanas/', asyncErrorWrap(controladorDashboard.listarSemanas))
+app.get('/listarSemanas/:fechasAntiguas', asyncErrorWrap(controladorDashboard.listarSemanas))
 
 app.get('/listarExamenesEnSemana/:semana', asyncErrorWrap(controladorDashboard.getExamenesEnSemana))
 

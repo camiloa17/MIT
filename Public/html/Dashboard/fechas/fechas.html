@@ -22,11 +22,18 @@
             <li id="editarChipDiaHora" class="chip enableSelectLi">Día / Hora</li>
             <li id="editarChipSemana" class="chip enableSelectLi">Semana</li>
         </ul>
+        
+        <span class="margin-Left-neg08 ">
+            <label>
+                <input id="fechasAntiguas"  type="checkbox" class="filled-in"  />
+                <span class="gris-texto clear-top-05">Incluir Fechas Antiguas</span>
+            </label>
+        </span>
     </div>
-    
+
     <div class="col s12 l12 m12 xl12 ">
         <div id="areaEditarFecha"></div>
-    </div>    
+    </div>
 </div>
 
 <div id="modalEliminarFecha" class="modal">
@@ -35,7 +42,8 @@
         <p>Está por eliminar una fecha y todos sus elementos dependientes de forma definitiva.</p>
     </div>
     <div class="modal-footer">
-        <a href="javascript: fechasVista.eliminarFecha();" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
+        <a href="javascript: fechasVista.eliminarFecha();"
+            class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
         <a class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
     </div>
 </div>

@@ -370,7 +370,7 @@ async function updateExamenesEnFechaEnDb(cambios) {
         })
       }
 
-    // -----------UPDATE CAMBIOS DIA LS 
+      // -----------UPDATE CAMBIOS DIA LS 
     } else if (tipoLista === "LS") {
       console.log("es un LS")
       if (cambios.cambioPausadoFecha) {
@@ -502,12 +502,14 @@ async function agregarFechaSemanaEnDb(fechas) {
 
 
 async function listarSemanas(req, res) {
-  let data = await buscarEnDBListaSemanas();
+  let fechasAntiguas = req.params.fechasAntiguas
+  let data = await buscarEnDBListaSemanas(fechasAntiguas);
   res.send(JSON.stringify(data));
 }
 
-async function buscarEnDBListaSemanas() {
+async function buscarEnDBListaSemanas(fechasAntiguas) {
   let connection;
+
   try {
     connection = await connectionToDb();
 
@@ -530,12 +532,14 @@ async function buscarEnDBListaSemanas() {
       
       YEARWEEK(semana_Examen,3) AS yyyyss, 
       cupo_maximo, finaliza_inscripcion, pausado, activo 
-      FROM semana_LS WHERE activo=1 ORDER BY semana_Examen ;`;
-
-
+      FROM semana_LS 
+      WHERE activo=1 
+      ${(fechasAntiguas === 'true') ? "" : "AND semana_Examen > CURDATE()"}
+      ORDER BY semana_Examen`
 
 
     const data = await queryToDb(connection, query);
+    //console.log(query)
     return data;
   } finally {
     if (connection) connection.release();
@@ -545,12 +549,14 @@ async function buscarEnDBListaSemanas() {
 
 
 async function listarHorarios(req, res) {
-  let data = await buscarEnDBListaHorarios();
+  let fechasAntiguas = req.params.fechasAntiguas
+  let data = await buscarEnDBListaHorarios(fechasAntiguas);
   res.send(JSON.stringify(data));
 }
 
-async function buscarEnDBListaHorarios() {
+async function buscarEnDBListaHorarios(fechasAntiguas) {
   let connection;
+  console.log("fechas angtigfuas", fechasAntiguas)
   try {
     const query =
       `SELECT 
@@ -574,7 +580,7 @@ async function buscarEnDBListaHorarios() {
       ) as cupos_libres,
 
       'RW' as source FROM dia_RW 
-      WHERE activo=1 
+      WHERE activo=1 ${(fechasAntiguas === 'true') ? "" : "AND fecha_Examen > CURDATE()"}
       
       UNION SELECT 
       BIN_TO_UUID(uuid) as uuid,       
@@ -597,7 +603,8 @@ async function buscarEnDBListaHorarios() {
       
       'LS' as source FROM dia_LS 
       
-      WHERE activo=1 ORDER BY fecha_Examen;`;
+      WHERE activo=1 ${(fechasAntiguas === 'true') ? "" : "AND fecha_Examen > CURDATE()"}
+      ORDER BY fecha_Examen;`;
 
     connection = await connectionToDb();
 

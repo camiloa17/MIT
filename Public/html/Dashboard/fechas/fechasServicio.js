@@ -50,10 +50,7 @@ class FechasServicio {
   }
 
 
-
-
-
-  async updateExamenesEnFecha(datos) {
+  async updateExamenesEnFecha(datos, tipoDeLista, guardadoExitoso, error, id) {
     console.log("estamos en servicio")
     try {
       const response = await fetch(`./updateExamenesEnFecha/`, {
@@ -64,7 +61,15 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
+
+      if(rta.error) {
+        error(id)
+      } else {
+        guardadoExitoso(tipoDeLista);
+      }
+
     } catch (err) {
+      err ? error(id) : null;
       console.log(err);
     }
   }
@@ -146,15 +151,16 @@ class FechasServicio {
 
 
   // Me trae horarios de Orales y Escritos
-  async getListaHorarios(exito, error, id) {
+  async getListaHorarios(exito, error, id, accionLuegoDeGuardar, fechasAntiguas) {
     try {
-      const response = await fetch("./listarHorarios/");
+      const response = await fetch(`./listarHorarios/${fechasAntiguas}`);
       const rta = await response.json();
 
       if (rta.error) {
         error(id)
       } else {        
-        exito(rta)
+        exito(rta);
+        accionLuegoDeGuardar ? accionLuegoDeGuardar() : null;
       }
 
     } catch (err) {
@@ -224,36 +230,56 @@ class FechasServicio {
 
 
 
-  async getListaSemanas() {
+  async getListaSemanas(exito, error, id, accionLuegoDeGuardar, fechasAntiguas)  {
     try {
-      const response = await fetch("./listarSemanas/");
-      const data = await response.json();
-      return data;
+      const response = await fetch(`./listarSemanas/${fechasAntiguas}`);
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(id)
+      } else {        
+        exito(rta)
+        accionLuegoDeGuardar ? accionLuegoDeGuardar() : null;
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(id) : null;
     }
   }
 
-  async getExamenesEnFecha(fecha, tipo) {
+  async getExamenesEnFecha(fecha, tipo, editable, exito, error, id){
     try {
       const response = await fetch(`./listarExamenesEnFecha/${fecha}&${tipo}`);
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(id)
+      } else {        
+        exito(editable, rta)
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(id) : null;
     }
   }
 
   
 
-  async getExamenesEnSemana(semana) {
+  async getExamenesEnSemana(semana, editable, exito, error, id) {
     try {
       const response = await fetch(`./listarExamenesEnSemana/${semana}`);
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(id)
+      } else {        
+        exito(editable, rta)
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(id) : null;
     }
+    
   }
 
   async getListaExamenes() {
