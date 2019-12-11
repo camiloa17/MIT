@@ -6,57 +6,99 @@
     </div>
 </div>
 <main>
-<section id="checkout">
-    <div id="steps">
-        <ul>
-            <li class="step-number selected-step">1</li>
-            <li class="step-number">2</li>
-            <li class="step-number">3</li>
-            <li class="step-number">4</li>
-        </ul>
-    </div>
-    <div id="information">
-        <h3>EXAMEN DE</h3>
-        <h1><%= nivel %> - <%= modo %></h1>
-        <form action="" method="post">
-            <div class="wrapper-form">
-            <div class="exam-wrapper ongoing" data-step="1">
-                <div class="exam-picture">
-                    <img src="/images/Front/team-section-picture.jpg" alt="">
-                </div>
-                <div class="exam-text">
-                    <h4>Descripción del examen</h4>
-                    <p><%=descripcion%></p>
-                    <span>€<%= precio %></span>
+    <section id="checkout">
+        <div id="steps">
+            <% if(modo == 'Reading & Writing' || modo =='Listening & Speaking'){ %>
+                <ul>
+                    <li class="step-number selected-step">1</li>
+                    <li class="step-number">2</li>
+                    <li class="step-number">3</li>
+                    <li class="step-number">4</li>
+                </ul>
+            <% }%>
+            <% if(modo == "Completo") { %>
+                        <ul>
+                            <li class="step-number selected-step">1</li>
+                            <li class="step-number">2</li>
+                            <li class="step-number">3</li>
+                            <li class="step-number">4</li>
+                            <li class="step-number">5</li>
+                        </ul>
+                        <% } %>
 
-                    <a href="#">Descargar las Normas</a>
-                        <div class="button-wrap">
-                            <a class="button-checkout next" href="#">Siguiente</a>
+        </div>
+        <div id="information">
+            <h3>EXAMEN DE</h3>
+            <h1><%= nivel %> - <%= modo %></h1>
+            <form action="" method="post">
+                <div class="wrapper-form">
+                    <div class="exam-wrapper ongoing" data-step="1">
+                        <div class="exam-picture">
+                            <img src="/images/Front/team-section-picture.jpg" alt="">
                         </div>
-                </div>
-            </div>
+                        <div class="exam-text">
+                            <h4>Descripción del examen</h4>
+                            <p><%=descripcion%></p>
+                            <span>€<%= precio %></span>
 
-            <div class="horario next" data-step="2">
-                <h2>DISPONIBILIDAD</h2>
-                <p>Selecciona la fecha que esten disponibles para rendir el examen</p>
-                <div class="horario-wrapper">
-                    <% if(modo== 'Reading & Writing' || 'Listening & Speaking'){ %>
-                    <% horario.horarios.forEach((opcion,index)=> {%>
-                    <input type="radio" name="horario-selector" id="h<%= index+1 %>">
-                    <label for="h<%= index+1 %>" class="horario-label" id="l<%= index+1 %>"><%=horario.text[index]%></label>
-                    <%})%>
-                    <%}%>
-                    <div class="button-wrap">
-                        <a class="button-checkout backwards" href="#">Regresar</a>
-                        <a class="button-checkout next" href="#">Siguiente</a>
+                            <a href="#">Descargar las Normas</a>
+                            <div class="button-wrap">
+                                <a class="button-checkout next" href="#">Siguiente</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                    <% if(modo == 'Reading & Writing' || modo =='Listening & Speaking'){ %>
+                    <div class="horario next" data-step="2">
+                        <h2>DISPONIBILIDAD</h2>
+                        <p>Selecciona la fecha que esten disponibles para rendir el examen</p>
+                        <div class="horario-wrapper">
+
+                            <% horario.horarios.forEach((opcion,index)=> {%>
+                            <input type="radio" name="horario-selector"  id="h<%= index+1 %>">
+                            <label for="h<%= index+1 %>" class="horario-label"
+                                id="l<%= index+1 %>"><%=horario.text[index]%></label>
+                            <%})%>
+
+                            <div class="button-wrap">
+                                <a class="button-checkout backwards" href="#">Regresar</a>
+                                <a class="button-checkout next disabled" href="#">Siguiente</a>
+                            </div>
+                        </div>
+                    </div>
+                    <%}%>
+            <% if(modo == "Completo") {%>
+                    <div class="horario next" data-step="2">
+                        <h2>DISPONIBILIDAD Reading & Writting</h2>
+                        <p>Selecciona la fecha que esten disponibles para rendir el examen</p>
+                        <div class="horario-wrapper">
+
+                            <div class="button-wrap">
+                                <a class="button-checkout backwards" href="#">Regresar</a>
+                                <a class="button-checkout next disabled" href="#" disabled>Siguiente</a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="horario next" data-step="3">
+                        <h2>LISTENING & SPEAKING</h2>
+                        <p>MIT se pondra en contacto contigo para darte la semana en la que tienes que presentar el examen</p>
+                        <div class="horario-wrapper">
+                            
+                            <div class="button-wrap">
+                                <a class="button-checkout backwards" href="#">Regresar</a>
+                                <a class="button-checkout next" href="#">Siguiente</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <%}%>
             
-
-
-
+            <% if(modo == 'Reading & Writing' || modo =='Listening & Speaking'){ %>
             <div class="pago next" data-step="3">
+                <%}%>
+                <% if(modo == "Completo") {%>
+                <div class="pago next" data-step="4">
+                <%}%>
                 <div id="person-information">
                     <h2>COMPLETAR TUS DATOS</h2>
                     <P>Completa todos los campos obligatorios *</P>

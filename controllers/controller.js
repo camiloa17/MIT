@@ -61,8 +61,8 @@ exports.adquirirMenu = async () => {
             modo: modo
         };
 
-    } catch (error) {
-        console.error(error)
+    } catch (err) {
+        console.error(err)
     }
 
 }
@@ -81,8 +81,8 @@ exports.consultaExamenCheckout = async (uuid) => {
             descripcion: respuesta[0].descripcion,
             precio: respuesta[0].precio
         };
-    } catch (error) {
-
+    } catch (err) {
+        console.error(err)
     }
 
 }
@@ -95,7 +95,18 @@ exports.consultaHorarios = async (modalidad, id) => {
 
         switch (modalidad) {
             case "Completo":
+                sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0;"
+                const horariosCo = await utils.queryAsync(sql, [id]);
+                const textoCompleto = await diasATexto(horariosCo);
+                const cuposCompleto = await armarArraydeIdsModalidades(horariosCo, modalidad);
 
+                horarios={
+                    horario: horariosCo,
+                    text: textoCompleto,
+                    cupo: cuposCompleto
+                }
+                horarioFinal = await corroborarCupos(horarios);
+                horarios = horarioFinal;
                 break;
             case "Reading_&_Writing":
                 sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0;"
@@ -130,8 +141,8 @@ exports.consultaHorarios = async (modalidad, id) => {
 
         return horarios;
 
-    } catch (error) {
-        console.error(error)
+    } catch (err) {
+        console.error(err)
     }
 }
 
@@ -144,12 +155,10 @@ async function diasATexto(horarios) {
             } else if (horario.semana_Examen) {
                 textoHorarios.push(horario.semana_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long' }));
             }
-
-
         });
         return textoHorarios;
 
-    } catch (error) {
+    } catch (err) {
         console.error(err)
     }
 
@@ -163,7 +172,7 @@ async function armarArraydeIdsModalidades(horarios, modalida) {
         });
         const disponible = await verVentasCupos(idsExamenEnDia, modalida);
         return disponible
-    } catch (error) {
+    } catch (err) {
         console.error(err)
     }
 
@@ -173,7 +182,7 @@ async function verVentasCupos(id, modalidad) {
     try {
         if (id.length > 0) {
             let verVentas;
-            if (modalidad == 'Reading_&_Writing') {
+            if (modalidad == 'Reading_&_Writing'|| modalidad=='Completo') {
                 verVentas = `select
   (drw.cupo_maximo - count(r.uuid)) as disponible,
   BIN_TO_UUID(drw.uuid) as dia_ID
@@ -204,17 +213,17 @@ where
             return ventas;
         }
 
-    } catch (error) {
-        console.error(error)
+    } catch (err) {
+        console.error(err)
     }
 
 }
 
 async function corroborarCupos(objetoHorario) {
     try {
-        let horario = objetoHorario;
-        let arrayHorarios = horario.horario;
-        let cupos = horario.cupo;
+        const horario = objetoHorario;
+        const arrayHorarios = horario.horario;
+        const cupos = horario.cupo;
 
         arrayHorarios.forEach(horario => {
             cupos.forEach(cupo => {
@@ -224,12 +233,13 @@ async function corroborarCupos(objetoHorario) {
                 }
             })
         })
+        
         return {
             horarios: horario.horario,
             text: horario.text
         }
     } catch (err) {
-        console.log(err)
+        console.error(err)
     }
 }
 

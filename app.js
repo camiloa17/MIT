@@ -12,7 +12,7 @@ app.use(express.static(`Public`));
 
 function asyncErrorWrap(f) {
     return (req, res, next)=> { 
-         return f(req,res).catch(next);
+         return Promise.resolve(f(req,res)).catch(next);
     }
 }
 

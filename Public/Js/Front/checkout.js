@@ -3,58 +3,76 @@ document.querySelector('.secondary-menu-logo span').addEventListener('click', cl
 document.querySelectorAll('.button-checkout').forEach(button => {
   button.addEventListener('click', step)
 })
+document.querySelectorAll('.horario-label').forEach(horario => {
+  horario.addEventListener('click', habilitarBoton)
+})
 
 
 
 function openNav(item) {
-    const clickItems = item.target.classList;
-    if (clickItems.contains('right-side')) {
-        document.querySelector('.right-side-menu').classList.add('active');
-        document.querySelector('.overflow').classList.add('overflow-menu');
-    } else if (clickItems.contains('left-side')) {
-        document.querySelector('.left-side-menu').classList.add('active');
-        document.querySelector('.overflow').classList.add('overflow-menu');
-    }
+  const clickItems = item.target.classList;
+  if (clickItems.contains('right-side')) {
+    document.querySelector('.right-side-menu').classList.add('active');
+    document.querySelector('.overflow').classList.add('overflow-menu');
+  } else if (clickItems.contains('left-side')) {
+    document.querySelector('.left-side-menu').classList.add('active');
+    document.querySelector('.overflow').classList.add('overflow-menu');
+  }
 
 }
 
 function closeNav(item) {
-    const clickItems = item.target.classList;
-    if (clickItems.contains('right-side')) {
-        document.querySelector('.right-side-menu').classList.remove('active');;
-        document.querySelector('.overflow').classList.remove('overflow-menu');
-    } else if (clickItems.contains('left-side')) {
-        document.querySelector('.left-side-menu').classList.remove('active');
-        document.querySelector('.overflow').classList.remove('overflow-menu');
-    }
-}
-
-
-
-function step(item){
-  const wrapper = item.target.parentElement.parentElement.parentElement;
-  const nextElement = wrapper.nextElementSibling;
-  const previousElement = wrapper.previousElementSibling;
-  const numeroPasos = document.querySelectorAll('.step-number').length;
-  if(item.target.classList.contains('next')){
-    wrapper.classList.remove('ongoing');
-    wrapper.classList.add('.backwards-wrapper');
-    nextElement.classList.add('ongoing');
-    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
-    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)].classList.add('selected-step');
-    document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos == 4) ? 25 * (parseInt(wrapper.dataset.step) + 1) : 20 * (parseInt(wrapper.dataset.step) + 1)}%`;
-  } else if (item.target.classList.contains('backwards')){
-    wrapper.classList.remove('ongoing');
-    previousElement.classList.remove('.backwards-wrapper');
-    previousElement.classList.add('ongoing');
-    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 2].classList.add('selected-step');
-    document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)-1].classList.remove('selected-step');
-    document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos == 4) ? 25 * (parseInt(wrapper.dataset.step) - 1) : 20 * (parseInt(wrapper.dataset.step) - 1)}%`;
+  const clickItems = item.target.classList;
+  if (clickItems.contains('right-side')) {
+    document.querySelector('.right-side-menu').classList.remove('active');;
+    document.querySelector('.overflow').classList.remove('overflow-menu');
+  } else if (clickItems.contains('left-side')) {
+    document.querySelector('.left-side-menu').classList.remove('active');
+    document.querySelector('.overflow').classList.remove('overflow-menu');
   }
 }
 
 
 
+function step(item) {
+  const stateButton = buttonChecker();
+  const wrapper = item.target.parentElement.parentElement.parentElement;
+  const nextElement = wrapper.nextElementSibling;
+  const previousElement = wrapper.previousElementSibling;
+  const numeroPasos = document.querySelectorAll('.step-number');
+
+  if (!item.target.classList.contains('disabled')) {
+    if (item.target.classList.contains('next')) {
+      wrapper.classList.remove('ongoing');
+      wrapper.classList.add('.backwards-wrapper');
+      nextElement.classList.add('ongoing');
+      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
+      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)].classList.add('selected-step');
+      document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos.length == 4) ? 25 * (parseInt(wrapper.dataset.step) + 1) : 20 * (parseInt(wrapper.dataset.step) + 1)}%`;
+    } else if (item.target.classList.contains('backwards')) {
+      wrapper.classList.remove('ongoing');
+      previousElement.classList.remove('.backwards-wrapper');
+      previousElement.classList.add('ongoing');
+      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 2].classList.add('selected-step');
+      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
+      document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos.length == 4) ? 25 * (parseInt(wrapper.dataset.step) - 1) : 20 * (parseInt(wrapper.dataset.step) - 1)}%`;
+    }
+  }
+}
+
+function buttonChecker() {
+  const horarios = document.getElementsByName('horario-selector');
+  horarios.forEach(horario => {
+    console.log(horario.checked)
+  })
+}
+function habilitarBoton() {
+  const boton = document.querySelector('.button-checkout.disabled');
+  if (boton) {
+    boton.classList.remove('disabled');
+  }
+
+}
 
 
 
@@ -84,13 +102,13 @@ var style = {
 };
 
 // Create an instance of the card Element.
-var card = elements.create('card', {style: style});
+var card = elements.create('card', { style: style });
 
 // Add an instance of the card Element into the `card-element` <div>.
 card.mount('#card-element');
 
 // Handle real-time validation errors from the card Element.
-card.addEventListener('change', function(event) {
+card.addEventListener('change', function (event) {
   var displayError = document.getElementById('card-errors');
   if (event.error) {
     displayError.textContent = event.error.message;

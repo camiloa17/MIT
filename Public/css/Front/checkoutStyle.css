@@ -341,21 +341,22 @@ input[id="h6"]:checked ~ #l6{
     text-align: center;
     margin:0 auto;
 }
-
+/*
 #information-wrapper{
     display: flex;
     width: 250px;
     flex-direction: column;
     justify-content: center;
-}
+}*/
 
 
-/*#information-wrapper input,
+#information-wrapper input,
 #information-wrapper label,
 #information-wrapper span{
     display: block;
+    width: 250px;
 }
-*/
+
 #information-wrapper input{
     margin-bottom:15px;
     padding-left: 5px;
@@ -363,7 +364,12 @@ input[id="h6"]:checked ~ #l6{
 
 
 #information-wrapper .genero-inp{
-    display:inline-block;
+    display :inline-block;
+    width:80px;
+}
+
+#information-wrapper input[name='genero'].genero-inp{
+    width:20px;
 }
 
 #information-wrapper label,
@@ -474,6 +480,16 @@ input[id="b2"]:checked ~ #label-no{
     cursor: pointer;
     text-align: center;
     text-decoration: none;
+}
+
+.button-checkout.disabled{
+    background: #e6e6e6;
+    border:1px solid  #e6e6e6;
+    cursor: not-allowed;
+}
+.button-checkout.disabled:hover{
+    background: #d9d9d9;
+    border:1px solid  #d9d9d9;
 }
 
 
@@ -713,16 +729,21 @@ input[id="b2"]:checked ~ #label-no{
     }
 
     .pago p{
-        
         text-align: left;
         margin-top:10px;
         margin-bottom:30px;
     }
 
     #information-wrapper{
-        margin:10px auto;
+        margin:10px 0;
         padding-left:0;
-        
+        width:500px;
+        height: 350px;
+        overflow-y:scroll;
+    }
+
+    #information-wrapper label{
+        margin-bottom:5px;
     }
 
     /*button checkout*/
