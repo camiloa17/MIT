@@ -1,0 +1,56 @@
+<div id="steps">
+    <% if(modo == 'Reading & Writing' || modo =='Listening & Speaking'){ %>
+    <ul>
+        <%if(step =='step_1'){%>
+        <li class="step-number selected-step">1</li>
+        <% }else if(step!='step_1') {%>
+            <li class="step-number">1</li>
+            <% }%>
+        <%if(step =='step_2'){%>
+        <li class="step-number selected-step">2</li>
+        <% }else if(step!='step_2') {%>
+        <li class="step-number">2</li>
+        <% }%>
+        <%if(step=='step_3'){%>
+        <li class="step-number selected-step">3</li>
+        <% }else if(step!='step-3') {%>
+        <li class="step-number">3</li>
+        <% }%>
+        <%if(step=='step_4'){%>
+        <li class="step-number selected-step">4</li>
+        <% }else if(step!='step-4') {%>
+        <li class="step-number">4</li>
+        <% }%>
+    </ul>
+    <% }%>
+    <% if(modo == "Completo") { %>
+    <ul>
+        <%if(step=='step_1'){%>
+        <li class="step-number selected-step">1</li>
+        <% }else if(step!='step_1') {%>
+        <li class="step-number">1</li>
+        <% }%>
+        <%if(step=='step_2'){%>
+        <li class="step-number selected-step">2</li>
+        <% }else if(step!='step_2') {%>
+        <li class="step-number">2</li>
+        <% }%>
+        <%if(step=='step_3'){%>
+        <li class="step-number selected-step">3</li>
+        <% }else if(step!='step_3') {%>
+        <li class="step-number">3</li>
+        <% }%>
+        <%if(step=='step_4'){%>
+        <li class="step-number selected-step">4</li>
+        <% }else if(step!='step_4') {%>
+        <li class="step-number">4</li>
+        <% }%>
+        <%if(step=='step_5'){%>
+        <li class="step-number selected-step">5</li>
+        <% }else if(step!='step_5') {%>
+        <li class="step-number">5</li>
+        <% }%>
+    </ul>
+    <% } %>
+
+</div>

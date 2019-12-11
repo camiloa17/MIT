@@ -71,7 +71,7 @@ exports.adquirirMenu = async () => {
 exports.consultaExamenCheckout = async (uuid) => {
     try {
         //const sql = 'select n.descripcion as descripcion, mo.precio as precio from nivel as n join modalidad as mo on n.uuid=mo.nivel_uuid where n.nombre = ? and mo.nombre = ?;';
-        const sql = 'select m.nombre as materia, t.nombre as tipo,n.nombre as nivel, n.descripcion as descripcion,mo.nombre as modalidad, mo.precio as precio from materia as m join tipo as t on t.materia_uuid = m.uuid join  nivel as n on n.tipo_uuid = t.uuid join modalidad as mo on n.uuid = mo.nivel_uuid where mo.uuid = UUID_TO_BIN(?);'
+        const sql = 'select m.nombre as materia, t.nombre as tipo,n.nombre as nivel, n.descripcion as descripcion,BIN_TO_UUID(mo.uuid) as id,mo.nombre as modalidad, mo.precio as precio from materia as m join tipo as t on t.materia_uuid = m.uuid join  nivel as n on n.tipo_uuid = t.uuid join modalidad as mo on n.uuid = mo.nivel_uuid where mo.uuid = UUID_TO_BIN(?);'
         const respuesta = await utils.queryAsync(sql, [uuid]);
         return {
             materia: respuesta[0].materia,
@@ -79,13 +79,15 @@ exports.consultaExamenCheckout = async (uuid) => {
             nivel: respuesta[0].nivel,
             modalidad: respuesta[0].modalidad,
             descripcion: respuesta[0].descripcion,
-            precio: respuesta[0].precio
+            precio: respuesta[0].precio,
+            id:respuesta[0].id
         };
     } catch (err) {
         console.error(err)
     }
 
 }
+
 
 exports.consultaHorarios = async (modalidad, id) => {
     try {

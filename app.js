@@ -34,6 +34,28 @@ app.get('/', asyncErrorWrap(async (req,res) => {
     res.render("home", { stylesheet: stylesheet,team:'#team',contacto:'#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
 }));
 
+app.get('/checkout/step_1/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap(async(req,res)=>{
+    const stylesheet = '/css/Front/checkoutStyle_Step1.css';
+    
+    const datosExamenModalidad1 = await controller.consultaExamenCheckout(req.query.id);
+
+    res.render('checkoutStep1',{stylesheet:stylesheet,nivel:datosExamenModalidad1.nivel, modo:datosExamenModalidad1.modalidad,precio:datosExamenModalidad1.precio,descripcion:datosExamenModalidad1.descripcion,step:'step_1',materia:datosExamenModalidad1.materia, id:datosExamenModalidad1.id,tipo:datosExamenModalidad1.tipo})
+}));
+
+app.get('/checkout/step_2/:materia/:tipo/:nivel/:modalidad', asyncErrorWrap(async (req, res) => {
+    const stylesheet = '/css/Front/checkoutStyle_Step1.css';
+    const rutaStep2 = {
+        materia: req.params.materia,
+        tipo: req.params.tipo,
+        id: req.query.id
+    }
+    const datosExamenModalidad1 = await controller.consultaExamenCheckout(req.query.id);
+
+    res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad1.nivel, modo: datosExamenModalidad1.modalidad, precio: datosExamenModalidad1.precio, descripcion: datosExamenModalidad1.descripcion, step: 'step_1', ruta: rutaStep1 })
+}));
+
+
+/*
 app.get('/checkout/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap (async(req, res) => {
     const stylesheet = '/css/Front/checkoutStyle.css';
     const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
@@ -41,6 +63,7 @@ app.get('/checkout/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap (async(req, 
     
     res.render('checkout', { stylesheet: stylesheet, tipo:datosExamenModalidad.tipo,nivel:datosExamenModalidad.nivel,modo:datosExamenModalidad.modalidad,precio:datosExamenModalidad.precio,descripcion:datosExamenModalidad.descripcion,horario:horarios})
 }));
+*/
 
 app.get('/faqs',asyncErrorWrap(async (req,res)=>{
     const stylesheet='css/Front/faqs.css';

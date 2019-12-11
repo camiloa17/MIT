@@ -1,0 +1,35 @@
+<%- include("partials/head") -%>
+<%- include("partials/upperMenuOnly") -%>
+
+
+<div id="progress-bar-outer">
+    <div id="progress-bar-inner">
+    </div>
+</div>
+<main>
+    <section id="checkout_step1">
+        <%- include("partials/checkoutSteps") -%>
+        <div id="information">
+            <h3>EXAMEN DE</h3>
+            <h1><%= nivel %> - <%= modo %></h1>
+            <div class="exam-wrapper ongoing">
+                <div class="exam-picture">
+                    <img src="/images/Front/team-section-picture.jpg" alt="">
+                </div>
+                <div class="exam-text">
+                    <h4>Descripción del examen</h4>
+                    <p><%=descripcion%></p>
+                    <span>€<%= precio %></span>
+                    <a href="#">Descargar las Normas</a>
+                </div>
+            </div>
+            <div class="button-wrap">
+                <a type="button" class="button-checkout next" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Siguiente</a>
+            </div>
+        </div>
+        </section>
+</main>
+
+
+
+<%- include("partials/footer-privacidad") -%>
