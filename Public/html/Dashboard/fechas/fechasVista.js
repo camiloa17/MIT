@@ -1532,6 +1532,7 @@ class FechasVista {
 
     //obtengo la fecha seleccionada y chequeo si es editable o no (true o false) segun si es una fecha anterior a la actual o posterior
     listaHorarios.forEach(horario => {
+      let cupos_libres = horario.cupo_maximo - horario.ventas;
       $("#listaHorarios").append(`
             <li id="${horario.uuid}" tipo="${horario.source}" pausado="${horario.pausado}" cupo="${horario.cupo_maximo}" fechaExamen="${horario.fecha_Examen}" fechaFinalizacion="${horario.fecha_finalizacion}" 
             class="collection-item azul-texto weight700 cursorPointer hoverGrey ${horario.pausado ? "inputInactivo" : ""}">
@@ -1548,7 +1549,7 @@ class FechasVista {
                     <i id="${horario.uuid}_pausa" class="noClickable material-icons-outlined secondary-content right white-text button-opacity ">${horario.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${horario.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
-                    <span class="new badge green margin-left-0-15" data-badge-caption="libres">${horario.cupos_libres}</span>
+                    <span class="new badge green margin-left-0-15" data-badge-caption="libres">${cupos_libres}</span>
                     <i id="${horario.uuid}_remover" href="#modalEliminarFecha" class="noClickable material-icons-outlined secondary-content right azul-texto button-opacity margin0 ">${!horario.ventas ? "delete" : ""}</i>
                   </div>
                 </div>
@@ -1618,7 +1619,11 @@ class FechasVista {
 
   renderHorariosSemana = (listaSemanas) => {
     $("#listaHorarios").empty();
+    
+    
     listaSemanas.forEach(semana => {
+      let cupos_libres = semana.cupo_maximo - semana.ventas;
+
       $("#listaHorarios").append(`
             <li id="${semana.uuid}" tipo="${semana.yyyyss}" pausado="${semana.pausado}" cupo="${semana.cupo_maximo}" fechaFinalizacion="${semana.finaliza_inscripcion}" class="collection-item azul-texto weight700 cursorPointer hoverGrey ${semana.pausado ? "inputInactivo" : ""}">
               <div class="row margin0">
@@ -1632,7 +1637,7 @@ class FechasVista {
                     <i id="${semana.uuid}_pausa" class="noClickable material-icons-outlined secondary-content right white-text button-opacity">${semana.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${semana.ventas}</span>
                     <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
-                    <span class="new badge green margin-left-0-15" data-badge-caption="libres">${semana.cupos_libres}</span>
+                    <span class="new badge green margin-left-0-15" data-badge-caption="libres">${cupos_libres}</span>
                     <i href="#modalEliminarFecha" id="${semana.uuid}_remover" class="noClickable material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!semana.ventas ? "delete" : ""}</i>
                   </div>
                 </div>
@@ -2075,8 +2080,11 @@ class FechasVista {
 
 
     diasOral.forEach(diaHorario => {
+
+      let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas;
+
       $('#listadoDiasOralesParaSemana').append(
-        `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${diaHorario.cupos_libres}</option>`
+        `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${cupos_libres}</option>`
       )
     }
     );

@@ -522,13 +522,8 @@ async function buscarEnDBListaSemanas(fechasAntiguas) {
       (SELECT count(*)  FROM reserva 
       LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
       LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas, 
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas,
       
-      (cupo_maximo - (SELECT count(*) FROM reserva 
-      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
-      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)
-      ) as cupos_libres,
       
       YEARWEEK(semana_Examen,3) AS yyyyss, 
       cupo_maximo, finaliza_inscripcion, pausado, activo 
@@ -539,7 +534,7 @@ async function buscarEnDBListaSemanas(fechasAntiguas) {
 
 
     const data = await queryToDb(connection, query);
-    //console.log(query)
+    console.log(query)
     return data;
   } finally {
     if (connection) connection.release();
@@ -556,7 +551,7 @@ async function listarHorarios(req, res) {
 
 async function buscarEnDBListaHorarios(fechasAntiguas) {
   let connection;
-  console.log("fechas angtigfuas", fechasAntiguas)
+
   try {
     const query =
       `SELECT 
@@ -573,11 +568,7 @@ async function buscarEnDBListaHorarios(fechasAntiguas) {
       LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
       where BIN_TO_UUID(dia_RW.uuid)=this_uuid)  as ventas, 
 
-      (cupo_maximo - (SELECT count(*)  FROM reserva 
-      LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
-      LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
-      where BIN_TO_UUID(dia_RW.uuid)=this_uuid)
-      ) as cupos_libres,
+
 
       'RW' as source FROM dia_RW 
       WHERE activo=1 ${(fechasAntiguas === 'true') ? "" : "AND fecha_Examen > CURDATE()"}
@@ -595,10 +586,7 @@ async function buscarEnDBListaHorarios(fechasAntiguas) {
       LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
       where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
 
-      (cupo_maximo - (SELECT count(*)  FROM reserva 
-      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
-      where BIN_TO_UUID(dia_LS.uuid)=this_uuid) 
-      ) as cupos_libres,
+    
 
       
       'LS' as source FROM dia_LS 
@@ -636,11 +624,6 @@ async function buscarEnDBListaHorariosOrales() {
       LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
       where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
 
-      (cupo_maximo - (SELECT count(*)  FROM reserva 
-      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
-      where BIN_TO_UUID(dia_LS.uuid)=this_uuid) 
-      ) as cupos_libres,
-      
       
       'LS' as source FROM dia_LS WHERE activo=1 
       ORDER BY fecha_Examen;`;
