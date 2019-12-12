@@ -135,10 +135,10 @@ class FechasVista {
 
       stop: (event, ui) => {
         // Evito que se seleccionen multiples chips. Quedará solo seleccionado el primero si hay una selección de más de un chip
-        $(event.target)
-          .children(".ui-selected")
-          .not(":first")
-          .removeClass("ui-selected");
+        // $(event.target)
+        //   .children(".ui-selected")
+        //   .not(":first")
+        //   .removeClass("ui-selected");
 
         // Obtengo chip seleccionado
         let idSelected = $(event.target)
@@ -286,8 +286,11 @@ class FechasVista {
             // escondo el dropdown de los examenes que se pueden agregar a la tabla de examenes. Se agregan a una semana, no a un dia.
             $('#inputSelectarExamenes').addClass("notVisible");
 
+            //Muestro la lista de examenes asignados a esta fecha (id de la fecha, RW LS o semana, true o false si es editable o no)
+            this.mostrarExamenesEnListaFromDB(idSelected, tipoSelected, fechaEditable);
+
             //NO MUESTRO EXAMENES EN DIA LS. ESO SE VE EN EXAMENES EN SEMANA LS
-            $("#listaExamenes").append(`<div class="azul-texto weight700 padding0-7rem">Los exámenes de Listening se deben asignar a una Semana.</div>`)
+            //$("#listaExamenes").append(`<div class="azul-texto weight700 padding0-7rem">Los exámenes de Listening se deben asignar a una Semana.</div>`)
 
             // Al elemento que esta seleccionado (que tiene clase ui-selected), le aplico a su icono remover la clase modal-trigger para que pueda aparecer el modal que pregunta si quiero eliminar el examen
             $('.noClickable').removeClass("modal-trigger");
@@ -480,7 +483,7 @@ class FechasVista {
     <div class="row margin0">
         <div class="col clear-top-2 s12 m12 l12 xl12 valign-wrapper">
             <a id="botonAgregaDia"  class="col disabled waves-effect waves-light btn btn-medium weight400 background-azul">Agregar</a>
-            <span id="estadoAgregarDia" class="col s3 m3 l3 xl3" ></span>
+            <span id="estadoAgregarDia" class="padding-left2-4" ></span>
         </div>
         
     </div>
@@ -2230,6 +2233,9 @@ class FechasVista {
 
 
   renderExamenesEnLista = (fechaEditable, examenes) => {
+
+    console.log(fechaEditable, examenes)
+
     $("#listaExamenes").empty();
     if (examenes.length === 0) {
       $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')

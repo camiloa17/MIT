@@ -715,6 +715,25 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
              
               FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
         break;
+      case "LS":
+        query= `SELECT  DISTINCT
+        BIN_TO_UUID(dia_LS.uuid) as fecha_uuid,
+        BIN_TO_UUID(dia_LS.uuid) as this_fecha_uuid,
+        BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as modalidad_uuid,
+        BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as this_modalidad_uuid,
+        
+        
+                      (SELECT count(*) FROM examen_en_semana_LS 
+                      LEFT JOIN reserva ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid) 
+                      LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid)=BIN_TO_UUID(reserva.dia_LS_uuid) 
+                      where BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid)=this_modalidad_uuid and BIN_TO_UUID(dia_LS.uuid) = this_fecha_uuid             
+                       ) as ventas
+        
+                      FROM examen_en_semana_LS  
+                      LEFT JOIN reserva on BIN_TO_UUID(reserva.examen_en_semana_LS_uuid) = BIN_TO_UUID(examen_en_semana_LS.uuid)
+                      LEFT JOIN dia_LS on BIN_TO_UUID(reserva.dia_LS_uuid) = BIN_TO_UUID(dia_LS.uuid)
+                      WHERE BIN_TO_UUID(dia_LS.uuid)= ?`;
+        break;
     }
     const values = [fecha];
 
