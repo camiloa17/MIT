@@ -24,12 +24,12 @@
                 </div>
             </div>
             <div class="button-wrap">
-                <a type="button" class="button-checkout next" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Siguiente</a>
+                <a class="button-checkout" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Siguiente</a>
             </div>
         </div>
         </section>
 </main>
 
-
+<script src="/Js/Front/checkout.js"></script>
 
 <%- include("partials/footer-privacidad") -%>

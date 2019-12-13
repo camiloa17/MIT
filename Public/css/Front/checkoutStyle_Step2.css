@@ -161,7 +161,7 @@ h3{
 }
 
 #progress-bar-inner{
-    width:25%;
+    width:50%;
     height: 7px;
     background-color: #72C6EF;
 }
@@ -194,79 +194,63 @@ h3{
     color:#262626;
 }
 
-/*Final barra de progreso y */
+/*Seccion Disponibilidad*/
 
-/*Titulos examen */
-#information h3{
-    font-size: 20px;
-    margin-top:30px;
-}
-
-#information h1{
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-#information h3,
-#information h1{
-    width: 100%;
-    text-align: center;
-    color:#000000;
-    font-weight: bold;
-}
-/*fin de Titulos examen*/
-
-.exam-wrapper{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+.horario{
+    display:flex;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top:48px;
 }
 
-/*Imagen Examen*/
-.exam-picture{
-    max-width: 500px;
-    max-height: 400px;
-    margin: 0 auto;
+.horario h2{
+    font-weight: bold;
+    font-size: 30px;
+    color:#000000;
 }
 
-.exam-picture img{
-    width: 100%;
-    height: 100%;
-}
-/*Fin Imagen Examen*/
-
-/*Texto Examen*/
-
-.exam-text{
-    margin-top: 20px;
+.horario p{
+    margin-top:10px;
+    font-size: 15px;
+    padding: 0 10px;
+    color: #4F4F4F;
     text-align: center;
 }
-.exam-text h4{
-    margin-bottom:10px;
-    font-weight: bold;
-    font-size: 20px;
-    line-height: 23px;
-    color: #4F4F4F;
+
+input[name="horario-selector"]{
+    display: none;
 }
 
-.exam-text>p{
-    color: #4F4F4F;
-    font-size: 15px;
-    line-height: 150%;
-    padding-left:20px;
-    padding-right:20px;
+.horario-wrapper{
+    margin-top:40px;
+    margin-bottom: 40px;
 }
-
-
-.exam-text>span{
+.horario-wrapper label{
     display: block;
-    color: #085796;
-    font-size: 30px;
-    margin-top:20px;
+    height: 40px;
+    width: 300px;
+    text-align: center;
+    padding-top:10px;
+    color:#4F4F4F;
+    margin-top:10px;
 }
-/*Fin texto examen*/
-.exam-text>a,
+
+/*Selecciona el input con el id designado y mira si esta chequeado, luego busca un sibling con el id designado*/
+input[id="h1"]:checked ~ #l1,
+input[id="h2"]:checked ~ #l2,
+input[id="h3"]:checked ~ #l3,
+input[id="h4"]:checked ~ #l4,
+input[id="h5"]:checked ~ #l5,
+input[id="h6"]:checked ~ #l6,
+input[id="h7"]:checked ~ #l7,
+input[id="h8"]:checked ~ #l8{
+    font-weight: bold;
+    border: 1px solid #085796;
+}
+
+
+
 .button-checkout{
     display: block;
     border: 1px solid #085796;
@@ -278,23 +262,11 @@ h3{
     cursor: pointer;
     text-align: center;
     text-decoration: none;
-}
-
-.exam-text>a{
-    color:#085796;
+    background: #085796;
+    color:#ffffff;
     font-weight: bold;
 }
 
-.exam-text>a:hover{
-    color: #04467c;
-    border: 1px solid #085796;
-}
-
-
-.button-checkout{
-    background: #085796;
-    color:#ffffff;
-}
 .button-checkout:hover{
     background-color: #08497e;
 }
@@ -302,6 +274,13 @@ h3{
 .button-checkout:active{
     background-color: #073f6d;
 }
+
+button.button-checkout:disabled{
+    cursor:not-allowed;
+    background:#BBBBBB;
+    border: 1px solid #BBBBBB;
+}
+
 
 /*footer politicas*/
  #lower-footer{
@@ -409,6 +388,7 @@ h3{
     }
 
     /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
+
 /*Checkout*/
 
 #progress-bar-outer{
@@ -418,45 +398,30 @@ h3{
         margin-left:48px;
     }
 
-    #information>h1{
-        margin-bottom: 50px;
-    }
-
-     .exam-wrapper{
-       flex-direction: row;
-       margin-bottom: 50px;
-       justify-content: center;
-       width: 100%;
-   }
-
-   .exam-picture{
-       margin:0;
-       margin-right: 54px;
-   }
-
-   .exam-text>p{
-    padding-left:0;
-    padding-right:0;
-}
-
-
-    .exam-text{
-        width: 396px;
-        text-align: left;
-    }
-   
-    .exam-text>a{
-        margin: 0;
-    }
-
-    .exam-text>span{
-        margin-bottom: 52px;
+    .button-wrap{
+    width: 900px;
+    margin: 10px auto;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     }
     .button-checkout{
-        margin-bottom: 41px;
+        display: inline-block;
+        margin:10px;
+    }
+
+    #button-horario{
+        padding-top:0;
     }
 
     /*Lower footer- privacidad*/
+    footer{
+        position:absolute;
+        width:100%;
+        bottom:0;
+    }
      #lower-footer{
         flex-direction: row;
         justify-content: space-between;
@@ -481,9 +446,5 @@ h3{
         border-left: 2px solid #fff;
         border-right: 2px solid #fff;
     }
-
-
-
 }
-
 

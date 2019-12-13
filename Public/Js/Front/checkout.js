@@ -1,12 +1,14 @@
+
+
 document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
-document.querySelectorAll('.button-checkout').forEach(button => {
-  button.addEventListener('click', step)
-})
-document.querySelectorAll('.horario-label').forEach(horario => {
-  horario.addEventListener('click', habilitarBoton)
+
+document.getElementsByName('horario-selector').forEach(input=>{
+  input.addEventListener('change', setRoute)
 })
 
+
+let route=window.location.href;
 
 
 function openNav(item) {
@@ -34,49 +36,61 @@ function closeNav(item) {
 
 
 
-function step(item) {
-  const stateButton = buttonChecker();
-  const wrapper = item.target.parentElement.parentElement.parentElement;
-  const nextElement = wrapper.nextElementSibling;
-  const previousElement = wrapper.previousElementSibling;
-  const numeroPasos = document.querySelectorAll('.step-number');
-
-  if (!item.target.classList.contains('disabled')) {
-    if (item.target.classList.contains('next')) {
-      wrapper.classList.remove('ongoing');
-      wrapper.classList.add('.backwards-wrapper');
-      nextElement.classList.add('ongoing');
-      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
-      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step)].classList.add('selected-step');
-      document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos.length == 4) ? 25 * (parseInt(wrapper.dataset.step) + 1) : 20 * (parseInt(wrapper.dataset.step) + 1)}%`;
-    } else if (item.target.classList.contains('backwards')) {
-      wrapper.classList.remove('ongoing');
-      previousElement.classList.remove('.backwards-wrapper');
-      previousElement.classList.add('ongoing');
-      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 2].classList.add('selected-step');
-      document.querySelectorAll('.step-number')[parseInt(wrapper.dataset.step) - 1].classList.remove('selected-step');
-      document.querySelector('#progress-bar-inner').style.width = `${(numeroPasos.length == 4) ? 25 * (parseInt(wrapper.dataset.step) - 1) : 20 * (parseInt(wrapper.dataset.step) - 1)}%`;
-    }
-  }
-}
-
-function buttonChecker() {
-  const horarios = document.getElementsByName('horario-selector');
-  horarios.forEach(horario => {
-    console.log(horario.checked)
-  })
-}
 function habilitarBoton() {
-  const boton = document.querySelector('.button-checkout.disabled');
+  const boton = document.querySelector('button.button-checkout');
   if (boton) {
-    boton.classList.remove('disabled');
+    boton.disabled = false;
   }
 
 }
+
+
+
+ function setRoute(){
+  try{
+  const submitRoute = route.replace(/step_2/g,"horario-selected");
+  let horarioSeleccionado;
+  document.getElementsByName('horario-selector').forEach(horario => {
+      if (horario.checked) {
+        horarioSeleccionado=(horario.classList[0]);
+      }
+    });
+
+    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${horarioSeleccionado}`);
+    habilitarBoton()
+  /*
+  const ingresarAlServer= await postData(`${submitRoute}&idhorario=${horarioSeleccionado}`,this);
+  */
+  
+  }catch(err){
+    console.log(err)
+  }
+}
+/*
+async function postData(url='',data={}){
+  try{
+  const response = await fetch(url,{
+    method:'POST',
+    mode:'cors',
+    cache:'no-cache',
+    credentials:'same-origin',
+    headers:{'Content-type':'application/json'},
+    redirect:'follow',
+    referrer:'no-referrer',
+    body:JSON.stringify(data)
+  })
+}catch(err){
+  console.log(err)
+}
+}
+*/
+
+
 
 
 
 /*Codigo Stripe */
+/*
 // Create a Stripe client.
 var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
@@ -117,6 +131,6 @@ card.addEventListener('change', function (event) {
   }
 });
 
-
+*/
 /*Codigo Stripe */
 

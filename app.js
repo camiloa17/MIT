@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const controller = require('../MIT/controllers/controller')
+const controller = require('../MIT/controllers/controller');
+const checkoutRoutes = require('./Routes/checkoutRoutes');
 const app = express();
 
 app.set("view engine", "ejs");
@@ -11,8 +12,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`Public`));
 
 function asyncErrorWrap(f) {
-    return (req, res, next)=> { 
-         return Promise.resolve(f(req,res)).catch(next);
+    
+    return (req, res, next) => {
+        return Promise.resolve(f(req, res)).catch(next);
     }
 }
 
@@ -22,10 +24,9 @@ function errorHandler(err, req, res, next) {
     }
     res.status(500)
     //res.render('error', { error: err })
-    res.send({ error: err.toString()})
+    
+    res.send({ error: err.toString() })
 }
-
-
 
 app.get('/', asyncErrorWrap(async (req,res) => {
     const stylesheet = '/css/Front/style.css';
@@ -34,25 +35,13 @@ app.get('/', asyncErrorWrap(async (req,res) => {
     res.render("home", { stylesheet: stylesheet,team:'#team',contacto:'#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
 }));
 
-app.get('/checkout/step_1/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap(async(req,res)=>{
-    const stylesheet = '/css/Front/checkoutStyle_Step1.css';
-    
-    const datosExamenModalidad1 = await controller.consultaExamenCheckout(req.query.id);
+app.use('/checkout', asyncErrorWrap (checkoutRoutes));
 
-    res.render('checkoutStep1',{stylesheet:stylesheet,nivel:datosExamenModalidad1.nivel, modo:datosExamenModalidad1.modalidad,precio:datosExamenModalidad1.precio,descripcion:datosExamenModalidad1.descripcion,step:'step_1',materia:datosExamenModalidad1.materia, id:datosExamenModalidad1.id,tipo:datosExamenModalidad1.tipo})
-}));
-
-app.get('/checkout/step_2/:materia/:tipo/:nivel/:modalidad', asyncErrorWrap(async (req, res) => {
-    const stylesheet = '/css/Front/checkoutStyle_Step1.css';
-    const rutaStep2 = {
-        materia: req.params.materia,
-        tipo: req.params.tipo,
-        id: req.query.id
-    }
-    const datosExamenModalidad1 = await controller.consultaExamenCheckout(req.query.id);
-
-    res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad1.nivel, modo: datosExamenModalidad1.modalidad, precio: datosExamenModalidad1.precio, descripcion: datosExamenModalidad1.descripcion, step: 'step_1', ruta: rutaStep1 })
-}));
+app.get('/faqs', asyncErrorWrap(async (req, res) => {
+    const stylesheet = 'css/Front/faqs.css';
+    const menuItems = await controller.adquirirMenu();
+    res.render("faqs", { stylesheet: stylesheet, team: '/#team', contacto: '/#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
+}))
 
 
 /*
@@ -64,13 +53,6 @@ app.get('/checkout/:materia/:tipo/:nivel/:modalidad',asyncErrorWrap (async(req, 
     res.render('checkout', { stylesheet: stylesheet, tipo:datosExamenModalidad.tipo,nivel:datosExamenModalidad.nivel,modo:datosExamenModalidad.modalidad,precio:datosExamenModalidad.precio,descripcion:datosExamenModalidad.descripcion,horario:horarios})
 }));
 */
-
-app.get('/faqs',asyncErrorWrap(async (req,res)=>{
-    const stylesheet='css/Front/faqs.css';
-    const menuItems = await controller.adquirirMenu();
-    res.render("faqs", { stylesheet: stylesheet, team: '/#team', contacto: '/#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
-}))
-
 
 app.use(errorHandler);
 

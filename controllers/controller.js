@@ -111,7 +111,7 @@ exports.consultaHorarios = async (modalidad, id) => {
                 horarios = horarioFinal;
                 break;
             case "Reading_&_Writing":
-                sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0;"
+                sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();"
                 const horariosRW = await utils.queryAsync(sql, [id]);
                 const textoHorario = await diasATexto(horariosRW);
                 const cupos = await armarArraydeIdsModalidades(horariosRW, modalidad);
@@ -144,7 +144,7 @@ exports.consultaHorarios = async (modalidad, id) => {
         return horarios;
 
     } catch (err) {
-        console.error(err)
+        return err
     }
 }
 
@@ -245,12 +245,5 @@ async function corroborarCupos(objetoHorario) {
     }
 }
 
-async function corroborarFechas(objetoHorario) {
-    let horario = objetoHorario;
-    let arrayHorarios = horario.horario;
-    arrayHorarios.forEach(horario=>{
-        
-    })
 
-}
 

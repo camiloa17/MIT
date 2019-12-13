@@ -1,0 +1,32 @@
+<%- include("partials/head") -%>
+<%- include("partials/upperMenuOnly") -%>
+
+
+<div id="progress-bar-outer">
+    <div id="progress-bar-inner">
+    </div>
+</div>
+<main>
+    <form action="#" method="post" id="form-horario">
+    <section id="checkout_step2">
+        <%- include("partials/checkoutSteps") -%>
+        <div class="horario next" data-step="2">
+            <h2>DISPONIBILIDAD</h2>
+            <p>Selecciona la fecha que esten disponibles para rendir el examen</p>
+            <div class="horario-wrapper">
+        
+                <% horario.horarios.forEach((opcion,index)=> {%>
+                <input type="radio" name="horario-selector" id="h<%= index+1 %>" class="<%=opcion.id%>">
+                <label for="h<%= index+1 %>" class="horario-label" id="l<%= index+1 %>"><%=horario.text[index]%></label>
+                <%})%>
+            </div>
+    </section>
+    <div class="button-wrap">
+        <a class="button-checkout"href="/checkout/step_1/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+        <button type="submit" class="button-checkout" id="button-horario" disabled>Siguiente</button>
+    </div>
+    </form>
+</main>
+<script src="/Js/Front/checkout.js"></script>
+
+<%- include("partials/footer-privacidad") -%>
