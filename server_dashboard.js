@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const controladorDashboard = require('./controlador/controladorDashboard')
+const controladorExcel = require('./exceljs/controlador_excel')
+const cors = require('cors');
 const port  = process.env.PORT || 8080;
 
 //const mailSenderFile = require('./mailSender/mailSender')
@@ -21,6 +23,8 @@ function errorHandler(err, req, res, next) {
   console.log(err)
   res.send({ error: err.toString()});
 }
+
+app.use(cors())
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -84,6 +88,10 @@ app.get('/listarReservaDiaLs/:fecha', asyncErrorWrap(controladorDashboard.listar
 app.post('/elminarFechaSemana/', asyncErrorWrap(controladorDashboard.elminarFechaSemana))
 app.post('/elminarFechaDiaRw/', asyncErrorWrap(controladorDashboard.elminarFechaDiaRw))
 app.post('/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFechaDiaLs))
+
+// EXCELS 
+app.get('/excelAsistencia/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelAsistencia))
+app.get('/excelTrinity/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelTrinity))
 
 
 app.use(errorHandler);

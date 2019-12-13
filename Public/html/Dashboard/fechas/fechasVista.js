@@ -155,7 +155,7 @@ class FechasVista {
         }
 
         let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
-      
+
         // Selecciono una Chip y me muestra lo solicitado
         idSelected === "editarChipDiaHora" ? this.mostrarListaDeHorarios(null, fechasAntiguas) : null;
 
@@ -275,6 +275,8 @@ class FechasVista {
             $("#listaExamenes").empty();
             $('#areaCambios').empty();
 
+            this.appendProgressIndeterminate($("#listaExamenes"))
+
             // reseteo el estado de cambios de la tabla de examenes (tabla de la derecha)
             this.cleanEstadoListaExamen();
 
@@ -328,7 +330,7 @@ class FechasVista {
             }
 
             // genero la lista de reservas a esa fecha seleccionada
-            this.generarListaReservaDiaRw(idSelected)
+            this.generarListaReservaDiaLs(idSelected)
 
 
             // SE SELECCIONA UNA SEMANA LS ///////////////////////////////////////
@@ -397,6 +399,9 @@ class FechasVista {
               // muestro un mensajes diciendo que la fecha fue rendida
               this.areaCambiosFechaRendida()
             }
+
+            // genero la lista de reservas a esa fecha seleccionada
+            this.generarListaReservaDiaLs(idSelected)
 
           }
         }
@@ -1028,7 +1033,7 @@ class FechasVista {
     this.deshabilitarTostadaGuardarResetear();
     this.removerClaseNoSelectableChips($('#chipsSeleccionDiaSemanaAgregar'));
     this.removerClaseNoSelectableChips($('#chipsSeleccionDiaSemanaEditar'));
-    this.removerClaseNoSelectableChips($('#listaHorarios'));    
+    this.removerClaseNoSelectableChips($('#listaHorarios'));
     $('#fechasAntiguas').prop('disabled', false);
     this.yaSeHizoUnCambio = false;
 
@@ -1562,7 +1567,7 @@ class FechasVista {
             `);
 
       this.formatoFechaEditable(horario.uuid)
-      this.asignarFuncionBotonPausa(horario.uuid);
+      this.asignarFuncionBotonPausa(horario.uuid, horario.source);
       this.asignarFuncionEliminarFecha(horario.uuid, horario.source);
     });
   }
@@ -1622,8 +1627,8 @@ class FechasVista {
 
   renderHorariosSemana = (listaSemanas) => {
     $("#listaHorarios").empty();
-    
-    
+
+
     listaSemanas.forEach(semana => {
       let cupos_libres = semana.cupo_maximo - semana.ventas;
 
@@ -1698,8 +1703,8 @@ class FechasVista {
         let atributoTipo = $(`#${id}`).attr('tipo');
         // Si esta seleccionada una fecha LS, RW o semana, es que tiene un atributo
         if (atributoTipo) {
-          // Si esa fecha que tiene un atributo, esta seleccionado, me permite poner pausa
-          if ((atributoTipo === "RW" || atributoTipo === "LS" || atributoTipo.length === 6) && $(`#${id}`).hasClass('ui-selected')) {
+          // Si esa fecha que tiene un atributo, esta seleccionado, me permite poner pausa (atributoTipo === "LS" no va, porque no se pueden pausar las fechas diaLS, solo se pueden eliminar)
+          if ((atributoTipo === "RW" || atributoTipo.length === 6) && $(`#${id}`).hasClass('ui-selected')) {
             this.funcionalidadBotonPausa(id);
             this.cambioPausadoFecha = true;
             this.seProdujoUnCambio();
@@ -1794,6 +1799,9 @@ class FechasVista {
 
   habilitarBotonGuardarExamenesEnFecha() {
     $("#botonGuardarExamenesEnFecha").on("click", () => {
+
+      $('#estadoCambiosFechaExamenes').empty().append(this.preloader());
+
       let tipoDeLista = $("#listaHorarios").find(".ui-selected").attr("tipo");
       let fechaDateTime;
 
@@ -1858,6 +1866,7 @@ class FechasVista {
   habilitarBotonResetExamenesEnFecha() {
     $("#resetExamenesEnFecha").on("click", () => {
 
+
       let id = this.lastExamSelected;
       let tipoDeLista = $("#listaHorarios").find(".ui-selected").attr("tipo");
       let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
@@ -1909,6 +1918,7 @@ class FechasVista {
   async generarListaReservaDiaRw(idSelected) {
     $('#listadoReservasEnFechas').empty();
     let reservaDiaRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected);
+    console.log(reservaDiaRw)
     this.mostrarlistadoReservasEnDiaRw();
     this.mostrarElementosListReservasEnDiaRw(reservaDiaRw)
 
@@ -1916,7 +1926,9 @@ class FechasVista {
 
   async generarListaReservaDiaLs(idSelected) {
     $('#listadoReservasEnFechas').empty();
+    console.log("fecha", idSelected)
     let reservaDiaLs = await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected);
+    console.log(reservaDiaLs)
     this.mostrarlistadoReservasEnDiaLs();
     this.mostrarElementosListReservasEnDiaLs(reservaDiaLs)
   }
@@ -1964,7 +1976,13 @@ class FechasVista {
           </thead>
 
           <tbody id="bodyListadoReservasEnFechas"></tbody>
-    </table>`)
+    </table>
+    
+    
+    <div class="col s6 m6 l6 xl6 right clear-top-2">
+    <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
+    <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
+  </div>    `)
   }
 
   mostrarElementosListReservasEnDiaRw(reservaDiaRw) {
@@ -1986,6 +2004,9 @@ class FechasVista {
           </tr>`)
     });
     this.habilitarToggleCheckboxAll()
+    this.asignarFuncionBotonExportarAsistencia();
+    this.asignarFuncionBotonExportarTrinity();
+  
   };
 
   habilitarToggleCheckboxAll() {
@@ -2013,7 +2034,18 @@ class FechasVista {
           </thead>
 
           <tbody id="bodyListadoReservasEnFechas"></tbody>
-    </table>`)
+
+    </table>
+    
+    
+    <div class="col s6 m6 l6 xl6 right clear-top-2">
+    <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
+    <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
+  </div>    
+    
+    `)
+
+
   }
 
   mostrarElementosListReservasEnDiaLs(reservaDiaLs) {
@@ -2036,6 +2068,9 @@ class FechasVista {
     });
 
     this.habilitarToggleCheckboxAll()
+    this.asignarFuncionBotonExportarAsistencia();
+    this.asignarFuncionBotonExportarTrinity();
+  
   };
 
 
@@ -2062,17 +2097,20 @@ class FechasVista {
 
     $('#listadoReservasEnFechas').append(
       `
-        <div class="col s12 m10 l8  xl5">
-      
-          <div class="input-field clear-top-3">
-            <select id="listadoDiasOralesParaSemana">
-          </select>
-          <label>Asignar Día de Oral a los seleccionados</label>
-
-          <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul">Asignar</a>
-
-      </div>
-        </div>    
+        <div class="col s12 m12 l12 xl12">
+          <div class="col s6 m6 l6  xl6">      
+            <div class="input-field clear-top-3">
+              <select id="listadoDiasOralesParaSemana"></select>
+              <label>Asignar Día de Oral a los seleccionados</label>
+              <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul ">Asignar</a>
+            </div>
+          </div>
+  
+          <div class="col s6 m6 l6 xl6 right clear-top-2">
+            <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
+            <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
+          </div>          
+        </div>              
   
 
      `);
@@ -2096,9 +2134,32 @@ class FechasVista {
     this.habilitarFormSelect();
     this.asignarFuncionBotonAsignarDiaOralASemana();
     this.habilitarToggleCheckboxAll()
+    this.asignarFuncionBotonExportarAsistencia();
+    this.asignarFuncionBotonExportarTrinity();
+  
 
 
   }
+  
+  asignarFuncionBotonExportarAsistencia() {
+    let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
+    let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
+    let fechaString = $("#listaHorarios").find(".ui-selected").attr("fechaExamen");
+
+    $('#botonExportarAsistencia').on('click', () => {
+      this.fechasServicio.getExcelAsistencia(fecha, tipo, fechaString);
+    });
+  }
+
+  asignarFuncionBotonExportarTrinity() {
+    let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
+    let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
+
+    $('#botonExportarTrinity').on('click', () => {
+      this.fechasServicio.getExcelTrinity(fecha, tipo);
+    });
+  }
+
 
   asignarFuncionBotonAsignarDiaOralASemana() {
     $('#botonAsignarDiaOralASemana').on('click', () => {
@@ -2232,9 +2293,7 @@ class FechasVista {
   }
 
 
-  renderExamenesEnLista = (fechaEditable, examenes) => {
-
-    console.log(fechaEditable, examenes)
+  renderExamenesEnLista = (fechaEditable, examenes, tipoSelected) => {
 
     $("#listaExamenes").empty();
     if (examenes.length === 0) {
@@ -2264,6 +2323,10 @@ class FechasVista {
         }
       })
 
+      // como los examenes en dia LS no se pueden editar (porque se asignan desde el listado de semana), la asigno como fecha no editable
+      if (tipoSelected === "LS") {
+        fechaEditable = 0;
+      }
 
       // Guardo en un array temporal: [0]index + [1]LI del examen + [2]uuid del examen (para luego asignar funcionalidad a los botones)
       arrayLis.push([
@@ -2302,8 +2365,6 @@ class FechasVista {
       this.habilitarToolTips();
       this.asignarFuncionBotonPausa(array[2]);
       this.asignarFuncionalidadBotonEliminarExamen(array[2]);
-
-
     });
   }
 

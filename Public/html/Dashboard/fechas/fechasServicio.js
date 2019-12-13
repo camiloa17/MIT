@@ -255,7 +255,7 @@ class FechasServicio {
       if (rta.error) {
         error(id)
       } else {        
-        exito(editable, rta)
+        exito(editable, rta, tipo)
       }
 
     } catch (err) {
@@ -289,6 +289,48 @@ class FechasServicio {
       return data;
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  async getExcelAsistencia(fecha, tipo, fechaString, exito, error, id){
+    try {
+      let fileName
+      await fetch(`./excelAsistencia/${fecha}&${tipo}&${fechaString}`).then(
+        function(response) {
+          fileName= response.headers.get('content-disposition')
+          return response.blob();
+        }).then(function(blob) {
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+          a.click();    
+          a.remove();         
+        }
+      );
+    } catch (err) {
+      //err ? error(id) : null;
+      console.log("error serviciio", err)
+    }
+  }
+
+  async getExcelTrinity(fecha, tipo, exito, error, id){
+    try {
+      const response = await fetch(`./excelTrinity/${fecha}&${tipo}`);
+     
+      console.log(response)
+      
+
+      // if (rta.error) {
+      //   error(id)
+      // } else {        
+      //   // exito(rta)
+      // }
+
+    } catch (err) {
+      err ? error(id) : null;
+      console.log("error serviciio", err)
     }
   }
 
