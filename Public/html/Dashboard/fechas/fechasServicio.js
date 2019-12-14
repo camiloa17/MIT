@@ -179,7 +179,7 @@ class FechasServicio {
     }
   }
 
-  async asignarDiaASemanaExamenOral(datos) {
+  async asignarDiaASemanaExamenOral(datos, idSelected, exito, error, id, accion) {
     try {
       const response = await fetch(`./asignarDiaASemanaExamenOral/`, {
         method: "POST",
@@ -189,9 +189,17 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
-      console.log(response.body)
+      
+      if (rta.error) {
+        error(id)
+      } else {        
+        exito(id);
+        accion(idSelected)
+      }
+
     } catch (err) {
       console.log(err);
+      err ? error(id) : null;
     }
   }
 
@@ -292,7 +300,7 @@ class FechasServicio {
     }
   }
 
-  async getExcelAsistencia(fecha, tipo, fechaString, exito, error, id){
+  async getExcelAsistencia(fecha, tipo, fechaString, error, id){
     try {
       let fileName
       await fetch(`./excelAsistencia/${fecha}&${tipo}&${fechaString}`).then(
@@ -310,7 +318,7 @@ class FechasServicio {
         }
       );
     } catch (err) {
-      //err ? error(id) : null;
+      err ? error(id) : null;
       console.log("error serviciio", err)
     }
   }
