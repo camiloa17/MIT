@@ -3,11 +3,12 @@
 document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
 
+/*step2 */
 document.getElementsByName('horario-selector').forEach(input=>{
   input.addEventListener('change', setRoute)
 })
 
-
+/* ruta para el step2 */
 let route=window.location.href;
 
 
@@ -45,7 +46,7 @@ function habilitarBoton() {
 }
 
 
-
+/* Paso 2  */
  function setRoute(){
   try{
   const submitRoute = route.replace(/step_2/g,"horario-selected");
@@ -90,7 +91,7 @@ async function postData(url='',data={}){
 
 
 /*Codigo Stripe */
-/*
+
 // Create a Stripe client.
 var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
@@ -131,6 +132,22 @@ card.addEventListener('change', function (event) {
   }
 });
 
-*/
+
 /*Codigo Stripe */
+
+
+/*Paso3 y 4 */
+
+document.querySelector('#adicion-nuevo-domicilio').addEventListener('change',mostrarNuevoDomiciolio);
+
+function mostrarNuevoDomiciolio(){
+  let estado= this.checked;
+  const elementoDomicilio = document.querySelector('#seccion-nuevo-domicilio');
+  if(estado===true){
+   elementoDomicilio.style.height= `${elementoDomicilio.scrollHeight+10}px`;
+  }else if(estado===false){
+    elementoDomicilio.style.height = `0px`;
+  }
+  
+}
 

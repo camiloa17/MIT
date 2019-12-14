@@ -19,10 +19,20 @@
                 <input type="radio" name="horario-selector" id="h<%= index+1 %>" class="<%=opcion.id%>">
                 <label for="h<%= index+1 %>" class="horario-label" id="l<%= index+1 %>"><%=horario.text[index]%></label>
                 <%})%>
+                <% if(horario.horarios.length==0){ %>
+                    <h3>No existen horarios para este examen</h3>
+
+                    <% }%>
             </div>
     </section>
     <div class="button-wrap">
-        <a class="button-checkout"href="/checkout/step_1/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+        <% if(horario.horarios.length>0) {%>
+            <a class="button-checkout"
+                href="/checkout/step_1/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+            <% }else if(horario.horarios.length===0){%>
+                <a class="button-checkout"
+                    href="/">Regresar</a>
+                <% }%>
         <button type="submit" class="button-checkout" id="button-horario" disabled>Siguiente</button>
     </div>
     </form>

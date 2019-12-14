@@ -80,7 +80,7 @@ exports.consultaExamenCheckout = async (uuid) => {
             modalidad: respuesta[0].modalidad,
             descripcion: respuesta[0].descripcion,
             precio: respuesta[0].precio,
-            id:respuesta[0].id
+            id: respuesta[0].id
         };
     } catch (err) {
         console.error(err)
@@ -97,21 +97,28 @@ exports.consultaHorarios = async (modalidad, id) => {
 
         switch (modalidad) {
             case "Completo":
-                sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0;"
-                const horariosCo = await utils.queryAsync(sql, [id]);
-                const textoCompleto = await diasATexto(horariosCo);
-                const cuposCompleto = await armarArraydeIdsModalidades(horariosCo, modalidad);
+                sql = "select DISTINCT dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();";
+                const sqlLS = "select DISTINCT semana.semana_Examen, semana.finaliza_inscripcion as fecha_cierre, semana.cupo_maximo, BIN_TO_UUID(semana.uuid) as id from examen_en_semana_LS as semLS join semana_LS as semana on semLS.semana_LS_uuid = semana.uuid where modalidad_uuid = UUID_TO_BIN(?) and semana.activo = 1 and semana.pausado=0 and semLS.activo=1 and semLS.pausado=0;";
 
-                horarios={
-                    horario: horariosCo,
-                    text: textoCompleto,
-                    cupo: cuposCompleto
-                }
-                horarioFinal = await corroborarCupos(horarios);
-                horarios = horarioFinal;
+                const horariosCo = await utils.queryAsync(sql, [id]);
+                const horarioCoLS = await utils.queryAsync(sqlLS, [id]);
+                
+                if (horarioCoLS && horariosCo) {
+                    const textoCompleto = await diasATexto(horariosCo);
+                    const cuposCompleto = await armarArraydeIdsModalidades(horariosCo, modalidad);
+                    const cuposCompletoLS= await armarArraydeIdsModalidades(horarioCoLS, modalidad);
+                    console.log(cuposCompletoLS);
+                    horarios = {
+                        horario: horariosCo,
+                        text: textoCompleto,
+                        cupo: cuposCompleto
+                    }
+                    horarioFinal = await corroborarCupos(horarios);
+                    horarios = horarioFinal;
+                } 
                 break;
             case "Reading_&_Writing":
-                sql = "select dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();"
+                sql = "select DISTINCT dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(diarw.uuid) as id, BIN_TO_UUID(dia.uuid) as id_2 from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();"
                 const horariosRW = await utils.queryAsync(sql, [id]);
                 const textoHorario = await diasATexto(horariosRW);
                 const cupos = await armarArraydeIdsModalidades(horariosRW, modalidad);
@@ -126,7 +133,7 @@ exports.consultaHorarios = async (modalidad, id) => {
 
                 break;
             case "Listening_&_Speaking":
-                sql = "select semana.semana_Examen, semana.finaliza_inscripcion as fecha_cierre, semana.cupo_maximo, BIN_TO_UUID(semana.uuid) as id from examen_en_semana_LS as semLS join semana_LS as semana on semLS.semana_LS_uuid = semana.uuid where modalidad_uuid = UUID_TO_BIN(?) and semana.activo = 1 and semana.pausado=0 and semLS.activo=1 and semLS.pausado=0;"
+                sql = "select DISTINCT semana.semana_Examen, semana.finaliza_inscripcion as fecha_cierre, semana.cupo_maximo, BIN_TO_UUID(semLS.uuid) as id, BIN_TO_UUID(semana.uuid) as id_2 from examen_en_semana_LS as semLS join semana_LS as semana on semLS.semana_LS_uuid = semana.uuid where modalidad_uuid = UUID_TO_BIN(?) and semana.activo = 1 and semana.pausado=0 and semLS.activo=1 and semLS.pausado=0;"
                 const horariosLS = await utils.queryAsync(sql, [id]);
                 const textoSemanas = await diasATexto(horariosLS);
                 const cuposOrales = await armarArraydeIdsModalidades(horariosLS, modalidad)
@@ -137,7 +144,6 @@ exports.consultaHorarios = async (modalidad, id) => {
                 }
                 horarioFinal = await corroborarCupos(horarios);
                 horarios = horarioFinal;
-
                 break
         }
 
@@ -155,7 +161,7 @@ async function diasATexto(horarios) {
             if (horario.fecha_Examen) {
                 textoHorarios.push(horario.fecha_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', hour: 'numeric', minute: 'numeric' }));
             } else if (horario.semana_Examen) {
-                textoHorarios.push(horario.semana_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long' }));
+                textoHorarios.push(horario.semana_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }));
             }
         });
         return textoHorarios;
@@ -170,9 +176,10 @@ async function armarArraydeIdsModalidades(horarios, modalida) {
     try {
         const idsExamenEnDia = [];
         horarios.forEach(horario => {
-            idsExamenEnDia.push(horario.id);
+            idsExamenEnDia.push(horario.id_2);
         });
         const disponible = await verVentasCupos(idsExamenEnDia, modalida);
+        
         return disponible
     } catch (err) {
         console.error(err)
@@ -184,7 +191,7 @@ async function verVentasCupos(id, modalidad) {
     try {
         if (id.length > 0) {
             let verVentas;
-            if (modalidad == 'Reading_&_Writing'|| modalidad=='Completo') {
+            if (modalidad == 'Reading_&_Writing' || modalidad == 'Completo') {
                 verVentas = `select
   (drw.cupo_maximo - count(r.uuid)) as disponible,
   BIN_TO_UUID(drw.uuid) as dia_ID
@@ -208,7 +215,6 @@ where
             for (let index = 0; index < id.length; index++) {
                 sqlArray.push(verVentas)
             }
-
             verVentas = sqlArray.join(' union all ');
 
             const ventas = await utils.queryAsync(verVentas, id);
@@ -230,18 +236,55 @@ async function corroborarCupos(objetoHorario) {
         arrayHorarios.forEach(horario => {
             cupos.forEach(cupo => {
                 if (cupo.id != 'null') {
-                    if (horario.id == cupo.dia_ID)
+                    if (horario.id_2 == cupo.dia_ID)
                         horario.cupo_maximo = cupo.disponible;
                 }
             })
         })
-        
+
         return {
             horarios: horario.horario,
             text: horario.text
         }
     } catch (err) {
         console.error(err)
+    }
+}
+
+exports.crearReservaEnProceso=async(idExamenEnDia,modalidad,idExamenEnSemana)=>{
+    console.log(modalidad)
+    switch (modalidad) {
+        case "Completo":
+          let corroborarExistenciaExamenCompleto= await corroborarHorario(idExamenEnDia,idExamenEnSemana);
+            
+            break;
+        case "Reading & Writing":
+           let corroborarExistenciaExamenRW= await corroborarHorario(idExamenEnDia,false);
+            break;
+
+        case "Listening & Speaking":
+          let  corroborarExistenciaExamenLS = await corroborarHorario(false,idExamenEnDia);
+            break;
+    
+    }
+    
+}
+
+async function corroborarHorario(idExamenEnDia, idExamenEnSemana){
+    const sqlRW = "select BIN_TO_UUID(UUID) as id from examen_en_dia_RW where uuid = UUID_TO_BIN(?);"
+    const sqlLS = "select BIN_TO_UUID(uuid) as Id from examen_en_semana_LS where uuid = UUID_TO_BIN(?);"
+    console.log(idExamenEnDia,idExamenEnSemana);
+    
+    if(idExamenEnDia && idExamenEnSemana){
+        let hoarioRwCo = await utils.queryAsync(sqlRW,idExamenEnDia);
+        let horarioLsCo = await utils.queryAsync(sqlLS,idExamenEnSemana);
+        console.log('Corroborar', hoarioRWCo.length,horarioLsCo);
+    }else if(idExamenEnDia){
+       let horarioRw= await utils.queryAsync(sqlRW, idExamenEnDia);
+        console.log('Corroborar', horarioRw.length);
+    }else if(idExamenEnSemana){
+      let  horarioLs = await utils.queryAsync(sqlLS, idExamenEnSemana);
+        console.log('Corroborar', horarioLs.length);
     }
 }
 
