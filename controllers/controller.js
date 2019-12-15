@@ -1,4 +1,5 @@
 const utils = require('../utils');
+const queries= require('../database/consultasSqlFront');
 
 const conexion = require(`../database/conexionDB/conexionbd`);
 
@@ -7,7 +8,7 @@ const conexion = require(`../database/conexionDB/conexionbd`);
 exports.adquirirMenu = async () => {
     try {
         //const sql = "select m.nombre as materia,m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad from materia m left join tipo t on t.materia_id = m.id left join nivel n on t.id = n.tipo_id left join modalidad mo on n.id = mo.nivel_id;"
-        const sql = "select m.nombre as materia, m.orden as orden_materia, t.nombre as tipo, t.orden as orden_tipo, n.nombre as nivel, n.orden as orden_nivel, mo.nombre as modalidad, mo.orden as orden_modalidad, BIN_TO_UUID(mo.uuid) as id_modalidad from materia m left join tipo t on t.materia_uuid = m.uuid left join nivel n on t.uuid = n.tipo_uuid left join modalidad mo on n.uuid = mo.nivel_uuid where ((m.mostrar_cliente = 1 or m.mostrar_cliente is NULL) and (t.mostrar_cliente=1 or t.mostrar_cliente is NULL) and(n.mostrar_cliente=1 or n.mostrar_cliente is NULL) and (mo.mostrar_cliente=1 or mo.mostrar_cliente is NULL)) AND((m.activo is NULL or m.activo = 1) and(t.activo is NULL or t.activo = 1) and (n.activo is NULL or n.activo = 1) and (mo.activo is NULL or mo.activo = 1));"
+        const sql = await queries.adquirirMenu();
         const respuesta = await utils.queryAsync(sql);
         const materias = [];
         const tipo = [];
@@ -71,7 +72,7 @@ exports.adquirirMenu = async () => {
 exports.consultaExamenCheckout = async (uuid) => {
     try {
         //const sql = 'select n.descripcion as descripcion, mo.precio as precio from nivel as n join modalidad as mo on n.uuid=mo.nivel_uuid where n.nombre = ? and mo.nombre = ?;';
-        const sql = 'select m.nombre as materia, t.nombre as tipo,n.nombre as nivel, n.descripcion as descripcion,BIN_TO_UUID(mo.uuid) as id,mo.nombre as modalidad, mo.precio as precio from materia as m join tipo as t on t.materia_uuid = m.uuid join  nivel as n on n.tipo_uuid = t.uuid join modalidad as mo on n.uuid = mo.nivel_uuid where mo.uuid = UUID_TO_BIN(?);'
+        const sql = await queries.consultaExamenPrecioDescripcion();
         const respuesta = await utils.queryAsync(sql, [uuid]);
         return {
             materia: respuesta[0].materia,
@@ -97,53 +98,32 @@ exports.consultaHorarios = async (modalidad, id) => {
 
         switch (modalidad) {
             case "Completo":
-                sql = "select DISTINCT dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(dia.uuid) as id from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();";
-                const sqlLS = "select DISTINCT semana.semana_Examen, semana.finaliza_inscripcion as fecha_cierre, semana.cupo_maximo, BIN_TO_UUID(semana.uuid) as id from examen_en_semana_LS as semLS join semana_LS as semana on semLS.semana_LS_uuid = semana.uuid where modalidad_uuid = UUID_TO_BIN(?) and semana.activo = 1 and semana.pausado=0 and semLS.activo=1 and semLS.pausado=0;";
+                sql = await queries.consultaExamenCompletoCupos()
 
-                const horariosCo = await utils.queryAsync(sql, [id]);
-                const horarioCoLS = await utils.queryAsync(sqlLS, [id]);
-                
-                if (horarioCoLS && horariosCo) {
-                    const textoCompleto = await diasATexto(horariosCo);
-                    const cuposCompleto = await armarArraydeIdsModalidades(horariosCo, modalidad);
-                    const cuposCompletoLS= await armarArraydeIdsModalidades(horarioCoLS, modalidad);
-                    console.log(cuposCompletoLS);
-                    horarios = {
-                        horario: horariosCo,
-                        text: textoCompleto,
-                        cupo: cuposCompleto
-                    }
-                    horarioFinal = await corroborarCupos(horarios);
-                    horarios = horarioFinal;
-                } 
+                const horariosCo = await utils.queryAsync(sql, [id,id]);
+                horarios = {
+                    horarios: horariosCo,
+                }
+                break
+
                 break;
             case "Reading_&_Writing":
-                sql = "select DISTINCT dia.fecha_Examen, dia.fecha_finalizacion as fecha_cierre, dia.cupo_maximo, BIN_TO_UUID(diarw.uuid) as id, BIN_TO_UUID(dia.uuid) as id_2 from examen_en_dia_RW as diarw join dia_RW as dia on diarw.dia_RW_uuid = dia.uuid where modalidad_uuid = UUID_TO_BIN(?) and dia.activo =1 and dia.pausado=0 and diarw.activo=1 and diarw.pausado=0 and dia.fecha_Examen>=CURDATE();"
+                sql = await queries.consultaExamenReadingAndWriting();
                 const horariosRW = await utils.queryAsync(sql, [id]);
-                const textoHorario = await diasATexto(horariosRW);
-                const cupos = await armarArraydeIdsModalidades(horariosRW, modalidad);
-
-                horarios = {
-                    horario: horariosRW,
-                    text: textoHorario,
-                    cupo: cupos
+                
+                 horarios = {
+                    horarios: horariosRW,
                 }
-                horarioFinal = await corroborarCupos(horarios);
-                horarios = horarioFinal;
-
                 break;
+
             case "Listening_&_Speaking":
-                sql = "select DISTINCT semana.semana_Examen, semana.finaliza_inscripcion as fecha_cierre, semana.cupo_maximo, BIN_TO_UUID(semLS.uuid) as id, BIN_TO_UUID(semana.uuid) as id_2 from examen_en_semana_LS as semLS join semana_LS as semana on semLS.semana_LS_uuid = semana.uuid where modalidad_uuid = UUID_TO_BIN(?) and semana.activo = 1 and semana.pausado=0 and semLS.activo=1 and semLS.pausado=0;"
+                sql = await queries.consultaExamenListeningAndSpeaking();
                 const horariosLS = await utils.queryAsync(sql, [id]);
-                const textoSemanas = await diasATexto(horariosLS);
-                const cuposOrales = await armarArraydeIdsModalidades(horariosLS, modalidad)
+                
                 horarios = {
-                    horario: horariosLS,
-                    text: textoSemanas,
-                    cupo: cuposOrales
+                    horarios: horariosLS,
                 }
-                horarioFinal = await corroborarCupos(horarios);
-                horarios = horarioFinal;
+                
                 break
         }
 
@@ -172,14 +152,14 @@ async function diasATexto(horarios) {
 
 }
 
-async function armarArraydeIdsModalidades(horarios, modalida) {
+async function verDispnonibilidad(horarios, modalida) {
     try {
         const idsExamenEnDia = [];
         horarios.forEach(horario => {
             idsExamenEnDia.push(horario.id_2);
         });
         const disponible = await verVentasCupos(idsExamenEnDia, modalida);
-        
+
         return disponible
     } catch (err) {
         console.error(err)
@@ -232,6 +212,8 @@ async function corroborarCupos(objetoHorario) {
         const horario = objetoHorario;
         const arrayHorarios = horario.horario;
         const cupos = horario.cupo;
+        const arrayHorarioLs = horario.horariols;
+        const cupoLS = horario.cupoLs
 
         arrayHorarios.forEach(horario => {
             cupos.forEach(cupo => {
@@ -251,40 +233,39 @@ async function corroborarCupos(objetoHorario) {
     }
 }
 
-exports.crearReservaEnProceso=async(idExamenEnDia,modalidad,idExamenEnSemana)=>{
-    console.log(modalidad)
+exports.crearReservaEnProceso = async (idExamenEnDia, modalidad, idExamenEnSemana) => {
+    
     switch (modalidad) {
         case "Completo":
-          let corroborarExistenciaExamenCompleto= await corroborarHorario(idExamenEnDia,idExamenEnSemana);
-            
+            let corroborarExistenciaExamenCompleto = await corroborarHorario(modalidad,idExamenEnDia, idExamenEnSemana);
             break;
         case "Reading & Writing":
-           let corroborarExistenciaExamenRW= await corroborarHorario(idExamenEnDia,false);
+            let corroborarExistenciaExamenRW = await corroborarHorario(modalidad,idExamenEnDia, false);
             break;
 
         case "Listening & Speaking":
-          let  corroborarExistenciaExamenLS = await corroborarHorario(false,idExamenEnDia);
+            let corroborarExistenciaExamenLS = await corroborarHorario(modalidad,false, idExamenEnDia);
             break;
-    
+
     }
-    
+
 }
 
-async function corroborarHorario(idExamenEnDia, idExamenEnSemana){
+async function corroborarHorario(modalidad,idExamenEnDia, idExamenEnSemana) {
     const sqlRW = "select BIN_TO_UUID(UUID) as id from examen_en_dia_RW where uuid = UUID_TO_BIN(?);"
     const sqlLS = "select BIN_TO_UUID(uuid) as Id from examen_en_semana_LS where uuid = UUID_TO_BIN(?);"
-    console.log(idExamenEnDia,idExamenEnSemana);
     
-    if(idExamenEnDia && idExamenEnSemana){
-        let hoarioRwCo = await utils.queryAsync(sqlRW,idExamenEnDia);
-        let horarioLsCo = await utils.queryAsync(sqlLS,idExamenEnSemana);
-        console.log('Corroborar', hoarioRWCo.length,horarioLsCo);
-    }else if(idExamenEnDia){
-       let horarioRw= await utils.queryAsync(sqlRW, idExamenEnDia);
-        console.log('Corroborar', horarioRw.length);
-    }else if(idExamenEnSemana){
-      let  horarioLs = await utils.queryAsync(sqlLS, idExamenEnSemana);
-        console.log('Corroborar', horarioLs.length);
+
+    if (modalidad==="Completo") {
+        let hoarioRwCo = await utils.queryAsync(sqlRW, idExamenEnDia);
+        let horarioLsCo = await utils.queryAsync(sqlLS, idExamenEnSemana);
+        console.log('Corroborar Completo', hoarioRwCo.length, horarioLsCo.length);
+    } else if (modalidad==="Reading & Writing") {
+        let horarioRw = await utils.queryAsync(sqlRW, idExamenEnDia);
+        console.log('Corroborar dia', horarioRw.length);
+    } else if (modalidad ==="Listening & Speaking") {
+        let horarioLs = await utils.queryAsync(sqlLS, idExamenEnSemana);
+        console.log('Corroborar semana', horarioLs.length);
     }
 }
 

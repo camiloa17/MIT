@@ -7,8 +7,10 @@
     </div>
 </div>
 <main>
+    <form action="">
     <section id="checkout_information">
         <%- include("partials/checkoutSteps") -%>
+        
         <div class="pago">
 
             <div id="person-information">
@@ -90,7 +92,7 @@
     </section>
     <div class="button-wrap">
         <% if(modo==="Completo") {%>
-            <a class="button-checkout backwards" href="/checkout/step_3/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+            <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
             <% }else {%>
                 <a class="button-checkout backwards"
                     href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
@@ -98,6 +100,7 @@
         
         <a class="button-checkout next" href="#">Siguiente</a>
     </div>
+    </form>
 </main>
 
 <script src="https://js.stripe.com/v3/"></script>

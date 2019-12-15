@@ -51,13 +51,20 @@ function habilitarBoton() {
   try{
   const submitRoute = route.replace(/step_2/g,"horario-selected");
   let horarioSeleccionado;
+  let horarioListening;
   document.getElementsByName('horario-selector').forEach(horario => {
       if (horario.checked) {
-        horarioSeleccionado=(horario.classList[0]);
+        if(horario.classList.length==2){
+          horarioSeleccionado = (horario.classList[0]);
+          horarioListening =(horario.classList[1])
+        }else{
+          horarioSeleccionado = (horario.classList[0]);
+        }
+        
       }
     });
-
-    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${horarioSeleccionado}`);
+    
+    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${horarioSeleccionado}${(horarioListening?`&idhorarioL=${horarioListening}`:"")}`);
     habilitarBoton()
   /*
   const ingresarAlServer= await postData(`${submitRoute}&idhorario=${horarioSeleccionado}`,this);

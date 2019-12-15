@@ -14,6 +14,10 @@ document.querySelectorAll('.materia-tipo').forEach(element => {
     element.addEventListener('click', openMenuItem)
 });
 
+document.querySelectorAll('.faqs-preguntas').forEach(element=>{
+    element.addEventListener('click',openText)
+})
+
 
 
 function openNav(item) {
@@ -73,6 +77,27 @@ function closeMenuItem(item) {
 }
 
 
+function openText(item){
+    let paragraph = (item.target.nextElementSibling?item.target.nextElementSibling:false)
+    let height = paragraph.scrollHeight;
+    let parent = item.target.parentElement;
+    if(paragraph){
+        if ((paragraph.classList.contains('faqs-inner-text'))) {
+            document.querySelectorAll('.faqs-inner-text').forEach(text => {
+                text.style.height = `0px`;
+                text.dataset.toggle = "closed";
+              text.parentElement.style.borderBottom = '3px solid #085796';
+            })
+
+            paragraph.dataset.toggle = "Open"
+            paragraph.style.height = `${height}px`
+            parent.style.borderBottom='0px';
+    }
+    
+    }
+    
+    
+}
 
 
 

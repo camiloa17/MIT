@@ -16,7 +16,7 @@ router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     const stylesheet = '/css/Front/checkoutStyle_Step2.css';
     const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
     const horarios = await controller.consultaHorarios(req.params.modalidad, req.query.id);
-
+    console.log(horarios);
     res.render('checkoutStep2', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_2', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horario: horarios })
 });
 
@@ -26,8 +26,7 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     
     if(req.params.modalidad==='Completo'){
         const stylesheet = '/css/Front/checkoutStyle_Step2.css';
-        
-        res.render('checkoutStep3Co', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_3', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horarioId: req.query.idhorario});
+        res.render('checkoutStep3Co', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_3', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horarioId: req.query.idhorario,horarioLs:req.query.idhorarioL});
     }else {
         const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
         
@@ -53,8 +52,14 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
         nivel:datosExamenModalidad.nivel,
         modalidad:datosExamenModalidad.modalidad
     }
+    if(examen.modalidad==='Completo'){
+        const corroborarHorario = await controller.crearReservaEnProceso(req.query.idhorario, examen.modalidad,req.query.idhorarioL);
+        res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}&idhorarioL=${req.query.idhorarioL}`)
+    }else{
+        res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}`)
+    }
     const corroborarHorario = await controller.crearReservaEnProceso(req.query.idhorario,examen.modalidad);
-    res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}`)
+    
 });
 
 

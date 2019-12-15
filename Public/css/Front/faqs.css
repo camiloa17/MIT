@@ -329,6 +329,51 @@ h3{
 }
 /*Final Menu secundario*/
 
+main{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+h1{
+    font-family: Roboto Slab;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 70px;
+    width: 250px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top:120px;
+}
+.faqs-list{
+    margin-top:54px;
+    margin-bottom: 54px;
+    width: 80%;
+    list-style: none;
+}
+
+.faqs-preguntas{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    border-bottom: 3px solid #085796;
+    margin-top:10px;
+    margin-bottom: 30px;
+    padding-bottom: 5px;
+    cursor:pointer;
+}
+
+.faqs-inner-text{
+    height: 0;
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+
+.faqs-inner-text{
+    font-weight: 400;
+}
 
 /*-----------------------------------------------Fin de estilos Menu-----------------------------------------------------------------------*/
 /*Footer-----------------------------------------------------------------------*/
@@ -453,6 +498,8 @@ h3{
         color:white;
     }
     /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
+
+
 
     /*-----------------------Fin de Seccion menu desktop--------------------------------------------------*/
     /*Lower footer- privacidad*/
