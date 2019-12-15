@@ -7,6 +7,8 @@ function appendNav() {
 
 appendNav();
 
+
+
 function appendExamenes() {
   $.get("./html/dashboard/examenes/examenes.html", function(data) {
     $("#contenido").append(data);

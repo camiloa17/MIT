@@ -132,7 +132,7 @@ function nuevoNivelTemplate() {
       nombre: "Nuevo Nivel",
       descripcion: "Descripcion del Nivel",
       activo: 1,
-      mostrar_cliente: 1,
+      mostrar_cliente: 0,
       edita_user_secundario: 0,
       tipo_uuid: $("#chipsMateriaEnTipo")
         .find(".ui-selected")
@@ -418,7 +418,7 @@ function agregarNuevoElemento(e, lista, input) {
       uuid: uuidv4(),
       nombre: e.target.value,
       activo: 1,
-      mostrar_cliente: 1,
+      mostrar_cliente: 0,
       edita_user_secundario: 0
     };
     colaAgregar.push(elemento.uuid);
@@ -1073,23 +1073,16 @@ function generarNombrePdfs(nivel) {
 //////////////////// PRESETS HTML elemento nivel
 const liNivelTemplate = nivel => {
   return `
-    <div id="${nivel.uuid}_nivel" activo="${nivel.activo}" mostrar_cliente="${
-    nivel.mostrar_cliente
-  }" dirty_input_nombre="0" dirty_input_descripcion="0" dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
+    <div id="${nivel.uuid}_nivel" activo="${nivel.activo}" mostrar_cliente="${nivel.mostrar_cliente}" dirty_input_nombre="0" dirty_input_descripcion="0" 
+    dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
 
       <div class="container right clear-top-1 ">
         <a href="#modalEliminar" class="secondary-content delete modal-trigger">
-          <i id="${
-            nivel.uuid
-          }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+          <i id="${nivel.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
         </a>
         
         <a href="#!" class="secondary-content check">
-          <i id="${
-            nivel.uuid
-          }_visibility" class="material-icons-outlined azul-texto right button-opacity">${
-    nivel.mostrar_cliente ? "visibility" : "visibility_off"
-  }</i>
+          <i id="${nivel.uuid}_visibility" class="material-icons-outlined azul-texto right button-opacity">${nivel.mostrar_cliente ? "visibility" : "visibility_off"}</i>
         </a>
       </div>
 

@@ -625,7 +625,8 @@ async function buscarEnDBListaHorariosOrales() {
       where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
 
       
-      'LS' as source FROM dia_LS WHERE activo=1 
+      'LS' as source FROM dia_LS 
+      WHERE activo=1 AND fecha_Examen > NOW()
       ORDER BY fecha_Examen;`;
     connection = await connectionToDb();
 

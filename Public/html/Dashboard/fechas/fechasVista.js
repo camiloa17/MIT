@@ -19,6 +19,9 @@ class FechasVista {
     this.lastExamSelected = [];
     this.fechaAEliminar = { uuid: "", lista: "" };
     this.yaSeHizoUnCambio = false;
+
+    //se usa para chequear cupos suficientes al reservas a asignar a dia ls en la seccion de semanaLS
+    this.cupoExamenSeleccionado = [];
   }
 
   async traerListaDeExamenesDb() {
@@ -1439,8 +1442,12 @@ class FechasVista {
 
     
 
-    <div class="row">
-        <div id="listadoReservasEnFechas" class="col s11 m11 l11 xl11 clear-top-3 "></div>
+    <div id="areaReservas" class="row">
+        <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
+        <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
+    </div>
+
+    <div id="areaMailSeleccionados" class="row">
     </div>
     `
   }
@@ -1745,7 +1752,7 @@ class FechasVista {
     switch (oralOEscrito) {
       case "RW":
         this.examenesFromDB.forEach(examen => {
-          if (examen.uuid && examen.rw &&  examen.activo_materia && examen.activo_tipo && examen.activo_nivel && examen.activo_modalidad) {
+          if (examen.uuid && examen.rw && examen.activo_materia && examen.activo_tipo && examen.activo_nivel && examen.activo_modalidad) {
             $("#selectarExamenes").append(`
               <option value="${examen.uuid}">${examen.materia} / ${examen.tipo} / ${examen.nivel} / ${examen.modalidad}</option>
               `);
@@ -1857,8 +1864,6 @@ class FechasVista {
 
   habilitarBotonResetExamenesEnFecha() {
     $("#resetExamenesEnFecha").on("click", () => {
-
-
       let id = this.lastExamSelected;
       let tipoDeLista = $("#listaHorarios").find(".ui-selected").attr("tipo");
       let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
@@ -1872,9 +1877,7 @@ class FechasVista {
       }
       else if (tipoDeLista === "LS") {
         let fechaExamen = $(`#${id}`).attr("fechaexamen")
-        let fechaEditable = this.chequearSiEsFechaEditable(fechaExamen);
         this.mostrarListaDeHorarios(this.accionLuegoDeReseteo, fechasAntiguas);
-        //this.mostrarExamenesEnListaFromDB(id, tipoDeLista, fechaEditable)
         this.mostrarInputsCambioDia(id);
       }
       else if (tipoDeLista.length === 6) {
@@ -1911,12 +1914,28 @@ class FechasVista {
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
+    this.listenChequearSiHayCuposLibresParaAsignarExamen();
+    this.mostrarEnviarMailASeleccionados();
+    $('.collapsible').collapsible();
+    M.updateTextFields();
+    let descriptionTextArea = $('#textarea_Mail')
+    M.textareaAutoResize(descriptionTextArea);
   }
 
   //cuando asigno diasLS a semanas, actualizo la lista de reservas
   updateElementosListaSemanaLs = async (idSelected) => {
     let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected);
+    let diasOral = await this.fechasServicio.getListaHorariosOrales();
+
     this.mostrarElementosListaReservasEnSemanasLs(reservaSemanas);
+    this.mostrarBotoneraReservasEnSemanaLs(diasOral);
+
+    this.habilitarFormSelect();
+    this.asignarFuncionBotonAsignarDiaOralASemana();
+    this.habilitarToggleCheckboxAll()
+    this.asignarFuncionBotonExportarAsistencia();
+    this.asignarFuncionBotonExportarTrinity();
+    this.listenChequearSiHayCuposLibresParaAsignarExamen();
   }
 
   async generarListaReservaDiaRw(idSelected) {
@@ -1978,7 +1997,29 @@ class FechasVista {
   mostrarElementosListaReservasEnSemanasLs(reservasSemanaLs) {
     $('#bodyListadoReservasEnFechas').empty();
 
-    console.log(reservasSemanaLs)
+    reservasSemanaLs.sort(function (objA, objB) {
+      // Primero ordeno por fecha diaLS asignado
+      let ordenFechaA = objA.dia_LS_fecha_examen;
+      let ordenFechaB = objB.dia_LS_fecha_examen;
+
+      if (ordenFechaA > ordenFechaB) {
+        return 1;
+      } else if (ordenFechaA < ordenFechaB) {
+        return -1;
+      } else if (ordenFechaA === null) {
+        return -2;
+      } else {
+        // luego ordeno por apellido
+        let ordenApellidoA = objA.alumno_apellido;
+        let ordenApellidoB = objB.alumno_apellido;
+
+        if (ordenApellidoA > ordenApellidoB) {
+          return 1;
+        } else if (ordenApellidoA < ordenApellidoB) {
+          return -1;
+        }
+      }
+    })
 
     reservasSemanaLs.forEach(reserva => {
       $('#bodyListadoReservasEnFechas').append(
@@ -1999,14 +2040,14 @@ class FechasVista {
   }
 
   mostrarBotoneraReservasEnSemanaLs(diasOral) {
-    $('#listadoReservasEnFechas').append(
+    $('#edicionReservasEnFechas').empty().append(
       `
         <div class="col s12 m12 l12 xl12">
-          <div class="col s6 m6 l6  xl6">      
+          <div class="col s6 m6 l6  xl5">      
             <div class="input-field clear-top-3">
               <select id="listadoDiasOralesParaSemana"></select>
               <label>Asignar Día de Oral a los seleccionados</label>
-              <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul ">Asignar</a>
+              <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Asignar</a>
               <span id="estadoReserva" class="padding-left2-4 rojo-texto" ></span>
             </div>
           </div>
@@ -2022,8 +2063,11 @@ class FechasVista {
       `<option value="" disabled selected>Seleccionar</option>`
     )
 
+    this.cupoExamenSeleccionado = [];
+
     diasOral.forEach(diaHorario => {
       let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas;
+      this.cupoExamenSeleccionado.push([diaHorario.uuid, cupos_libres])
 
       $('#listadoDiasOralesParaSemana').append(
         `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${cupos_libres}</option>`
@@ -2057,6 +2101,18 @@ class FechasVista {
   mostrarElementosListaReservasEnDiaRw(reservaDiaRw) {
     $('#bodyListadoReservasEnFechas').empty();
 
+    reservaDiaRw.sort(function (objA, objB) {
+      // ordeno por apellido
+      let ordenApellidoA = objA.alumno_apellido;
+      let ordenApellidoB = objB.alumno_apellido;
+
+      if (ordenApellidoA > ordenApellidoB) {
+        return 1;
+      } else if (ordenApellidoA < ordenApellidoB) {
+        return -1;
+      }
+    })
+
     reservaDiaRw.forEach(reserva => {
       $('#bodyListadoReservasEnFechas').append(
         `<tr>
@@ -2072,12 +2128,12 @@ class FechasVista {
             <td>${reserva.alumno_documento_id}</td>
           </tr>`)
     });
- 
+
 
   };
 
   mostrarBotoneraReservasEnDiaRw() {
-    $('#listadoReservasEnFechas').append(
+    $('#edicionReservasEnFechas').empty().append(
       `<div class="col s6 m6 l6 xl6 right clear-top-2">
       
       <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
@@ -2118,6 +2174,18 @@ class FechasVista {
   mostrarElementosListaReservasEnDiaLs(reservaDiaLs) {
     $('#bodyListadoReservasEnFechas').empty();
 
+    reservaDiaLs.sort(function (objA, objB) {
+      // ordeno por apellido
+      let ordenApellidoA = objA.alumno_apellido;
+      let ordenApellidoB = objB.alumno_apellido;
+
+      if (ordenApellidoA > ordenApellidoB) {
+        return 1;
+      } else if (ordenApellidoA < ordenApellidoB) {
+        return -1;
+      }
+    })
+
     reservaDiaLs.forEach(reserva => {
       $('#bodyListadoReservasEnFechas').append(
         `<tr>
@@ -2139,7 +2207,7 @@ class FechasVista {
   };
 
   mostrarBotoneraReservasEnDiaLs() {
-    $('#listadoReservasEnFechas').append(
+    $('#edicionReservasEnFechas').empty().append(
       `
       <div class="col s6 m6 l6 xl6 right clear-top-2">
     <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
@@ -2152,345 +2220,431 @@ class FechasVista {
       `)
   };
 
+  mostrarEnviarMailASeleccionados() {
+    $('#areaMailSeleccionados').append(`    
+        <div class="col s10 m10 l10 xl10 ">
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">mail</i>Enviar Email con Fechas a Seleccionados
+                    </div>
+
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <form class="col s12">
+                                <div class="row">
+                                    <div class="input-field col l8">
+                                        <input placeholder="Placeholder" id="mail_asunto" type="text" class="validate" value="Fechas de Examen MIT">
+                                        <label for="mail_asunto">Asunto</label>
+                                    </div>
+                                    <div class="input-field col l12">
+                                        <textarea id="textarea_Mail" class="materialize-textarea gris-texto">
+                                            Hola {alumno.nombre} {alumno.apellido},
+                                            Ya estás inscripto al examen {examen.nombre} el día {examen.dia} y en el horario {examen.hora}.
+                                            Debés presentarte en Av Cordoba 1659 - 3er piso con una anticipación de 30 minutos.
+                                            Cualquier duda te podés comunicar vía telefónica al +34 952 202322
+                                            Saludos!
+                                        </textarea>
+                                        <label for="textarea_Mail">Cuerpo de Mail</label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <a class="waves-effect waves-light btn btn-medium weight400 background-azul right">ENVIAR MAILS</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+  `)}
 
 
 
 
-asignarFuncionBotonExportarAsistencia() {
-  let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
-  let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
-  let fechaString = $("#listaHorarios").find(".ui-selected").attr("fechaExamen");
 
-  $('#botonExportarAsistencia').on('click', () => {
-    let id = $('#estadoReserva')
-    this.fechasServicio.getExcelAsistencia(fecha, tipo, fechaString, this.huboUnError, id);
-  });
-}
+  asignarFuncionBotonExportarAsistencia() {
+    let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
+    let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
+    let fechaString = $("#listaHorarios").find(".ui-selected").attr("fechaExamen");
 
-asignarFuncionBotonExportarTrinity() {
-  let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
-  let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
-
-  $('#botonExportarTrinity').on('click', () => {
-    this.fechasServicio.getExcelTrinity(fecha, tipo);
-  });
-}
-
-
-asignarFuncionBotonAsignarDiaOralASemana() {
-  $('#botonAsignarDiaOralASemana').on('click', () => {
-    this.asignarDiaASemanaExamenOral()
-  })
-}
-
-
-asignarDiaASemanaExamenOral() {
-  // Obtengo el día del oral seleccionado
-  $("select").formSelect();
-  let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
-  let diaOralSeleccionado = instance.getSelectedValues();
-
-  // Obtengo las reservas de semana a las que se le debe asignar un día
-  let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function () {
-    return this.id;
-  }).get();
-
-  let datos = {
-    fecha: diaOralSeleccionado,
-    reservas: reservasSeleccionadas,
+    $('#botonExportarAsistencia').on('click', () => {
+      let id = $('#estadoReserva')
+      this.fechasServicio.getExcelAsistencia(fecha, tipo, fechaString, this.huboUnError, id);
+    });
   }
 
-  let id = $('#estadoReserva')
-  id.append(this.preloader());
-  this.fechasServicio.asignarDiaASemanaExamenOral(datos, this.lastExamSelected, this.accionExitosa, this.huboUnError, id, this.updateElementosListaSemanaLs);
-}
+  asignarFuncionBotonExportarTrinity() {
+    let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
+    let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
 
-botonAgregarExamenesAFecha() {
-  $("#botonAgregarExamenesAFecha").on("click", () => {
-    // Obtengo los elementos seleccionados
+    $('#botonExportarTrinity').on('click', () => {
+      this.fechasServicio.getExcelTrinity(fecha, tipo);
+    });
+  }
+
+
+  asignarFuncionBotonAsignarDiaOralASemana() {
+    $('#botonAsignarDiaOralASemana').on('click', () => {
+      this.asignarDiaASemanaExamenOral()
+    })
+  }
+
+  listenChequearSiHayCuposLibresParaAsignarExamen() {
+    $('.checkBoxClass').on('change', () => {
+      this.chequearSiHayCuposLibresParaAsignarExamen()
+    });
+
+    $('#ckbCheckAll').on('change', () => {
+      this.chequearSiHayCuposLibresParaAsignarExamen()
+    });
+
+    $('#listadoDiasOralesParaSemana').on('change', () => {
+      this.chequearSiHayCuposLibresParaAsignarExamen()
+    });
+  }
+
+  chequearSiHayCuposLibresParaAsignarExamen() {
+    console.log("click")
+
     $("select").formSelect();
-    var instance = M.FormSelect.getInstance($("#selectarExamenes"));
-    var examenesSeleccionados = instance.getSelectedValues();
+    let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
+    let diaOralSeleccionado = instance.getSelectedValues();
+    let cuposLibres;
+    let alumnosSeleccionados;
 
-    // Obtengo los elementos que ya estan en la lista
-    var examenesYaEnLista = this.obtenerListaDeExamenesDeUl();
+    this.cupoExamenSeleccionado.forEach(par => {
+      if (par[0] == diaOralSeleccionado) {
+        cuposLibres = par[1];
+      }
+    })
+    
+    alumnosSeleccionados = $("#bodyListadoReservasEnFechas :checkbox:checked").length;
+    
+    if(diaOralSeleccionado != "" && alumnosSeleccionados > 0 ) {
+      if (alumnosSeleccionados > 0  && alumnosSeleccionados <= cuposLibres) {
+        $('#botonAsignarDiaOralASemana').removeClass("disabled");
+        $('#estadoReserva').empty();
+      } else {
+        $('#botonAsignarDiaOralASemana').addClass("disabled");
+        $('#estadoReserva').empty().append(`<div>La cantidad de alumnos seleccionados es mayor que los cupos libres en esta fecha.</div>`);
+        setTimeout(() => $('#estadoReserva').empty(), 6000)
+      }
+    }
+    
+  }
 
-    // Genero un array con los objetos que se necesitan agregar
-    let examenesSelecionadosQueNoEstanEnLista = examenesSeleccionados.filter(
-      element => !examenesYaEnLista.some(el => element === el.examen)
-    );
 
-    //Reinicia los valores seleccionados
-    $("form input").val("");
-    $("select").val("None");
-    $("#inputSelectarExamenes div input").val("");
+  asignarDiaASemanaExamenOral() {
+    // Obtengo el día del oral seleccionado
+    $("select").formSelect();
+    let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
+    let diaOralSeleccionado = instance.getSelectedValues();
 
-    this.mostrarExamenesNuevosEnLista(examenesSelecionadosQueNoEstanEnLista);
-  });
-}
+    // Obtengo las reservas de semana a las que se le debe asignar un día
+    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function () {
+      return this.id;
+    }).get();
 
-asignarFuncionalidadBotonEliminarExamen(id) {
-  $(`#${id}_remove`).on('click', () => {
-    let examen = $(`#${id}`).attr("id");
-
-    // Chequeo si el examen fue agregado en una instancia antes de ser guardado en la DB
-    let examenEnAdd = this.addExamenesFechaDia.some(element => element === examen);
-
-    // Si el exanen esta pendiente por agregarse a la DB, lo elimino. Si el examen ya esta agregado a la DB, lo pongo en el array para eliminarlo
-    if (examenEnAdd) {
-      let newAddArray = this.addExamenesFechaDia.filter(element => element != examen)
-      this.addExamenesFechaDia = newAddArray;
-    } else {
-      this.removeExamenesFechaDia.push(examen);
+    let datos = {
+      fecha: diaOralSeleccionado,
+      reservas: reservasSeleccionadas,
     }
 
-    $('#botonGuardarExamenesEnFecha').removeClass('disabled');
-    $('#resetExamenesEnFecha').removeClass('disabled');
-    this.seProdujoUnCambio();
+    let id = $('#estadoReserva')
+    id.append(this.preloader());
+    this.fechasServicio.asignarDiaASemanaExamenOral(datos, this.lastExamSelected, this.accionExitosa, this.huboUnError, id, this.updateElementosListaSemanaLs);
+  }
 
-    $(`#${id}`).remove();
+  botonAgregarExamenesAFecha() {
+    $("#botonAgregarExamenesAFecha").on("click", () => {
+      // Obtengo los elementos seleccionados
+      $("select").formSelect();
+      var instance = M.FormSelect.getInstance($("#selectarExamenes"));
+      var examenesSeleccionados = instance.getSelectedValues();
 
-    if (!$('#listaExamenes').find('li').length) {
+      // Obtengo los elementos que ya estan en la lista
+      var examenesYaEnLista = this.obtenerListaDeExamenesDeUl();
+
+      // Genero un array con los objetos que se necesitan agregar
+      let examenesSelecionadosQueNoEstanEnLista = examenesSeleccionados.filter(
+        element => !examenesYaEnLista.some(el => element === el.examen)
+      );
+
+      //Reinicia los valores seleccionados
+      $("form input").val("");
+      $("select").val("None");
+      $("#inputSelectarExamenes div input").val("");
+
+      this.mostrarExamenesNuevosEnLista(examenesSelecionadosQueNoEstanEnLista);
+    });
+  }
+
+  asignarFuncionalidadBotonEliminarExamen(id) {
+    $(`#${id}_remove`).on('click', () => {
+      let examen = $(`#${id}`).attr("id");
+
+      // Chequeo si el examen fue agregado en una instancia antes de ser guardado en la DB
+      let examenEnAdd = this.addExamenesFechaDia.some(element => element === examen);
+
+      // Si el exanen esta pendiente por agregarse a la DB, lo elimino. Si el examen ya esta agregado a la DB, lo pongo en el array para eliminarlo
+      if (examenEnAdd) {
+        let newAddArray = this.addExamenesFechaDia.filter(element => element != examen)
+        this.addExamenesFechaDia = newAddArray;
+      } else {
+        this.removeExamenesFechaDia.push(examen);
+      }
+
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      $('#resetExamenesEnFecha').removeClass('disabled');
+      this.seProdujoUnCambio();
+
+      $(`#${id}`).remove();
+
+      if (!$('#listaExamenes').find('li').length) {
+        $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
+      }
+
+    });
+  }
+
+  mostrarExamenesNuevosEnLista(examenes) {
+    if (examenes.length > 0) {
+      $('#botonGuardarExamenesEnFecha').removeClass('disabled');
+      $('#resetExamenesEnFecha').removeClass('disabled');
+      $('#listaVacia').remove();
+      this.seProdujoUnCambio();
+    }
+
+    examenes.forEach(examen => {
+      let nombreCompleto = this.convertirUuidExamenEnTexto(examen)[0];
+      let pausado = 0;
+      let uuid = uuidv4();
+      let fecha = $("#listaHorarios")
+        .find(".ui-selected")
+        .attr("id");
+      let ventas = 0;
+      let activo = 0;
+      let mostrarCliente = this.chequearSiElExamenEstaVisible(examen);
+      let fechaEditable = 1;
+
+      $("#listaExamenes").append(
+        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, activo, mostrarCliente, fechaEditable)
+      );
+
+      this.habilitarToolTips();
+      this.addExamenesFechaDia.push(uuid)
+      this.asignarFuncionBotonPausa(uuid);
+      this.asignarFuncionalidadBotonEliminarExamen(uuid);
+
+    });
+  }
+
+  chequearSiElExamenEstaVisible(examen) {
+    let mostrarCliente;
+
+    this.examenesFromDB.forEach(modalidad => {
+      if (modalidad.uuid === examen) {
+        mostrarCliente = !(modalidad.mostrarCliente_materia & modalidad.mostrarCliente_tipo & modalidad.mostrarCliente_nivel & modalidad.mostrarCliente_modalidad);
+      };
+    });
+    return mostrarCliente;
+  }
+
+  habilitarToolTips() {
+    $('.tooltipped').tooltip();
+  }
+
+  async mostrarExamenesEnListaFromDB(idSelected, tipoSelected, fechaEditable) {
+    let id = $("#listaExamenes");
+    await this.fechasServicio.getExamenesEnFecha(idSelected, tipoSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
+  }
+
+
+  renderExamenesEnLista = (fechaEditable, examenes, tipoSelected) => {
+    $("#listaExamenes").empty();
+    if (examenes.length === 0) {
       $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
     }
 
-  });
-}
-
-mostrarExamenesNuevosEnLista(examenes) {
-  if (examenes.length > 0) {
-    $('#botonGuardarExamenesEnFecha').removeClass('disabled');
-    $('#resetExamenesEnFecha').removeClass('disabled');
-    $('#listaVacia').remove();
-    this.seProdujoUnCambio();
-  }
-
-  examenes.forEach(examen => {
-    let nombreCompleto = this.convertirUuidExamenEnTexto(examen)[0];
-    let pausado = 0;
-    let uuid = uuidv4();
-    let fecha = $("#listaHorarios")
-      .find(".ui-selected")
-      .attr("id");
-    let ventas = 0;
-    let activo = 0;
-    let mostrarCliente = this.chequearSiElExamenEstaVisible(examen);
-    let fechaEditable = 1;
-
-    $("#listaExamenes").append(
-      this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, activo, mostrarCliente, fechaEditable)
-    );
-
-    this.habilitarToolTips();
-    this.addExamenesFechaDia.push(uuid)
-    this.asignarFuncionBotonPausa(uuid);
-    this.asignarFuncionalidadBotonEliminarExamen(uuid);
-
-  });
-}
-
-chequearSiElExamenEstaVisible(examen) {
-  let mostrarCliente;
-
-  this.examenesFromDB.forEach(modalidad => {
-    if (modalidad.uuid === examen) {
-      mostrarCliente = !(modalidad.mostrarCliente_materia & modalidad.mostrarCliente_tipo & modalidad.mostrarCliente_nivel & modalidad.mostrarCliente_modalidad);
-    };
-  });
-  return mostrarCliente;
-}
-
-habilitarToolTips() {
-  $('.tooltipped').tooltip();
-}
-
-async mostrarExamenesEnListaFromDB(idSelected, tipoSelected, fechaEditable) {
-  let id = $("#listaExamenes");
-  await this.fechasServicio.getExamenesEnFecha(idSelected, tipoSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
-}
-
-
-renderExamenesEnLista = (fechaEditable, examenes, tipoSelected) => {
-  $("#listaExamenes").empty();
-  if (examenes.length === 0) {
-    $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
-  }
-
-  // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.
-  let arrayLis = [];
-
-  // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
-  examenes.forEach(examen => {
-    let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[0];
-    let activo;
-    let mostrarCliente;
+    // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.
+    let arrayLis = [];
 
     // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
-    this.examenesFromDB.map(exam => {
-      if (exam.uuid === examen.modalidad_uuid) {
-        activo = !(exam.activo_materia & exam.activo_tipo & exam.activo_nivel & exam.activo_modalidad) ? true : false;
+    examenes.forEach(examen => {
+      let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[0];
+      let activo;
+      let mostrarCliente;
+
+      // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
+      this.examenesFromDB.map(exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          activo = !(exam.activo_materia & exam.activo_tipo & exam.activo_nivel & exam.activo_modalidad) ? true : false;
+        }
+      })
+
+      // de cada examen que voy a mostrar en la tabla, chequeo su estado de mostrarCliente desde el listado que traje de la DB
+      this.examenesFromDB.map(exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          mostrarCliente = !(exam.mostrarCliente_materia & exam.mostrarCliente_tipo & exam.mostrarCliente_nivel & exam.mostrarCliente_modalidad) ? true : false;
+        }
+      })
+
+      // como los examenes en dia LS no se pueden editar (porque se asignan desde el listado de semana), la asigno como fecha no editable
+      if (tipoSelected === "LS") {
+        fechaEditable = 0;
       }
-    })
 
-    // de cada examen que voy a mostrar en la tabla, chequeo su estado de mostrarCliente desde el listado que traje de la DB
-    this.examenesFromDB.map(exam => {
-      if (exam.uuid === examen.modalidad_uuid) {
-        mostrarCliente = !(exam.mostrarCliente_materia & exam.mostrarCliente_tipo & exam.mostrarCliente_nivel & exam.mostrarCliente_modalidad) ? true : false;
-      }
-    })
+      // Guardo en un array temporal: [0]index + [1]LI del examen + [2]uuid del examen (para luego asignar funcionalidad a los botones)
+      arrayLis.push([
+        this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[1],
 
-    // como los examenes en dia LS no se pueden editar (porque se asignan desde el listado de semana), la asigno como fecha no editable
-    if (tipoSelected === "LS") {
-      fechaEditable = 0;
-    }
-
-    // Guardo en un array temporal: [0]index + [1]LI del examen + [2]uuid del examen (para luego asignar funcionalidad a los botones)
-    arrayLis.push([
-      this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[1],
-
-      this.templateLiExamen(
-        examen.uuid,
-        examen.modalidad_uuid,
-        examen.fecha_uuid,
-        nombre,
-        examen.pausado,
-        examen.ventas,
-        activo,
-        mostrarCliente,
-        fechaEditable
-      ),
-      examen.uuid
-    ]);
-  });
-
-  // Ordeno el array temporal por el index
-  arrayLis.sort(function (liA, liB) {
-    let ordenLiA = liA[0];
-    let ordenLiB = liB[0];
-    if (ordenLiA > ordenLiB) {
-      return 1;
-    } else {
-      return -1;
-    }
-  })
-
-  // Renderizo los LIs en orden y le asigno funcionalidad a los botones segun su uuid array[2]
-  arrayLis.forEach(array => {
-    $('#listaExamenes').append(array[1])
-    // habilito los mensajes en hover en los badges de inactivo y eliminado
-    this.habilitarToolTips();
-    this.asignarFuncionBotonPausa(array[2]);
-    this.asignarFuncionalidadBotonEliminarExamen(array[2]);
-  });
-}
-
-
-async mostrarExamenesDeSemanaEnListaFromDB(idSelected, fechaEditable) {
-  let id = $("#listaExamenes");
-  await this.fechasServicio.getExamenesEnSemana(idSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
-}
-
-
-renderExamenesSemanaEnLista = (fechaEditable, examenes) => {
-  $("#listaExamenes").empty();
-
-  // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.
-  let arrayLis = [];
-
-  examenes.forEach(examen => {
-    let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[0];
-    let activo;
-    let mostrarCliente;
-
-
-    // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
-    this.examenesFromDB.map(exam => {
-      if (exam.uuid === examen.modalidad_uuid) {
-        activo = !(exam.activo_materia & exam.activo_tipo & exam.activo_nivel & exam.activo_modalidad) ? true : false;
-      }
-    })
-
-    // de cada examen que voy a mostrar en la tabla, chequeo su estado de mostrarCliente desde el listado que traje de la DB
-    this.examenesFromDB.map(exam => {
-      if (exam.uuid === examen.modalidad_uuid) {
-        mostrarCliente = !(exam.mostrarCliente_materia & exam.mostrarCliente_tipo & exam.mostrarCliente_nivel & exam.mostrarCliente_modalidad) ? true : false;
-      }
-    })
-
-    // Guardo en un array temporal: [0]index + [1]LI del examen + [2]uuid del examen (para luego asignar funcionalidad a los botones)
-    arrayLis.push([
-      this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[1],
-
-      this.templateLiExamen(
-        examen.uuid,
-        examen.modalidad_uuid,
-        examen.fecha_uuid,
-        nombre,
-        examen.pausado,
-        examen.ventas,
-        activo,
-        mostrarCliente,
-        fechaEditable
-      ),
-      examen.uuid
-    ]);
-  });
-
-  // Ordeno el array temporal por el index
-  arrayLis.sort(function (liA, liB) {
-    let ordenLiA = liA[0];
-    let ordenLiB = liB[0];
-    if (ordenLiA > ordenLiB) {
-      return 1;
-    } else {
-      return -1;
-    }
-  })
-
-  // Renderizo los LIs en orden y le asigno funcionalidad a los botones segun su uuid array[2]
-  arrayLis.forEach(array => {
-    $('#listaExamenes').append(array[1])
-    // habilito los mensajes en hover en los badges de inactivo y eliminado
-    this.habilitarToolTips();
-    this.asignarFuncionBotonPausa(array[2]);
-    this.asignarFuncionalidadBotonEliminarExamen(array[2]);
-
-  })
-};
-
-
-obtenerListaDeExamenesDeUl() {
-  let examenesEnUl = [];
-
-  $("#listaExamenes li").each(function () {
-    examenesEnUl.push({
-      uuid: $(this)
-        .attr("id")
-        .trim(),
-      examen: $(this)
-        .attr("uuidExamen")
-        .trim(),
-      pausado: $(this)
-        .attr("pausado")
-        .trim(),
-      fecha: $(this)
-        .attr("uuidfecha")
-        .trim(),
+        this.templateLiExamen(
+          examen.uuid,
+          examen.modalidad_uuid,
+          examen.fecha_uuid,
+          nombre,
+          examen.pausado,
+          examen.ventas,
+          activo,
+          mostrarCliente,
+          fechaEditable
+        ),
+        examen.uuid
+      ]);
     });
-  });
-  return examenesEnUl;
-}
 
-convertirUuidExamenEnTexto(uuidExamen) {
-  let nombreSegunUuid;
-  let indexOrder;
+    // Ordeno el array temporal por el index
+    arrayLis.sort(function (liA, liB) {
+      let ordenLiA = liA[0];
+      let ordenLiB = liB[0];
+      if (ordenLiA > ordenLiB) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
 
-  this.examenesFromDB.forEach(function (item, index) {
-    if (item.uuid === uuidExamen) {
-      nombreSegunUuid = `${item.materia} / ${item.tipo} / ${item.nivel} / ${item.modalidad}`;
-      indexOrder = index;
-    }
-  });
-  return [nombreSegunUuid, indexOrder];
-}
+    // Renderizo los LIs en orden y le asigno funcionalidad a los botones segun su uuid array[2]
+    arrayLis.forEach(array => {
+      $('#listaExamenes').append(array[1])
+      // habilito los mensajes en hover en los badges de inactivo y eliminado
+      this.habilitarToolTips();
+      this.asignarFuncionBotonPausa(array[2]);
+      this.asignarFuncionalidadBotonEliminarExamen(array[2]);
+    });
+  }
+
+
+  async mostrarExamenesDeSemanaEnListaFromDB(idSelected, fechaEditable) {
+    let id = $("#listaExamenes");
+    await this.fechasServicio.getExamenesEnSemana(idSelected, fechaEditable, this.renderExamenesEnLista, this.huboUnError, id);
+  }
+
+
+  renderExamenesSemanaEnLista = (fechaEditable, examenes) => {
+    $("#listaExamenes").empty();
+
+    // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.
+    let arrayLis = [];
+
+    examenes.forEach(examen => {
+      let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[0];
+      let activo;
+      let mostrarCliente;
+
+
+      // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
+      this.examenesFromDB.map(exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          activo = !(exam.activo_materia & exam.activo_tipo & exam.activo_nivel & exam.activo_modalidad) ? true : false;
+        }
+      })
+
+      // de cada examen que voy a mostrar en la tabla, chequeo su estado de mostrarCliente desde el listado que traje de la DB
+      this.examenesFromDB.map(exam => {
+        if (exam.uuid === examen.modalidad_uuid) {
+          mostrarCliente = !(exam.mostrarCliente_materia & exam.mostrarCliente_tipo & exam.mostrarCliente_nivel & exam.mostrarCliente_modalidad) ? true : false;
+        }
+      })
+
+      // Guardo en un array temporal: [0]index + [1]LI del examen + [2]uuid del examen (para luego asignar funcionalidad a los botones)
+      arrayLis.push([
+        this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[1],
+
+        this.templateLiExamen(
+          examen.uuid,
+          examen.modalidad_uuid,
+          examen.fecha_uuid,
+          nombre,
+          examen.pausado,
+          examen.ventas,
+          activo,
+          mostrarCliente,
+          fechaEditable
+        ),
+        examen.uuid
+      ]);
+    });
+
+    // Ordeno el array temporal por el index
+    arrayLis.sort(function (liA, liB) {
+      let ordenLiA = liA[0];
+      let ordenLiB = liB[0];
+      if (ordenLiA > ordenLiB) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
+
+    // Renderizo los LIs en orden y le asigno funcionalidad a los botones segun su uuid array[2]
+    arrayLis.forEach(array => {
+      $('#listaExamenes').append(array[1])
+      // habilito los mensajes en hover en los badges de inactivo y eliminado
+      this.habilitarToolTips();
+      this.asignarFuncionBotonPausa(array[2]);
+      this.asignarFuncionalidadBotonEliminarExamen(array[2]);
+
+    })
+  };
+
+
+  obtenerListaDeExamenesDeUl() {
+    let examenesEnUl = [];
+
+    $("#listaExamenes li").each(function () {
+      examenesEnUl.push({
+        uuid: $(this)
+          .attr("id")
+          .trim(),
+        examen: $(this)
+          .attr("uuidExamen")
+          .trim(),
+        pausado: $(this)
+          .attr("pausado")
+          .trim(),
+        fecha: $(this)
+          .attr("uuidfecha")
+          .trim(),
+      });
+    });
+    return examenesEnUl;
+  }
+
+  convertirUuidExamenEnTexto(uuidExamen) {
+    let nombreSegunUuid;
+    let indexOrder;
+
+    this.examenesFromDB.forEach(function (item, index) {
+      if (item.uuid === uuidExamen) {
+        nombreSegunUuid = `${item.materia} / ${item.tipo} / ${item.nivel} / ${item.modalidad}`;
+        indexOrder = index;
+      }
+    });
+    return [nombreSegunUuid, indexOrder];
+  }
 }
