@@ -409,11 +409,7 @@ class FechasVista {
     });
   }
 
-  appendProgressIndeterminate(lista) {
-    lista.empty();
-    lista.append(`<div class="progress "><div class="indeterminate"></div></div>
-    `);
-  }
+ 
 
   cleanEstadoListaExamen() {
     this.addExamenesFechaDia = [];
@@ -1168,6 +1164,12 @@ class FechasVista {
     setTimeout(() => id.empty(), 6000)
   }
 
+  appendProgressIndeterminate(lista) {
+    lista.empty();
+    lista.append(`<div class="progress "><div class="indeterminate"></div></div>
+    `);
+  }
+
 
   preloader() {
     return `
@@ -1547,7 +1549,7 @@ class FechasVista {
               <div class="row margin0">
                 <div class="col s6 m6 l6 xl6 padding0">
                   <span class="title ${horario.pausado ? "inputInactivo" : ""}">
-                    <span class="new badge margin-left-0-15 margin-right-1 left ${horario.source === "RW" ? "light-blue " : "orange "} " data-badge-caption="">${horario.source === "RW" ? "ESCR" : "ORAL"}</span>
+                  <span class="new badge margin-left-0-15 margin-right-1 left ${horario.source === "RW" ? "light-blue " : "orange "} " data-badge-caption="">${horario.source === "RW" ? "ESCR" : "ORAL"}</span>
                     ${this.fechasServicio.stringDiaHoraEspanol(horario.fecha_Examen)}
                   </span>
                 </div>

@@ -30,22 +30,22 @@ const lugarBotonAgregarNivel = $("#lugarBotonAgregarNivel");
 
 //////////////////// INICIALIZACION ACORDEON
 ulCollapsibleExamenes.collapsible({
-  onOpenStart: function() {
+  onOpenStart: function () {
     // Hasta que no selecciono un chip en tipo, no muestro ni lista ni botones (se usa cuando entraste a tipo, fuiste a materia o nivel y volves a tipo)
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
       ? removeAreaEdicionTipo()
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-      ? (function() {
-          removeAreaTipoEnNivel();
-          removeAreaNivelEnNivel();
-          removeAreaEdicionNivel();
-        })()
+      ? (function () {
+        removeAreaTipoEnNivel();
+        removeAreaNivelEnNivel();
+        removeAreaEdicionNivel();
+      })()
       : null;
   },
 
   // Cada vez que se abre una solapa del acordeon, se trae la información de la base de datos
-  onOpenEnd: function() {
+  onOpenEnd: function () {
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleMateria"
       ? mostrarListaMateria()
       : null;
@@ -53,16 +53,16 @@ ulCollapsibleExamenes.collapsible({
       ? mostrarChipMateria(chipsMateriaEnTipo, listaTipo)
       : null;
     ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-      ? (function() {
-          mostrarChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel);
-          removeAreaEdicionNivel();
-        })()
+      ? (function () {
+        mostrarChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel);
+        removeAreaEdicionNivel();
+      })()
       : null;
   }
 });
 
 //////////////////// Modal confirmación mensaje eliminar
-$(document).ready(function() {
+$(document).ready(function () {
   $(".modal").modal();
 });
 
@@ -198,7 +198,7 @@ async function mostrarChipNivel(listaChips, listaLis, idSelected) {
 function habilitarTostadaGuardarResetear() {
   $(".collapsible-header, .noSelectable, #agregarNivel").on(
     "click",
-    function() {
+    function () {
       M.toast({ html: "Debe Guardar o Resetear cambios para proceder" });
     }
   );
@@ -230,10 +230,6 @@ function renderNivel(data, lista) {
   let newTemplate = liNivelTemplate(nivel);
   lista.empty().append(newTemplate);
 
-  console.log(nivel.uuid);
-
-  console.log($(`#${nivel.uuid}_descripcion`));
-
   showAreaEdicionNivel();
   inicializarSelectDropdown();
   asignarFuncionalidadBotonesNivel(nivel, lista);
@@ -255,7 +251,7 @@ function autoResizeTextAreaOnWindowWidthChange(textArea) {
   let $window = $(window);
   let lastWindowWidth = $window.width();
 
-  $window.resize(function() {
+  $window.resize(function () {
     /* Do not calculate the new window width twice.
      * Do it just once and store it in a variable. */
     var windowWidth = $window.width();
@@ -269,7 +265,7 @@ function autoResizeTextAreaOnWindowWidthChange(textArea) {
 }
 
 function aceptarSoloNumerosEnInput(uuidInput) {
-  $(`#${uuidInput}_modalidad_precio`).on("keydown", function(e) {
+  $(`#${uuidInput}_modalidad_precio`).on("keydown", function (e) {
     if (e.which == 69 || e.which == 107 || e.which == 109) {
       e.preventDefault();
     }
@@ -301,24 +297,28 @@ function nuevaModalidad(nivel) {
     nombre: $(`#${nivel}_modalidad`).val(),
     precio: $(`#${nivel}_modalidad_precio`).val(),
     mostrar_cliente: true,
-    examen_RW: false,
-    examen_LS: false
+    examen_RW: $(`#${nivel}_examen_RW`).prop("checked"),
+    examen_LS: $(`#${nivel}_examen_LS`).prop("checked"),
   };
 }
 
 function asignarFuncionalidadBotoneAgregarModalidad(nivel) {
-  $(`#${nivel}_agregarModalidad`).on("click", function() {
+  $(`#${nivel}_agregarModalidad`).on("click", function () {
     if (
       $(`#${nivel}_modalidad`).val() &&
-      $(`#${nivel}_modalidad_precio`).val()
+      $(`#${nivel}_modalidad_precio`).val() &&
+      ($(`#${nivel}_examen_RW`).prop("checked") || $(`#${nivel}_examen_LS`).prop("checked"))
     ) {
       let modalidadDatos = nuevaModalidad(nivel);
       let modalidadGenerada = liModalidadTemplate(modalidadDatos);
       let nombreLista = $("#modalidadNivel");
       nombreLista.append(modalidadGenerada);
 
+      // Reinicio formulario
       $(`#${nivel}_modalidad`).val("");
       $(`#${nivel}_modalidad_precio`).val("");
+      $(`#${nivel}_examen_RW`).prop("checked", false);
+      $(`#${nivel}_examen_LS`).prop("checked", false);
 
       asignarFuncionalidadBotonesModalidad(modalidadDatos, nombreLista);
       addModalidades.push(modalidadDatos.uuid);
@@ -407,7 +407,7 @@ inicializarNuevoInputEnLi(listaMateria, agregarMateria);
 inicializarNuevoInputEnLi(listaTipo, agregarTipo);
 
 function inicializarNuevoInputEnLi(lista, input) {
-  input.on("keypress", function(e) {
+  input.on("keypress", function (e) {
     agregarNuevoElemento(e, lista, input);
   });
 }
@@ -439,6 +439,7 @@ inicializarBotonGuardarMateriaTipo(botonGuardarNivel, listaNivel);
 
 function inicializarBotonGuardarMateriaTipo(boton, lista) {
   boton.on("click", () => {
+    let idEstado= $('#estadoMateria')   
     switch (lista) {
       case listaMateria:
         let elementosMateria = generarEstoadoLista(lista);
@@ -447,8 +448,11 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
           lista
         );
         console.log("Cambios a Guardar", cambiosAGuardarMateria);
-        updateMateria(cambiosAGuardarMateria);
+            
+        idEstado.append(preloader() );
+        updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstado, getMateria, seGuardaOResetea, lista);
         break;
+
       case listaTipo:
         let elementosTipo = generarEstoadoLista(lista);
         let cambiosAGuardarTipo = generarObjetoConCambiosMateriaTipo(
@@ -456,8 +460,10 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
           lista
         );
         console.log("Cambios a Guardar", cambiosAGuardarTipo);
+        idEstado.append(preloader() );
         updateTipo(cambiosAGuardarTipo);
         break;
+
       case listaNivel:
         let nivelSeleccionado = chipsNivelEnNivel
           .find(".ui-selected")
@@ -476,7 +482,7 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
 
         break;
     }
-    seGuardaOResetea(lista);
+    // seGuardaOResetea(lista);
     // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
   });
 }
@@ -583,13 +589,13 @@ function seGeneroUnCambioEnLista(lista) {
 }
 
 function aplicarClaseNoSelectableChips(ulChips) {
-  ulChips.find("li").each(function() {
+  ulChips.find("li").each(function () {
     $(this).addClass("noSelectable");
   });
 }
 
 function removerClaseNoSelectableChips(ulChips) {
-  ulChips.find("li").each(function() {
+  ulChips.find("li").each(function () {
     $(this).removeClass("noSelectable");
   });
 }
@@ -715,12 +721,12 @@ function asignarFuncionalidadBotonesLista(elemento, lista) {
     elementoAEliminar.lista = lista;
   });
 
-  $(`#${elemento.uuid} input`).on("input", function() {
+  $(`#${elemento.uuid} input`).on("input", function () {
     $(`#${elemento.uuid}`).attr("dirty_input", (index, attr) => 1);
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_visibility`).on("click", function() {
+  $(`#${elemento.uuid}_visibility`).on("click", function () {
     seGeneroUnCambioEnLista(lista);
 
     // Si esta la visibilidad en false, el input se ve inactivo
@@ -750,7 +756,7 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     elementoAEliminar.lista = lista;
   });
 
-  $(`#${elemento.uuid}_nombre`).on("input", function() {
+  $(`#${elemento.uuid}_nombre`).on("input", function () {
     $(`#${elemento.uuid}_nivel`).attr("dirty_input_nombre", 1);
 
     // Actualiza el nombre del chip cuando se cambia el nombre en input del nombre del nivel
@@ -766,13 +772,13 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_descripcion`).on("input", function() {
+  $(`#${elemento.uuid}_descripcion`).on("input", function () {
     $(`#${elemento.uuid}_nivel`).attr("dirty_input_descripcion", 1);
     cambioDataNivel = true;
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_visibility`).on("click", function() {
+  $(`#${elemento.uuid}_visibility`).on("click", function () {
     cambioDataNivel = true;
     seGeneroUnCambioEnLista(lista);
 
@@ -798,13 +804,13 @@ function asignarFuncionalidadBotonesNivel(elemento, lista) {
     );
   });
 
-  $(`#${elemento.uuid}_imagen`).on("change", function() {
+  $(`#${elemento.uuid}_imagen`).on("change", function () {
     $(`#${elemento.uuid}_nivel`).attr("dirty_imagen", 1);
     cambioDataNivel = true;
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_pdf`).on("change", function() {
+  $(`#${elemento.uuid}_pdf`).on("change", function () {
     $(`#${elemento.uuid}_nivel`).attr("dirty_pdf", 1);
     cambioDataNivel = true;
     seGeneroUnCambioEnLista(lista);
@@ -819,27 +825,17 @@ function asignarFuncionalidadBotonesModalidad(elemento, lista) {
     seGeneroUnCambioEnLista(listaNivel);
   });
 
-  $(`#${elemento.uuid}_nombre`).on("input", function() {
+  $(`#${elemento.uuid}_nombre`).on("input", function () {
     cambioModalidades = true;
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_precio`).on("input", function() {
+  $(`#${elemento.uuid}_precio`).on("input", function () {
     cambioModalidades = true;
     seGeneroUnCambioEnLista(lista);
   });
 
-  $(`#${elemento.uuid}_examen_RW`).on("click", function() {
-    cambioModalidades = true;
-    seGeneroUnCambioEnLista(lista);
-  });
-
-  $(`#${elemento.uuid}_examen_LS`).on("click", function() {
-    cambioModalidades = true;
-    seGeneroUnCambioEnLista(lista);
-  });
-
-  $(`#${elemento.uuid}_visibility`).on("click", function() {
+  $(`#${elemento.uuid}_visibility`).on("click", function () {
     cambioModalidades = true;
     seGeneroUnCambioEnLista(lista);
 
@@ -868,14 +864,14 @@ function habilitaSortable(lista) {
     placeholder: "white",
     connectWith: lista,
 
-    start: function(e, ui) {
+    start: function (e, ui) {
       // creates a temporary attribute on the element with the old index
       $(this).attr("data-previndex", ui.item.index());
 
       ui.placeholder.height(ui.helper[0].scrollHeight * 1.15); // 1.15 para tener en cuenta el lugar del borde del li al moverse y no se generen saltos visuales
     },
 
-    update: function(e, ui) {
+    update: function (e, ui) {
       // gets the new and old index then removes the temporary attribute
       var newIndex = ui.item.index();
       var oldIndex = $(this).attr("data-previndex");
@@ -895,14 +891,14 @@ function habilitaSortableModalidad(lista) {
     placeholder: "white",
     connectWith: lista,
 
-    start: function(e, ui) {
+    start: function (e, ui) {
       // creates a temporary attribute on the element with the old index
       $(this).attr("data-previndex", ui.item.index());
 
       ui.placeholder.height(ui.helper[0].scrollHeight * 1.15); // 1.15 para tener en cuenta el lugar del borde del li al moverse y no se generen saltos visuales
     },
 
-    update: function(e, ui) {
+    update: function (e, ui) {
       // gets the new and old index then removes the temporary attribute
       var newIndex = ui.item.index();
       var oldIndex = $(this).attr("data-previndex");
@@ -911,9 +907,9 @@ function habilitaSortableModalidad(lista) {
       //Si no se movio de lugar, no se genera ningun cambio
 
       !(newIndex === oldIndex)
-        ? (function() {
-            seGeneroUnCambioEnLista(listaNivel), (cambioModalidades = true);
-          })()
+        ? (function () {
+          seGeneroUnCambioEnLista(listaNivel), (cambioModalidades = true);
+        })()
         : null;
     }
   });
@@ -926,14 +922,14 @@ function habilitaSortableChip(lista) {
     tolerance: "pointer",
     connectWith: lista,
 
-    start: function(e, ui) {
+    start: function (e, ui) {
       ui.placeholder.height(ui.helper[0].scrollHeight * -0.6); // 1.15 para tener en cuenta el lugar del borde del li al moverse y no se generen saltos visuales
 
       // creates a temporary attribute on the element with the old index
       $(this).attr("data-previndex", ui.item.index());
     },
 
-    update: function(e, ui) {
+    update: function (e, ui) {
       // gets the new and old index then removes the temporary attribute
       var newIndex = ui.item.index();
       var oldIndex = $(this).attr("data-previndex");
@@ -943,10 +939,10 @@ function habilitaSortableChip(lista) {
       //Si no se movio de lugar, no se genera ningun cambio
       console.log(newIndex, oldIndex, lista);
       !(newIndex === oldIndex)
-        ? (function() {
-            seGeneroUnCambioEnLista(listaNivel);
-            cambioOrdenChipNiveles = true;
-          })()
+        ? (function () {
+          seGeneroUnCambioEnLista(listaNivel);
+          cambioOrdenChipNiveles = true;
+        })()
         : null;
     }
   });
@@ -993,9 +989,9 @@ function habilitarSelectable(ulChips) {
 
       //Selecciono un Nivel en la solapa nivel
       idSelected && ulChips === chipsNivelEnNivel
-        ? (function() {
-            mostrarNivel(idSelected);
-          })()
+        ? (function () {
+          mostrarNivel(idSelected);
+        })()
         : null;
     }
   });
@@ -1016,28 +1012,28 @@ const liMateriaTipoTemplate = materia => {
   return `
     <li id="${materia.uuid}" activo="${materia.activo}" mostrar_cliente="${
     materia.mostrar_cliente
-  }" dirty_input="0" dirty_mostrar_cliente="0" class="collection-item grey lighten-4 margin-bottom-0-4">
+    }" dirty_input="0" dirty_mostrar_cliente="0" class="collection-item grey lighten-4 margin-bottom-0-4">
         
       <a href="#!" class="secondary-content left">
         <i class="material-icons-outlined azul-texto left button-opacity move-button ">import_export</i>
       </a>
 
       <input class="browser-default weight500 ${
-        !materia.mostrar_cliente ? "inputInactivo" : ""
-      }" type="text" value="${materia.nombre}">
+    !materia.mostrar_cliente ? "inputInactivo" : ""
+    }" type="text" value="${materia.nombre}">
 
       <a  href="#modalEliminar" class="secondary-content modal-trigger delete">
         <i id="${
-          materia.uuid
-        }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
+    materia.uuid
+    }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
       </a>
 
       <a  href="#!" class="secondary-content check">
         <i id="${
-          materia.uuid
-        }_visibility" class="material-icons-outlined azul-texto right button-opacity">${
+    materia.uuid
+    }_visibility" class="material-icons-outlined azul-texto right button-opacity">${
     materia.mostrar_cliente ? "visibility" : "visibility_off"
-  }</i>
+    }</i>
       </a>
     </li>
   `;
@@ -1051,7 +1047,7 @@ function generarNombreImagenes(nivel) {
   imagenes.forEach(element => {
     textHTML += `
       <option value="" ${
-        element === nivel.imagen ? "selected" : ""
+      element === nivel.imagen ? "selected" : ""
       } data-icon="../../files/images/${element}" class="left">${element}</option>
     `;
   });
@@ -1063,7 +1059,7 @@ function generarNombrePdfs(nivel) {
   pdf.forEach(element => {
     textHTML += `
       <option value="" ${
-        element === nivel.pdf ? "selected" : ""
+      element === nivel.pdf ? "selected" : ""
       } class="left">${element}</option>
     `;
   });
@@ -1073,69 +1069,65 @@ function generarNombrePdfs(nivel) {
 //////////////////// PRESETS HTML elemento nivel
 const liNivelTemplate = nivel => {
   return `
-    <div id="${nivel.uuid}_nivel" activo="${nivel.activo}" mostrar_cliente="${nivel.mostrar_cliente}" dirty_input_nombre="0" dirty_input_descripcion="0" 
-    dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 ">
+    <div id="${nivel.uuid}_nivel" activo="${nivel.activo}" mostrar_cliente="${nivel.mostrar_cliente}" dirty_input_nombre="0" dirty_input_descripcion="0" dirty_pdf="0" dirty_imagen="0" dirty_mostrar_cliente="0" class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1">
 
-      <div class="container right clear-top-1 ">
+      <div class="container right clear-top-1">
         <a href="#modalEliminar" class="secondary-content delete modal-trigger">
           <i id="${nivel.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
         </a>
         
-        <a href="#!" class="secondary-content check">
+        <a class="secondary-content check">
           <i id="${nivel.uuid}_visibility" class="material-icons-outlined azul-texto right button-opacity">${nivel.mostrar_cliente ? "visibility" : "visibility_off"}</i>
         </a>
       </div>
 
       <div class="row padding0 margin0">
           <div class="input-field col s12 padding0 margin0  ">
-              <input class="weight500 ${
-                !nivel.mostrar_cliente ? "inputInactivo" : ""
-              }" autocomplete="off" placeholder="Tíulo" id="${
-    nivel.uuid
-  }_nombre"
-                  type="text" value="${nivel.nombre}">
+            <input class="weight500 ${!nivel.mostrar_cliente ? "inputInactivo" : ""}" autocomplete="off" placeholder="Tíulo" id="${nivel.uuid}_nombre" type="text" value="${nivel.nombre}">
           </div>
       </div>
 
 
       <div class="row input-field padding0 margin0">
-          <textarea id="${
-            nivel.uuid
-          }_descripcion" class="materialize-textarea" autocomplete="off"
-              placeholder="Descripción del examen">${
-                nivel.descripcion
-              }</textarea>
+          <textarea id="${nivel.uuid}_descripcion" class="materialize-textarea" autocomplete="off" placeholder="Descripción del examen">${nivel.descripcion}</textarea>
       </div>
 
       <div class="row">
-        <form class="col s12 m12 l12 xl12">
-            <div
-                class="input-field col s4 m4 l5 xl5 offset-s1 offset-m1 offset-l1 offset-xl1">
-                <input id="${
-                  nivel.uuid
-                }_modalidad" type="text" autocomplete="off" class="">
-                <label for="${nivel.uuid}_modalidad">Modalidad</label>
-            </div>
-            <div class="input-field col s3 m3 l4 xl4 ">
-                <input id="${
-                  nivel.uuid
-                }_modalidad_precio" type="number" autocomplete="off" >
-                <label for="${
-                  nivel.uuid
-                }_modalidad_precio ">Precio Euros</label>
-                
-            </div>
-            <div class="col s1 l1 m1 xl1 clear-top-2 ">
-                <a id="${nivel.uuid}_agregarModalidad"
-                    class="btn-floating btn-small waves-effect waves-light background-azul ">
+        <div class="col s12 m12 l12 xl12">
+        <div class="col s1 l1 m1 xl1 clear-top-1-5">
+                <a id="${nivel.uuid}_agregarModalidad" class="btn-floating btn-small waves-effect waves-light background-darkGrey ">
                     <i class="material-icons">add</i>
                 </a>
             </div>
-        </form>
+
+            <div class="input-field col s5 m5 l5 xl5" >
+                <input id="${nivel.uuid}_modalidad" type="text" autocomplete="off" >
+                <label for="${nivel.uuid}_modalidad">Modalidad</label>
+            </div>
+
+            <div class="input-field col s3 m3 l3 xl3">
+                <input id="${nivel.uuid}_modalidad_precio" type="number" autocomplete="off" >
+                <label for="${nivel.uuid}_modalidad_precio">Precio €</label>                
+            </div>
+
+            <div class="col s3 m3 l3 xl3 clear-top-1">
+              <label>
+                <input id="${nivel.uuid}_examen_RW" type="checkbox" class="filled-in"  />
+                <span>Escrito</span>
+              </label>                       
+    
+              <label>
+                <input id="${nivel.uuid}_examen_LS" type="checkbox" class="filled-in"   />
+                <span>Oral</span>
+              </label>
+            </div>
+
+            
+        </div>
 
         <div class="row">
             <div class="col s12 m12 l12 xl12">
-                <ul id="modalidadNivel" class="collection collectionSinBorde">                     
+                <ul id="modalidadNivel" class="collection collectionSinBorde ">                     
                 </ul>
             </div>
         </div>
@@ -1167,56 +1159,35 @@ const liNivelTemplate = nivel => {
 //////////////////// PRESETS HTML elemento modalidad que pertenece a cada nivel
 const liModalidadTemplate = modalidad => {
   return `
-  <li id="${
-    modalidad.uuid
-  }" class="collection-item grey lighten-4 margin-bottom-0-4">
-  <a href="#!" class="secondary-content left">
-      <i
-          class="material-icons-outlined azul-texto left button-opacity move-button">import_export</i>
-  </a>
+  <li id="${modalidad.uuid}" class="collection-item grey lighten-4 margin-bottom-0-4"  RW="${modalidad.examen_RW ? 1 : 0}" LS="${modalidad.examen_LS ? 1 : 0}"   >
+    <div class="row margin0">
+      <div class="col padding-left3  ">
+        <a class="secondary-content left">
+          <i class="material-icons-outlined azul-texto left button-opacity cursorPointer move-button">import_export</i>
+        </a>
 
-  <input id="${modalidad.uuid}_nombre" class="browser-default ${
-    !modalidad.mostrar_cliente ? "inputInactivo" : ""
-  } " type="text" value="${modalidad.nombre}">
-  <input id="${
-    modalidad.uuid
-  }_precio" class="browser-default precio width4rem" type="number" value="${
-    modalidad.precio
-  }">
+        <input id="${modalidad.uuid}_nombre" class="browser-default ${!modalidad.mostrar_cliente ? "inputInactivo" : ""}" type="text" value="${modalidad.nombre}"/>
+        <span class="azul-texto">€</span>
+        <input id="${modalidad.uuid}_precio" class="browser-default precio width4rem" type="number" value="${modalidad.precio}"/>
 
-  <div class="secondary-content">
-      <a href="#!" class="secondary-content delete ">
-          <i id="${
-            modalidad.uuid
-          }_delete" class="material-icons-outlined azul-texto right button-opacity ">delete</i>
-      </a>
+        <div class="secondary-content">
+          ${modalidad.examen_RW ?
+          `<span class="new badge margin-left-0-15 margin-right-1 left light-blue" data-badge-caption="">ESCR</span>` : `<span class="new badge margin-left-0-15 margin-right-1 left background-grey" data-badge-caption=""></span>`}
+            
+          ${modalidad.examen_LS ?
+          `<span class="new badge margin-left-0-15 margin-right-1 left orange" data-badge-caption="">ORAL</span>` : `<span class="new badge margin-left-0-15 margin-right-1 left background-grey" data-badge-caption=""></span>`}
 
-      <a href="#!" class="secondary-content check">
-          <i id="${modalidad.uuid}_visibility"
-              class="material-icons-outlined azul-texto right button-opacity">${
-                modalidad.mostrar_cliente ? "visibility" : "visibility_off"
-              }</i>
-      </a>
+          <a class="secondary-content delete">
+            <i id="${modalidad.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity">delete</i>
+          </a>
 
-      <label>
-          <input id="${
-            modalidad.uuid
-          }_examen_RW" type="checkbox" class="filled-in" ${
-    modalidad.examen_RW ? "checked" : ""
-  }  />
-          <span>Escrito</span>
-      </label>
-
-      <label>
-          <input id="${
-            modalidad.uuid
-          }_examen_LS" type="checkbox" class="filled-in" ${
-    modalidad.examen_LS ? "checked" : ""
-  }  />
-          <span>Oral</span>
-      </label>
-  </div>
-</li>`;
+          <a class="secondary-content check">
+            <i id="${modalidad.uuid}_visibility" class="material-icons-outlined azul-texto right button-opacity">${modalidad.mostrar_cliente ? "visibility" : "visibility_off"}</i>
+          </a>          
+        </div>
+      </div>
+    </div>
+  </li>`;
 };
 
 //////////////////// PRESETS HTML chip sin ser sortable (chips de materia o tipo)
@@ -1249,7 +1220,7 @@ function generarEstoadoLista(lista) {
   let elementos = [];
   let orden = 1;
 
-  lista.find(`li`).each(function() {
+  lista.find(`li`).each(function () {
     elementos.push({
       uuid: $(this).attr("id"),
       orden: orden++,
@@ -1312,7 +1283,7 @@ function generarEstadoNivel(nivelSeleccionado) {
     let ordenNivel = 1; //Desde donde comienza a sumar el orden de los niveles
 
     // Obtengo el estado de orden de los niveles
-    chipsNivelEnNivel.find(`li`).each(function() {
+    chipsNivelEnNivel.find(`li`).each(function () {
       let nivelId = $(this).attr("id");
 
       chipNiveles.push({
@@ -1324,7 +1295,7 @@ function generarEstadoNivel(nivelSeleccionado) {
     let ordenModalidad = 1;
     $("#modalidadNivel")
       .find(`li`)
-      .each(function() {
+      .each(function () {
         let modalidadId = $(this).attr("id");
 
         modalidades.push({
@@ -1332,10 +1303,9 @@ function generarEstadoNivel(nivelSeleccionado) {
           orden: ordenModalidad++,
           nombre: $(`#${modalidadId}_nombre`).val(),
           precio: $(`#${modalidadId}_precio`).val(),
-          mostrar_cliente:
-            $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
-          examen_RW: $(`#${modalidadId}_examen_RW`).prop("checked"),
-          examen_LS: $(`#${modalidadId}_examen_LS`).prop("checked"),
+          mostrar_cliente: $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
+          examen_RW: $(`#${modalidadId}`).attr("rw"),
+          examen_LS: $(`#${modalidadId}`).attr("ls"),
           edita_user_secundario: 0
         });
       });
@@ -1364,7 +1334,7 @@ function generarEstadoNivel(nivelSeleccionado) {
     let ordenNivel = 1;
     let chipNiveles = [];
 
-    chipsNivelEnNivel.find(`li`).each(function() {
+    chipsNivelEnNivel.find(`li`).each(function () {
       let nivelId = $(this).attr("id");
 
       chipNiveles.push({
@@ -1505,7 +1475,7 @@ async function getModalidad(nivelId) {
 }
 
 //////////////////// UPDATES POST AL SERVIDOR
-async function updateMateria(cambios) {
+async function updateMateria(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
   try {
     const response = await fetch(`./examenes/`, {
       method: "POST",
@@ -1515,11 +1485,18 @@ async function updateMateria(cambios) {
       body: JSON.stringify(cambios)
     });
     const rta = await response.json();
-    // Luego de guardar las cosas en la base de datos, me trae esa info
-    console.log(rta);
-    getMateria();
+
+    if (rta.error) {
+      error(idEstado)
+    } else {        
+      exito(idEstado);
+      accionExitosa();
+      seGuardaOResetea(lista);
+    }
+  
   } catch (err) {
     console.log(err);
+    err ? error(idEstado) : null;
   }
 }
 
@@ -1556,3 +1533,53 @@ async function updateNivelModalidad(cambios) {
     console.log(err);
   }
 }
+
+
+
+function accionExitosa(id) {
+    id.empty();
+    id.append('<div class="azul-texto">Se realizaron los cambios</div>');
+    setTimeout(() => id.empty(), 4000)
+  }
+
+  function huboUnError(id) {
+    id.empty();
+    id.append('<div class="rojo-texto">Hubo un error. Contactate con personal técnico.</div>');
+    setTimeout(() => id.empty(), 6000)
+  }
+
+  function appendProgressIndeterminate(lista) {
+    lista.empty();
+    lista.append(`<div class="progress "><div class="indeterminate"></div></div>
+    `);
+  }
+
+
+  function preloader() {
+    return `
+    <div class="preloader-wrapper small active ">
+      <div class="spinner-layer spinner-yellow-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+         </div>
+      </div>
+    </div>    
+    `
+  }
+
+
+
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+

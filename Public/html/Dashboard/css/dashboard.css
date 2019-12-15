@@ -54,6 +54,14 @@ body {
   background-color: #085796 !important;
 }
 
+.background-grey {
+  background-color: #f5f5f5 !important;
+}
+
+.background-darkGrey {
+  background-color: #0e62a7 !important;
+}
+
 .azul-texto {
   color: #085796 !important;
 }
@@ -324,6 +332,10 @@ input[type="number"] {
   margin-top: 1rem !important;
 }
 
+.clear-top-1-5 {
+  margin-top: 1.5rem !important;
+}
+
 .clear-top-2 {
   margin-top: 2rem !important;
 }
@@ -366,6 +378,10 @@ input[type="number"] {
 
 .padding-left0{
   padding-left: 0 !important;
+}
+
+.padding-left1-5 {
+  padding-left: 1.5rem !important;
 }
 
 .padding-left2-4 {
