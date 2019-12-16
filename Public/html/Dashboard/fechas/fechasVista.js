@@ -2223,7 +2223,7 @@ class FechasVista {
   };
 
   mostrarEnviarMailASeleccionados() {
-    $('#areaMailSeleccionados').append(`    
+    $('#areaMailSeleccionados').empty().append(`    
         <div class="col s10 m10 l10 xl10 ">
             <ul class="collapsible">
                 <li>

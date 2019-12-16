@@ -1,3 +1,4 @@
+(function() {
 const ulCollapsibleExamenes = $("#collapsibleExamenes");
 const listaMateria = $("#listaMateria");
 const listaTipo = $("#listaTipo");
@@ -439,7 +440,7 @@ inicializarBotonGuardarMateriaTipo(botonGuardarNivel, listaNivel);
 
 function inicializarBotonGuardarMateriaTipo(boton, lista) {
   boton.on("click", () => {
-    let idEstado= $('#estadoMateria')   
+    
     switch (lista) {
       case listaMateria:
         let elementosMateria = generarEstoadoLista(lista);
@@ -447,10 +448,10 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
           elementosMateria,
           lista
         );
-        console.log("Cambios a Guardar", cambiosAGuardarMateria);
-            
-        idEstado.append(preloader() );
-        updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstado, getMateria, seGuardaOResetea, lista);
+        console.log("Cambios a Guardar Materia", cambiosAGuardarMateria);
+        let idEstadoMateria= $('#estadoMateria');
+        idEstadoMateria.append(preloader() );
+        updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstadoMateria, getMateria, seGuardaOResetea, lista);
         break;
 
       case listaTipo:
@@ -459,9 +460,11 @@ function inicializarBotonGuardarMateriaTipo(boton, lista) {
           elementosTipo,
           lista
         );
-        console.log("Cambios a Guardar", cambiosAGuardarTipo);
-        idEstado.append(preloader() );
-        updateTipo(cambiosAGuardarTipo);
+        console.log("Cambios a Guardar Tipo", cambiosAGuardarTipo);
+        
+        let idEstadoTipo= $('#estadoTipo');
+        idEstadoTipo.append(preloader() );
+        updateTipo(cambiosAGuardarTipo, accionExitosa, huboUnError, idEstadoTipo, mostrarListaTipo, seGuardaOResetea, lista);
         break;
 
       case listaNivel:
@@ -1500,7 +1503,8 @@ async function updateMateria(cambios, exito, error, idEstado, accionExitosa, seG
   }
 }
 
-async function updateTipo(cambios) {
+
+async function updateTipo(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
   try {
     const response = await fetch(`./examenes/`, {
       method: "POST",
@@ -1511,9 +1515,20 @@ async function updateTipo(cambios) {
     });
     const rta = await response.json();
     // Luego de guardar las cosas en la base de datos, me trae esa info
-    mostrarListaTipo(cambios.materia);
+
+
+    if (rta.error) {
+      error(idEstado)
+    } else {        
+      exito(idEstado);
+      accionExitosa(cambios.materia);
+      seGuardaOResetea(lista);
+    }
+
+    //mostrarListaTipo(cambios.materia);
   } catch (err) {
     console.log(err);
+    err ? error(idEstado) : null;
   }
 }
 
@@ -1573,13 +1588,7 @@ function accionExitosa(id) {
     `
   }
 
+}());
 
 
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
 
