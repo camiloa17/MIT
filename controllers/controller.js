@@ -98,26 +98,25 @@ exports.consultaHorarios = async (modalidad, id) => {
         switch (modalidad) {
             case "Completo":
                 sql = await queries.consultaExamenCompletoCupos()
-
                 const horariosCo = await utils.queryAsync(sql, [id,id]);
+                console.log(horariosCo)
                 horarios = {
                     horarios: horariosCo,
                 }
                 break
 
-                break;
             case "Reading_&_Writing":
                 sql = await queries.consultaExamenReadingAndWriting();
                 const horariosRW = await utils.queryAsync(sql, [id]);
-                
+                console.log(horariosRW)
                  horarios = {
                     horarios: horariosRW,
                 }
                 break;
-
             case "Listening_&_Speaking":
                 sql = await queries.consultaExamenListeningAndSpeaking();
                 const horariosLS = await utils.queryAsync(sql, [id]);
+                console.log(horariosLS)
                 
                 horarios = {
                     horarios: horariosLS,
@@ -233,41 +232,30 @@ async function corroborarCupos(objetoHorario) {
 }
 */
 
-exports.crearReservaEnProceso = async (idExamenEnDia, modalidad, idExamenEnSemana) => {
+exports.crearReservaEnProceso = async (modalidad,idExamenEnDia, idExamenEnSemana) => {
     
     switch (modalidad) {
         case "Completo":
-            let corroborarExistenciaExamenCompleto = await corroborarHorario(modalidad,idExamenEnDia, idExamenEnSemana);
+            const consultaCompleto = await queries.consultaExistenciaDeExamenEnHorario(modalidad);
+            let corroborarExistenciaExamenCompleto = await utils.queryAsync(consultaCompleto, [idExamenEnDia, idExamenEnSemana]);
+            console.log(corroborarExistenciaExamenCompleto);
             break;
         case "Reading & Writing":
-            let corroborarExistenciaExamenRW = await corroborarHorario(modalidad,idExamenEnDia, false);
+            const consultaRW= await queries.consultaExistenciaDeExamenEnHorario(modalidad);
+            let corroborarExistenciaExamenRW = await utils.queryAsync(consultaRW, idExamenEnDia);
+            console.log(corroborarExistenciaExamenRW)
             break;
 
         case "Listening & Speaking":
-            let corroborarExistenciaExamenLS = await corroborarHorario(modalidad,false, idExamenEnDia);
+            const consultaLS= await queries.consultaExistenciaDeExamenEnHorario(modalidad);
+            let corroborarExistenciaExamenLS = await utils.queryAsync(consultaLS, idExamenEnDia);
+            console.log(corroborarExistenciaExamenLS)
             break;
 
     }
 
 }
 
-async function corroborarHorario(modalidad,idExamenEnDia, idExamenEnSemana) {
-    const sqlRW = "select BIN_TO_UUID(UUID) as id from examen_en_dia_RW where uuid = UUID_TO_BIN(?);"
-    const sqlLS = "select BIN_TO_UUID(uuid) as Id from examen_en_semana_LS where uuid = UUID_TO_BIN(?);"
-    
-
-    if (modalidad==="Completo") {
-        let hoarioRwCo = await utils.queryAsync(sqlRW, idExamenEnDia);
-        let horarioLsCo = await utils.queryAsync(sqlLS, idExamenEnSemana);
-        console.log('Corroborar Completo', hoarioRwCo.length, horarioLsCo.length);
-    } else if (modalidad==="Reading & Writing") {
-        let horarioRw = await utils.queryAsync(sqlRW, idExamenEnDia);
-        console.log('Corroborar dia', horarioRw.length);
-    } else if (modalidad ==="Listening & Speaking") {
-        let horarioLs = await utils.queryAsync(sqlLS, idExamenEnSemana);
-        console.log('Corroborar semana', horarioLs.length);
-    }
-}
 
 
 

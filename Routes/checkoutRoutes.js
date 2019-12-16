@@ -53,12 +53,13 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
         modalidad:datosExamenModalidad.modalidad
     }
     if(examen.modalidad==='Completo'){
-        const corroborarHorario = await controller.crearReservaEnProceso(req.query.idhorario, examen.modalidad,req.query.idhorarioL);
+        const corroborarHorario = await controller.crearReservaEnProceso(examen.modalidad, req.query.idhorario,req.query.idhorarioL);
         res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}&idhorarioL=${req.query.idhorarioL}`)
     }else{
+        console.log(examen.modalidad);
+        const corroborarHorario = await controller.crearReservaEnProceso(examen.modalidad, req.query.idhorario);
         res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}`)
     }
-    const corroborarHorario = await controller.crearReservaEnProceso(req.query.idhorario,examen.modalidad);
     
 });
 

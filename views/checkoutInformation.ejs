@@ -7,7 +7,7 @@
     </div>
 </div>
 <main>
-    <form action="">
+    <form action="/pay" method="POST">
     <section id="checkout_information">
         <%- include("partials/checkoutSteps") -%>
         
@@ -98,7 +98,7 @@
                     href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
                 <% }%>
         
-        <a class="button-checkout next" href="#">Siguiente</a>
+        <a class="button-checkout next" href="#">Pagar</a>
     </div>
     </form>
 </main>
