@@ -94,7 +94,6 @@ exports.consultaHorarios = async (modalidad, id) => {
     try {
         let horarios = {};
         let sql;
-        let horarioFinal;
 
         switch (modalidad) {
             case "Completo":
@@ -151,7 +150,7 @@ async function diasATexto(horarios) {
     }
 
 }
-
+/*
 async function verDispnonibilidad(horarios, modalida) {
     try {
         const idsExamenEnDia = [];
@@ -232,6 +231,7 @@ async function corroborarCupos(objetoHorario) {
         console.error(err)
     }
 }
+*/
 
 exports.crearReservaEnProceso = async (idExamenEnDia, modalidad, idExamenEnSemana) => {
     
