@@ -15,6 +15,8 @@ appendNav();
 //   });
 // }
 
+let eliminarExamenLista;
+let examenAEliminar;
 
 // function appendExamenes() {
 //   $.get("./html/dashboard/examenes/examenes.html", function(data) {

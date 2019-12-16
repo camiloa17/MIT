@@ -22,6 +22,15 @@ class FechasVista {
 
     //se usa para chequear cupos suficientes al reservas a asignar a dia ls en la seccion de semanaLS
     this.cupoExamenSeleccionado = [];
+
+    this.inicializarModalEliminar();
+    
+  }
+
+  inicializarModalEliminar() {
+    $(document).ready(function(){
+      $('.modal').modal();
+    });
   }
 
   async traerListaDeExamenesDb() {
@@ -1670,6 +1679,8 @@ class FechasVista {
   async eliminarFecha() {
     let idEstado = $('#estadoCambiosFechaExamenes')
     let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
+
+    console.log(idEstado, "elminar fecha")
 
     switch (this.fechaAEliminar.lista) {
       case "semana":

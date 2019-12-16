@@ -484,3 +484,9 @@ td{
     margin-bottom: 8rem;
   }
 }
+
+
+.preloader-wrapper.xsmall {
+  width: 20px;
+  height: 20px;
+}
