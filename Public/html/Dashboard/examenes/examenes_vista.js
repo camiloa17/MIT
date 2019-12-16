@@ -1,13 +1,9 @@
 (function () {
-
-  
-
-  const ulCollapsibleExamenes = $("#collapsibleExamenes");
   const listaMateria = $("#listaMateria");
   const listaTipo = $("#listaTipo");
   const listaNivel = $("#listaNivel");
 
-  const agregarMateria = $("#agregarMateria");
+  const inputAgregarMateria = $("#agregarMateria");
   const botonesMateria = $("#botonesMateria");
   const botonGuardarMateria = $("#guardarMateria");
   const botonResetMateria = $("#resetMateria");
@@ -32,102 +28,139 @@
   const estadoNivel = $("#estadoNivel");
   const lugarBotonAgregarNivel = $("#lugarBotonAgregarNivel");
 
-  //////////////////// INICIALIZACION ACORDEON
-  ulCollapsibleExamenes.collapsible({
-    onOpenStart: function () {
-      // Hasta que no selecciono un chip en tipo, no muestro ni lista ni botones (se usa cuando entraste a tipo, fuiste a materia o nivel y volves a tipo)
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
-        ? removeAreaEdicionTipo()
-        : null;
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-        ? (function () {
-          
-        })()
-        : null;
-    },
 
-    // Cada vez que se abre una solapa del acordeon, se trae la información de la base de datos
-    onOpenEnd: function () {
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleMateria"
-        ? mostrarListaMateria()
-        : null;
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleTipo"
-        ? mostrarChipMateria(chipsMateriaEnTipo, listaTipo)
-        : null;
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-        ? (function () {
-          mostrarChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel);
-          removeAreaEdicionNivel();
-        })()
-        : null;
-    },
-    onCloseStart: function () {
-      ulCollapsibleExamenes.find("li.active").attr("id") == "collapsibleNivel"
-        ? (function () {
-          removeAreaTipoEnNivel();
-          removeAreaNivelEnNivel();
-          removeAreaEdicionNivel();
-          mostrarChipMateria(chipsMateriaEnNivel, chipsTipoEnNivel);
-        })()
-        : null;
-    }
-  });
+  // Inicializacion
+  inicializacionAcordeon();
 
-  //////////////////// Modal confirmación mensaje eliminar
+  // Modal confirmación mensaje eliminar
   $(document).ready(function () {
     $(".modal").modal();
   });
 
-  function inicializarSelectDropdown() {
-    $("select").formSelect();
+
+  // Inicializacion acordeon. Que pasa cuando abro o cierro las solapas
+  function inicializacionAcordeon() {
+    $("#collapsibleExamenes").collapsible({
+
+      onOpenEnd: function () {
+        let acordeonSeleccionado = $("#collapsibleExamenes").find("li.active").attr("id");
+
+        // Cuando termino de abrir una solapa del acordeon, cargo la lista o chips de materias.
+        switch (acordeonSeleccionado) {
+          case ("collapsibleMateria"):
+            appendProgressIndeterminate(listaMateria);
+            mostrarListaMateria(huboUnError, estadoMateria, renderListaMateriaOTipo, listaMateria);
+            break;
+          case ("collapsibleTipo"):
+            appendProgressIndeterminate(chipsMateriaEnTipo);
+            mostrarChipMateria(huboUnError, estadoTipo, visualizarChipMateriaTipo, chipsMateriaEnTipo);
+            break;
+          case ("collapsibleNivel"):
+            appendProgressIndeterminate(chipsMateriaEnNivel);
+            mostrarChipMateria(huboUnError, chipsMateriaEnNivel, visualizarChipMateriaTipo, chipsMateriaEnNivel);
+            break;
+        }
+      },
+
+      onCloseStart: function () {
+        let acordeonSeleccionado = $("#collapsibleExamenes").find("li.active").attr("id");
+
+        // Cada vez que cierro una solapa del acordeon, limpio las areas
+        switch (acordeonSeleccionado) {
+          case ("collapsibleMateria"):
+            listaMateria.empty();
+            break;
+          case ("collapsibleTipo"):
+            listaTipo.empty();
+            chipsMateriaEnTipo.empty();
+            listaTipo.addClass("hidden");
+            botonesTipo.addClass("hidden");
+            agregarTipo.addClass("hidden");
+            break;
+          case ("collapsibleNivel"):
+            chipsMateriaEnNivel.empty();
+            chipsTipoEnNivel.empty();
+            areaTipoEnNivel.addClass("hidden");
+            areaNivelEnNivel.addClass("hidden");
+            areaListaNivel.addClass("hidden");
+            botonesNivel.addClass("hidden");
+            break;
+        }
+      },
+    });
   }
 
-  ////////////////////  Cuando hay cambios pendientes se deshabilita la posibilidad de navegar por el acordeon
+  //  Cuando hay cambios pendientes se deshabilita la posibilidad de navegar por el acordeon
   function habilitarAcordeon() {
-    ulCollapsibleExamenes.addClass("collapsible");
+    $("#collapsibleExamenes").addClass("collapsible");
   }
 
   function deshabilitarAcordeon() {
-    ulCollapsibleExamenes.removeClass("collapsible");
+    $("#collapsibleExamenes").removeClass("collapsible");
   }
 
-  // Busca las materias en la DB y renderiza la lista
-  async function mostrarListaMateria() {
-    try {
-      //progressIndeterminate(listaMateria)
-      let data = await getMateria();
-      renderListaMateriaOTipo(data, listaMateria);
-    } catch (err) {
-      console.log(err);
-    }
+  function aceptarSoloNumerosEnInput(uuidInput) {
+    $(`#${uuidInput}_modalidad_precio`).on("keydown", function (e) {
+      if (e.which == 69 || e.which == 107 || e.which == 109) {
+        e.preventDefault();
+      }
+    });
   }
 
-  // Busca las tipos en la DB de cada materiaID ingresada y renderiza la lista
-  async function mostrarListaTipo(tipoId) {
-    try {
-      let data = await getTipo(tipoId);
-      showAreaEdicionTipo();
-      renderListaMateriaOTipo(data, listaTipo);
-    } catch (err) {
-      console.log(err);
-    }
+  // Tostadas
+  function habilitarTostadaGuardarResetear() {
+    $(".collapsible-header, .noSelectable, #agregarNivel").on(
+      "click",
+      function () {
+        M.toast({ html: "Debe Guardar o Resetear cambios para proceder" });
+      }
+    );
   }
 
-  function progressIndeterminate(lista) {
+  function deshabilitarTostadaGuardarResetear() {
+    $(".collapsible-header, .noSelectable, #agregarNivel").off("click");
+  }
+
+  // Renderiza elementos en la lista Materia o Tipo a partir del preset li HTML
+  function renderListaMateriaOTipo(data, lista) {
+    let dataOrdenada = JSON.parse(JSON.stringify(data));
+
+    dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
     lista.empty();
-    lista.append(`<div class="progress "><div class="indeterminate"></div></div>
-  `);
+
+    dataOrdenada.forEach(elemento => {
+      // Muestro solo las materias activos
+      elemento.activo ? lista.append(liMateriaTipoTemplate(elemento)) : null;
+
+      asignarFuncionalidadBotonesLista(elemento, lista);
+    });
   }
 
-  // Busca el nivel seleccionado en la DB y lo renderiza
-  async function mostrarNivel(nivelId) {
-    try {
-      let data = await getNivel(nivelId);
-      console.log(data)
-      renderNivel(data, listaNivel);
-    } catch (err) {
-      console.log(err);
-    }
+  function renderNivel(data, lista) {
+    let nivel = data[0];
+    let newTemplate = liNivelTemplate(nivel);
+    lista.empty().append(newTemplate);
+
+    areaListaNivel.removeClass("hidden");
+
+    // Inicializo dropDowns
+    $("select").formSelect();
+
+    asignarFuncionalidadBotonesNivel(nivel, lista);
+
+    appendProgressIndeterminate($("#modalidadNivel"));
+    mostrarModalidad(nivel.uuid, huboUnError);
+    asignarFuncionalidadBotoneAgregarModalidad(nivel.uuid);
+
+    aceptarSoloNumerosEnInput(nivel.uuid);
+    // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
+    $(`#${nivel.uuid}`).addClass("ui-selected");
+
+    let descriptionTextArea = $(`#${nivel.uuid}_descripcion`);
+
+    M.textareaAutoResize(descriptionTextArea);
+    autoResizeTextAreaOnWindowWidthChange(descriptionTextArea);
+
   }
 
   function mostrarNivelNuevo() {
@@ -153,111 +186,6 @@
     ];
   }
 
-  // Busca las modalidades del nivel seleccionado en la DB y las renderiza
-  async function mostrarModalidad(nivelId) {
-    try {
-      let data = await getModalidad(nivelId);
-      renderModalidad(data, $("#modalidadNivel")); // modalidadNivel no la ingreso en las const de arriba porque no existe al inicio
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  // Busca las materias en la DB y renderiza los chips. listaChips: aqui se colgaran los chips // listaLis: se limpia esta lista
-  async function mostrarChipMateria(listaChips, listaLis) {
-    listaLis.empty(); //Limpio los chips antiguos de la lista
-    try {
-      let data = await getMateria();
-      visualizarChipMateriaTipo(data, listaChips);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  // Busca los tipos en la DB y renderiza los chips
-  async function mostrarChipTipo(listaChips, listaLis, idSelected) {
-    listaLis.empty(); //Limpio los chips antiguos de la lista
-    try {
-      let data = await getTipo(idSelected);
-      showAreaTipoEnNivel();
-      removeAreaNivelEnNivel();
-      removeAreaEdicionNivel();
-      data.length
-        ? visualizarChipMateriaTipo(data, listaChips)
-        : listaChips.append("Este elemento está vacío");
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  // Busca los niveles en la DB y renderiza los chips
-  async function mostrarChipNivel(listaChips, listaLis, idSelected) {
-    listaLis.empty(); //Limpio los chips antiguos de la lista
-    try {
-      let data = await getChipNivel(idSelected);
-      showAreaNivelEnNivel();
-      removeAreaEdicionNivel();
-      visualizarChipNivel(data, listaChips);
-      lugarBotonAgregarNivel.empty();
-      lugarBotonAgregarNivel.append(botonAgregarNivel());
-      asignarFuncionalidadBotonAgregarNivel();
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  //////////////////// Tostadas
-  function habilitarTostadaGuardarResetear() {
-    $(".collapsible-header, .noSelectable, #agregarNivel").on(
-      "click",
-      function () {
-        M.toast({ html: "Debe Guardar o Resetear cambios para proceder" });
-      }
-    );
-  }
-
-  function deshabilitarTostadaGuardarResetear() {
-    $(".collapsible-header, .noSelectable, #agregarNivel").off("click");
-  }
-
-  //////////////////// Renderiza elementos en la lista Materia o Tipo a partir del preset li HTML
-  function renderListaMateriaOTipo(data, lista) {
-    let dataOrdenada = JSON.parse(JSON.stringify(data));
-
-    dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
-    lista.empty();
-
-    console.log("Data from DB", dataOrdenada);
-
-    dataOrdenada.forEach(elemento => {
-      // Muestro solo las materias activos
-      elemento.activo ? lista.append(liMateriaTipoTemplate(elemento)) : null;
-
-      asignarFuncionalidadBotonesLista(elemento, lista);
-    });
-  }
-
-  function renderNivel(data, lista) {
-    let nivel = data[0];
-    let newTemplate = liNivelTemplate(nivel);
-    lista.empty().append(newTemplate);
-
-    showAreaEdicionNivel();
-    inicializarSelectDropdown();
-    asignarFuncionalidadBotonesNivel(nivel, lista);
-    mostrarModalidad(nivel.uuid);
-    asignarFuncionalidadBotoneAgregarModalidad(nivel.uuid);
-
-    aceptarSoloNumerosEnInput(nivel.uuid);
-    // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
-    $(`#${nivel.uuid}`).addClass("ui-selected");
-
-    let descriptionTextArea = $(`#${nivel.uuid}_descripcion`);
-
-    M.textareaAutoResize(descriptionTextArea);
-    autoResizeTextAreaOnWindowWidthChange(descriptionTextArea);
-
-  }
 
   function autoResizeTextAreaOnWindowWidthChange(textArea) {
     let $window = $(window);
@@ -276,13 +204,7 @@
     });
   }
 
-  function aceptarSoloNumerosEnInput(uuidInput) {
-    $(`#${uuidInput}_modalidad_precio`).on("keydown", function (e) {
-      if (e.which == 69 || e.which == 107 || e.which == 109) {
-        e.preventDefault();
-      }
-    });
-  }
+
 
   function renderModalidad(data, lista) {
     let dataOrdenada = JSON.parse(JSON.stringify(data));
@@ -296,14 +218,10 @@
       asignarFuncionalidadBotonesModalidad(elemento, listaNivel);
     });
 
-    let nivelSeleccionado = chipsNivelEnNivel.find(".ui-selected").attr("id");
-
     habilitaSortableModalidad(lista);
   }
 
   function nuevaModalidad(nivel) {
-    console.log(nivel);
-
     return {
       uuid: uuidv4(),
       nombre: $(`#${nivel}_modalidad`).val(),
@@ -353,7 +271,9 @@
   }
 
   function visualizarChipNivel(data, chipLista) {
+    console.log("sortable chips")
     let dataOrdenada = JSON.parse(JSON.stringify(data));
+    console.log(dataOrdenada)
 
     dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
     chipLista.empty();
@@ -364,58 +284,10 @@
     habilitaSortableChip(chipLista);
   }
 
-  //////////////////// Muestra o Esconde la lista y la botonera de Tipo dependiendo de si está seleccionado un chip Materia o no.
-  // EN LA SOLAPA TIPO
-  function showAreaEdicionTipo() {
-    listaTipo.removeClass("hidden");
-    botonesTipo.removeClass("hidden");
-    agregarTipo.removeClass("hidden");
-  }
-
-  function removeAreaEdicionTipo() {
-    listaTipo.addClass("hidden");
-    botonesTipo.addClass("hidden");
-    agregarTipo.addClass("hidden");
-  }
-
-  // EN LA SOLAPA NIVEL
-  function showBotoneraNivel() {
-    botonesNivel.removeClass("hidden");
-  }
-
-  function removeBotoneraNivel() {
-    botonesNivel.addClass("hidden");
-  }
-
-  function showAreaTipoEnNivel() {
-    areaTipoEnNivel.removeClass("hidden");
-  }
-
-  function removeAreaTipoEnNivel() {
-    areaTipoEnNivel.addClass("hidden");
-  }
-
-  function showAreaNivelEnNivel() {
-    areaNivelEnNivel.removeClass("hidden");
-    showBotoneraNivel();
-  }
-
-  function removeAreaNivelEnNivel() {
-    areaNivelEnNivel.addClass("hidden");
-    removeBotoneraNivel();
-  }
-
-  function showAreaEdicionNivel() {
-    areaListaNivel.removeClass("hidden");
-  }
-
-  function removeAreaEdicionNivel() {
-    areaListaNivel.addClass("hidden");
-  }
 
   //////////////////// Agregar nuevo elemento a la lista de Materia o Tipo
 
-  inicializarNuevoInputEnLi(listaMateria, agregarMateria);
+  inicializarNuevoInputEnLi(listaMateria, inputAgregarMateria);
   inicializarNuevoInputEnLi(listaTipo, agregarTipo);
 
   function inicializarNuevoInputEnLi(lista, input) {
@@ -451,7 +323,6 @@
 
   function inicializarBotonGuardarMateriaTipo(boton, lista) {
     boton.on("click", () => {
-
       switch (lista) {
         case listaMateria:
           let elementosMateria = generarEstoadoLista(lista);
@@ -459,10 +330,9 @@
             elementosMateria,
             lista
           );
-          console.log("Cambios a Guardar Materia", cambiosAGuardarMateria);
           let idEstadoMateria = $('#estadoMateria');
           idEstadoMateria.append(preloader());
-          updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstadoMateria, getMateria, seGuardaOResetea, lista);
+          updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstadoMateria, mostrarListaMateria, seGuardaOResetea, lista);
           break;
 
         case listaTipo:
@@ -471,7 +341,6 @@
             elementosTipo,
             lista
           );
-          console.log("Cambios a Guardar Tipo", cambiosAGuardarTipo);
 
           let idEstadoTipo = $('#estadoTipo');
           idEstadoTipo.append(preloader());
@@ -480,21 +349,19 @@
 
         case listaNivel:
           let nivelSeleccionado = chipsNivelEnNivel.find(".ui-selected").attr("id");
-
+          let tipoSeleccionado = chipsTipoEnNivel.find(".ui-selected").attr("id")
           let cambiosAGuardarNivel = generarEstadoNivel(nivelSeleccionado);
 
-          console.log("Cambios a Guardar", cambiosAGuardarNivel);
+          let idEstadoNivel = $('#estadoNivel');
+          idEstadoNivel.append(preloader());
 
-          updateNivelModalidad(cambiosAGuardarNivel);
+          updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado);
 
-          mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel, $("#chipsTipoEnNivel").find(".ui-selected").attr("id"));
-
-          mostrarNivel(nivelSeleccionado);
+          
+          
 
           break;
       }
-      // seGuardaOResetea(lista);
-      // (retornarPertenenciaTablaDb(lista) === 'tipo') ? habilitarSelectable(chipsMateriaEnTipo) : null;    borrar
     });
   }
 
@@ -506,51 +373,45 @@
     boton.on("click", () => {
       switch (lista) {
         case listaMateria:
-          mostrarListaMateria();
-          seGuardaOResetea(lista);
+          mostrarListaMateria(huboUnError, estadoMateria, renderListaMateriaOTipo, listaMateria, seGuardaOResetea);
           break;
+
         case listaTipo:
-          mostrarListaTipo(chipsMateriaEnTipo.find(".ui-selected").attr("id"));
-          seGuardaOResetea(lista);
+          let materiaSeleccionada = chipsMateriaEnTipo.find(".ui-selected").attr("id");
+          mostrarListaTipo(materiaSeleccionada, huboUnError, estadoTipo, renderListaMateriaOTipo, listaTipo, seGuardaOResetea);
           break;
+
         case listaNivel:
-          let nivelSeleccionado = chipsNivelEnNivel
-            .find(".ui-selected")
-            .attr("id");
+          let tipoSeleccionado = chipsTipoEnNivel.find(".ui-selected").attr("id")
+          let nivelSeleccionado = chipsNivelEnNivel.find(".ui-selected").attr("id");
+          console.log("resetiamo nivel")
 
           if (nivelSeleccionado) {
+            // Cuando ya tengo otros niveles
+            console.log("con nivel seleccionado")
             seGuardaOResetea(lista);
-            mostrarChipNivel(
-              chipsNivelEnNivel,
-              chipsNivelEnNivel,
-              $("#chipsTipoEnNivel")
-                .find(".ui-selected")
-                .attr("id")
-            );
-            mostrarNivel(nivelSeleccionado);
+            mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
+            mostrarNivel(nivelSeleccionado, huboUnError, listaNivel, renderNivel)
           } else {
-            removeAreaEdicionNivel();
+            // Cuando es el primer nivel que creo
+            console.log("SIN nivel seleccionado")
+            areaListaNivel.addClass("hidden");
             deshabilitarBotonera(listaNivel);
             seGuardaOResetea(lista);
-            mostrarChipNivel(
-              chipsNivelEnNivel,
-              chipsNivelEnNivel,
-              $("#chipsTipoEnNivel")
-                .find(".ui-selected")
-                .attr("id")
-            );
+            mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
           }
           break;
       }
     });
   }
 
+
   ////////////////////  Asignar funcionalidad al boton de agregar nivel
   function asignarFuncionalidadBotonAgregarNivel() {
     $("#agregarNivel").on("click", () => {
       chipsNivelEnNivel.find(".ui-selected").removeClass("ui-selected");
       mostrarNivelNuevo();
-      showAreaEdicionNivel();
+      areaListaNivel.removeClass("hidden");
       addNivel = true;
       cambioOrdenChipNiveles = true;
       seGeneroUnCambioEnLista(listaNivel);
@@ -713,7 +574,7 @@
       case listaNivel:
         $(`#${uuid}_nivel`).remove(); // Remueve el nivel de la visualizacion del nivel
         $(`#${uuid}`).remove(); // Remueve el chip con el nombre del nivel
-        removeAreaEdicionNivel();
+        areaListaNivel.addClass("hidden");
 
         // Indico que este elemento debe ser removido
         removeNivel.push(uuid);
@@ -944,11 +805,9 @@
         // gets the new and old index then removes the temporary attribute
         var newIndex = ui.item.index();
         var oldIndex = $(this).attr("data-previndex");
-        $(this).removeAttr("data-previndex");
-        //seGeneroCambioOrden();
+        $(this).removeAttr("data-previndex");    
 
-        //Si no se movio de lugar, no se genera ningun cambio
-        console.log(newIndex, oldIndex, lista);
+        //Si no se movio de lugar, no se genera ningun cambio       
         !(newIndex === oldIndex)
           ? (function () {
             seGeneroUnCambioEnLista(listaNivel);
@@ -972,38 +831,56 @@
 
       stop: (event, ui) => {
         // Evito que se seleccionen multiples chips. Quedará solo seleccionado el primero si hay una selección de más de un chip
-        $(event.target)
-          .children(".ui-selected")
-          .not(":first")
-          .removeClass("ui-selected");
+        $(event.target).children(".ui-selected").not(":first").removeClass("ui-selected");
 
         // Obtengo el uuid del elemento seleccionado
-        let idSelected = $(event.target)
-          .children(".ui-selected")
-          .attr("id");
+        let idSelected = $(event.target).children(".ui-selected").attr("id");
 
-        // Si selecciono un chip vólido, obtengo el id y mando a buscar info a la DB, si no selecciono ningun chip escondo la lista y la botonera de guardar/reset
-        //Selecciono una Materia en solapa Tipo
-        idSelected && ulChips === chipsMateriaEnTipo
-          ? mostrarListaTipo(idSelected)
-          : null;
+        // Si selecciono un chip vólido, obtengo el id y mando a buscar info a la DB, 
+        // Si no selecciono ningun chip escondo la lista y la botonera de guardar/reset
+        if (idSelected && ulChips === chipsMateriaEnTipo) {
 
-        //Selecciono una Materia en solapa Nivel
-        idSelected && ulChips === chipsMateriaEnNivel
-          ? mostrarChipTipo(chipsTipoEnNivel, chipsTipoEnNivel, idSelected)
-          : null;
+          //Selecciono una Materia en Acordeon Tipo
+          listaTipo.removeClass("hidden");
+          botonesTipo.removeClass("hidden");
+          agregarTipo.removeClass("hidden");
+          appendProgressIndeterminate(listaTipo);
+          mostrarListaTipo(idSelected, huboUnError, estadoTipo, renderListaMateriaOTipo, listaTipo, seGuardaOResetea)
 
-        //Selecciono un Tipo en solapa Nivel
-        idSelected && ulChips === chipsTipoEnNivel
-          ? mostrarChipNivel(chipsNivelEnNivel, chipsNivelEnNivel, idSelected)
-          : null;
+        } else if (idSelected && ulChips === chipsMateriaEnNivel) {
+          //Selecciono una Materia en Acordeon Nivel y me muestra los Tipos
+          areaTipoEnNivel.removeClass("hidden");
+          areaNivelEnNivel.addClass("hidden");
+          botonesNivel.addClass("hidden");
+          areaListaNivel.addClass("hidden");
+          chipsTipoEnNivel.empty();
 
-        //Selecciono un Nivel en la solapa nivel
-        idSelected && ulChips === chipsNivelEnNivel
-          ? (function () {
-            mostrarNivel(idSelected);
-          })()
-          : null;
+          appendProgressIndeterminate(chipsTipoEnNivel);
+          mostrarChipTipo(idSelected, huboUnError, chipsTipoEnNivel, visualizarChipMateriaTipo);
+
+        } else if (idSelected && ulChips === chipsTipoEnNivel) {
+          //Selecciono un Tipo en solapa Nivel
+
+
+          areaNivelEnNivel.removeClass("hidden");
+          botonesNivel.removeClass("hidden");
+          areaListaNivel.addClass("hidden");
+          chipsNivelEnNivel.empty();
+          appendProgressIndeterminate(chipsNivelEnNivel);
+
+          lugarBotonAgregarNivel.empty();
+          lugarBotonAgregarNivel.append(botonAgregarNivel());
+          asignarFuncionalidadBotonAgregarNivel();
+
+          mostrarChipNivel(idSelected, huboUnError, chipsNivelEnNivel, visualizarChipMateriaTipo);
+
+        } else if (idSelected && ulChips === chipsNivelEnNivel) {
+          //Selecciono un Nivel en la solapa nivel
+          appendProgressIndeterminate(listaNivel);
+          mostrarNivel(idSelected, huboUnError, listaNivel, renderNivel);
+
+        }
+
       }
     });
   }
@@ -1132,7 +1009,6 @@
                 <span>Oral</span>
               </label>
             </div>
-
             
         </div>
 
@@ -1157,9 +1033,7 @@
           ${generarNombrePdfs(nivel)}
         </select>
         <label>PDF</label>
-      </div>
-
-        
+      </div>        
 
       </div>
     </div>
@@ -1432,84 +1306,13 @@
 
 
   //////////////////// CONSULTAS GET AL SERVIDOR
-  async function getMateria() {
-    try {
-      const response = await fetch("./materia");
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
-  async function getTipo(materiaId) {
-    try {
-      const response = await fetch(`./tipo/${materiaId}`);
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
-  // Me trae todos los nombres de los niveles de un tipo
-  async function getChipNivel(tipoId) {
-    try {
-      const response = await fetch(`./nivelChip/${tipoId}`);
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
-  // Me trae toda la informacion de un nivel seleccionado
-  async function getNivel(nivelId) {
-    try {
-      const response = await fetch(`./nivel/${nivelId}`);
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
-  // Me trae toda las modalidades de un nivel seleccionado
-  async function getModalidad(nivelId) {
-    try {
-      const response = await fetch(`./modalidad/${nivelId}`);
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
-  //////////////////// UPDATES POST AL SERVIDOR
-  async function updateMateria(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
-    try {
-      const response = await fetch(`./examenes/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(cambios)
-      });
-      const rta = await response.json();
 
-      if (rta.error) {
-        error(idEstado)
-      } else {
-        exito(idEstado);
-        accionExitosa();
-        seGuardaOResetea(lista);
-      }
 
-    } catch (err) {
-      console.log(err);
-      err ? error(idEstado) : null;
-    }
-  }
 
 
   async function updateTipo(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
@@ -1522,25 +1325,24 @@
         body: JSON.stringify(cambios)
       });
       const rta = await response.json();
-      // Luego de guardar las cosas en la base de datos, me trae esa info
-
 
       if (rta.error) {
         error(idEstado)
       } else {
         exito(idEstado);
-        accionExitosa(cambios.materia);
+        accionExitosa(cambios.materia, error, lista, renderListaMateriaOTipo, listaTipo, seGuardaOResetea);
         seGuardaOResetea(lista);
       }
 
-      //mostrarListaTipo(cambios.materia);
     } catch (err) {
       console.log(err);
       err ? error(idEstado) : null;
     }
   }
 
-  async function updateNivelModalidad(cambios) {
+  
+
+  async function updateNivelModalidad(cambios, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado) {
     try {
       const response = await fetch(`./examenesUpdateNivelModalidad/`, {
         method: "POST",
@@ -1550,10 +1352,22 @@
         body: JSON.stringify(cambios)
       });
       const rta = await response.json();
-      // Luego de guardar las cosas en la base de datos, me trae esa info
-      mostrarNivel(cambios.uuid);
+      // Luego de guardar las cosas en la base de datos, me trae esa info      
+      mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel)
+
+      if (rta.error) {
+        huboUnError(idEstadoNivel)
+      } else {
+        accionExitosa(idEstadoNivel);
+        mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
+        mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel);
+        nivelSeleccionado.addClass("ui-selected")
+        seGuardaOResetea(lista);
+      }
+
     } catch (err) {
       console.log(err);
+      err ? huboUnError(idEstadoNivel) : null;
     }
   }
 
@@ -1574,7 +1388,7 @@
   function appendProgressIndeterminate(lista) {
     lista.empty();
     lista.append(`<div class="progress "><div class="indeterminate"></div></div>
-    `);
+      `);
   }
 
 
@@ -1596,7 +1410,176 @@
     `
   }
 
-  //$('#estadoMateria').append(preloader());
+
+  /////////////////////////////////////////////////////////////  SERVICIO  /////////////////////////////////////////////////////////////
+  // Busca las materias en la DB y renderiza la lista
+  async function mostrarListaMateria(huboUnError, estadoMateria, renderListaMateriaOTipo, listaMateria, seGuardaOResetea) {
+    try {
+      const response = await fetch("./materia");
+      const rta = await response.json();
+
+      if (rta.error) {
+        huboUnError(estadoMateria)
+        console.log(rta.error);
+      } else {
+        renderListaMateriaOTipo(rta, listaMateria);
+        seGuardaOResetea ? seGuardaOResetea(listaMateria) : null;
+      }
+
+    } catch (err) {
+      err ? huboUnError(estadoMateria) : null;
+      console.log(err);
+    }
+  }
+
+  // Busca las materias en la DB y renderiza los chips. listaChips: aqui se colgaran los chips // listaLis: se limpia esta lista
+  async function mostrarChipMateria(huboUnError, listaEstado, accion, lista) {
+    try {
+      const response = await fetch("./materia");
+      const rta = await response.json();
+
+      if (rta.error) {
+        huboUnError(listaEstado)
+        console.log(rta.error);
+      } else {
+        accion(rta, lista);
+      }
+
+    } catch (err) {
+      err ? huboUnError(listaEstado) : null;
+      console.log(err);
+    }
+  }
+
+  //Update Materia
+  async function updateMateria(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
+    try {
+      const response = await fetch(`./examenes/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(cambios)
+      });
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(idEstado)
+      } else {
+        exito(idEstado);
+        accionExitosa(error, idEstado, renderListaMateriaOTipo, listaMateria, seGuardaOResetea);
+        seGuardaOResetea(lista);
+      }
+
+    } catch (err) {
+      console.log(err);
+      err ? error(idEstado) : null;
+    }
+  }
+
+  // Busca las tipos en la DB de cada materiaID ingresada y renderiza la lista
+  async function mostrarListaTipo(tipoId, huboUnError, listaEstado, renderListaMateriaOTipo, listaTipo, seGuardaOResetea) {
+    try {
+      const response = await fetch(`./tipo/${tipoId}`);
+      const rta = await response.json();
+
+
+      if (rta.error) {
+        huboUnError(listaEstado)
+        console.log(rta.error);
+      } else {
+        renderListaMateriaOTipo(rta, listaTipo);
+        seGuardaOResetea ? seGuardaOResetea(listaTipo) : null;
+      }
+
+    } catch (err) {
+      err ? huboUnError(listaEstado) : null;
+      console.log(err);
+    }
+  }
+
+
+  // Busca el nivel seleccionado en la DB y lo renderiza
+  async function mostrarNivel(nivelId, huboUnError, listaNivel, renderNivel) {
+    try {
+      const response = await fetch(`./nivel/${nivelId}`);
+      const rta = await response.json();
+
+      if (rta.error) {
+        huboUnError(listaNivel)
+        console.log(rta.error);
+      } else {
+        renderNivel(rta, listaNivel);
+      }
+
+    } catch (err) {
+      err ? huboUnError(listaNivel) : null;
+      console.log(err);
+    }
+  }
+
+  // Busca las modalidades del nivel seleccionado en la DB y las renderiza
+  async function mostrarModalidad(nivelId, huboUnError) {
+    try {
+      const response = await fetch(`./modalidad/${nivelId}`);
+      const rta = await response.json();
+
+      if (rta.error) {
+        huboUnError($("#modalidadNivel"))
+        console.log(rta.error);
+      } else {
+        renderModalidad(rta, $("#modalidadNivel")); // modalidadNivel no la ingreso en las const de arriba porque no existe al inicio
+
+      }
+
+    } catch (err) {
+      err ? huboUnError($("#modalidadNivel")) : null;
+      console.log(err);
+    }
+  }
+
+
+
+  // Busca los tipos en la DB y renderiza los chips
+  async function mostrarChipTipo(idSelected, huboUnError, chipsTipoEnNivel, visualizarChipMateriaTipo) {
+    try {
+      const response = await fetch(`./tipo/${idSelected}`);
+      const rta = await response.json();
+
+
+      if (rta.error) {
+        huboUnError(chipsTipoEnNivel)
+        console.log(rta.error);
+      } else {
+        rta.length ? visualizarChipMateriaTipo(rta, chipsTipoEnNivel) : chipsTipoEnNivel.empty().append("Este elemento está vacío");
+      }
+
+    } catch (err) {
+      err ? huboUnError(chipsTipoEnNivel) : null;
+      console.log(err);
+    }
+  }
+
+  // Busca los niveles en la DB y renderiza los chips
+  async function mostrarChipNivel(idSelected, huboUnError, chipsNivelEnNivel, visualizarChipNivel) {
+    try {
+      const response = await fetch(`./nivelChip/${idSelected}`);
+      const rta = await response.json();
+
+      if (rta.error) {
+        huboUnError(chipsNivelEnNivel)
+        console.log(rta.error);
+      } else {
+        visualizarChipNivel(rta, chipsNivelEnNivel);
+      }
+
+    } catch (err) {
+      err ? huboUnError(chipsNivelEnNivel) : null;
+      console.log(err);
+    }
+  }
+
+
 
 }());
 
