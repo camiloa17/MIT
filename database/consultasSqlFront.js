@@ -119,9 +119,26 @@ exports.consultaExistenciaDeExamenEnHorario = async (modalidad)=>{
     case "Reading & Writing":
       return `select count(BIN_TO_UUID(uuid)) as id from examen_en_dia_RW where uuid = UUID_TO_BIN(?);`
       
-
     case "Listening & Speaking":
-      return `select coBIN_TO_UUID(uuid) as id from examen_en_semana_LS where uuid = UUID_TO_BIN(?);`
+      return `select count(BIN_TO_UUID(uuid)) as id from examen_en_semana_LS where uuid = UUID_TO_BIN(?);`
 
   }
 }
+
+
+exports.ingresarReservaEnProcesoExamenCompleto=async()=>{
+  return `insert into reserva (examen_en_dia_RW_uuid,examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid)values(UUID_TO_BIN(?),UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+}
+
+exports.ingresarReservaEnProcesoExamenRW= async()=>{
+  return `insert into reserva (examen_en_dia_RW_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid) values (UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+}
+
+exports.ingresarReservaEnProcesoExamenLS= async()=>{
+  return `insert into reserva (examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid) values (UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+}
+
+exports.consultaReservaPaso3 = async()=>{
+  return `select count(BIN_TO_UUID(uuid)) from reserva where uuid=UUID_TO_BIN(?) and en_proceso=1;`
+}
+

@@ -145,9 +145,9 @@ card.addEventListener('change', function (event) {
 
 /*Paso3 y 4 */
 
-document.querySelector('#adicion-nuevo-domicilio').addEventListener('change',mostrarNuevoDomiciolio);
+document.querySelector('#adicion-nuevo-domicilio').addEventListener('change',mostrarNuevoDomicilio);
 
-function mostrarNuevoDomiciolio(){
+function mostrarNuevoDomicilio(){
   let estado= this.checked;
   const elementoDomicilio = document.querySelector('#seccion-nuevo-domicilio');
   if(estado===true){

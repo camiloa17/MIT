@@ -11,7 +11,7 @@
         <section id="checkout_step2">
             <%- include("partials/checkoutSteps") -%>
             <div class="horario next" data-step="2">
-                <h2>INFROMACION IMPORTANTE</h2>
+                <h2>INFORMACION IMPORTANTE</h2>
                 <p>Te estaremos contactando para darte la fecha de el examen Listening and Speaking</p>
                 <div class="horario-wrapper">
 
@@ -21,11 +21,10 @@
             <a class="button-checkout"
                 href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
                 <a class="button-checkout"
-                    href="/checkout/step_4/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>">Siguiente</a>
-           
+                    href="/checkout/step_4/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>&idreserva=<%=idreserva %>">Siguiente</a>
         </div>
     
 </main>
-<script src="/Js/Front/checkout.js"></script>
+<script src="/Js/Front/checkout_3.js"></script>
 
 <%- include("partials/footer-privacidad") -%>

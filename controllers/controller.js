@@ -1,7 +1,7 @@
 const utils = require('../utils');
-const queries= require('../database/consultasSqlFront');
+const queries = require('../database/consultasSqlFront');
 
-const conexion = require(`../database/conexionDB/conexionbd`);
+const uuidv4 = require('uuid/v4');
 
 
 
@@ -98,8 +98,8 @@ exports.consultaHorarios = async (modalidad, id) => {
         switch (modalidad) {
             case "Completo":
                 sql = await queries.consultaExamenCompletoCupos()
-                const horariosCo = await utils.queryAsync(sql, [id,id]);
-                console.log(horariosCo)
+                const horariosCo = await utils.queryAsync(sql, [id, id]);
+
                 horarios = {
                     horarios: horariosCo,
                 }
@@ -108,27 +108,27 @@ exports.consultaHorarios = async (modalidad, id) => {
             case "Reading_&_Writing":
                 sql = await queries.consultaExamenReadingAndWriting();
                 const horariosRW = await utils.queryAsync(sql, [id]);
-                console.log(horariosRW)
-                 horarios = {
+
+                horarios = {
                     horarios: horariosRW,
                 }
                 break;
             case "Listening_&_Speaking":
                 sql = await queries.consultaExamenListeningAndSpeaking();
                 const horariosLS = await utils.queryAsync(sql, [id]);
-                console.log(horariosLS)
-                
+
+
                 horarios = {
                     horarios: horariosLS,
                 }
-                
+
                 break
         }
 
         return horarios;
 
     } catch (err) {
-        return err
+        console.error(err)
     }
 }
 
@@ -149,112 +149,116 @@ async function diasATexto(horarios) {
     }
 
 }
-/*
-async function verDispnonibilidad(horarios, modalida) {
+
+exports.crearReservaEnProceso = async (modalidad, idExamenEnDia, idExamenEnSemana) => {
     try {
-        const idsExamenEnDia = [];
-        horarios.forEach(horario => {
-            idsExamenEnDia.push(horario.id_2);
-        });
-        const disponible = await verVentasCupos(idsExamenEnDia, modalida);
 
-        return disponible
-    } catch (err) {
-        console.error(err)
-    }
-
-}
-
-async function verVentasCupos(id, modalidad) {
-    try {
-        if (id.length > 0) {
-            let verVentas;
-            if (modalidad == 'Reading_&_Writing' || modalidad == 'Completo') {
-                verVentas = `select
-  (drw.cupo_maximo - count(r.uuid)) as disponible,
-  BIN_TO_UUID(drw.uuid) as dia_ID
-from reserva r
-join examen_en_dia_RW as erw on erw.uuid = r.examen_en_dia_RW_uuid
-join dia_RW as drw on erw.dia_RW_uuid = drw.uuid
-where
-  drw.uuid = UUID_TO_BIN(?)`;
-            } else if (modalidad == 'Listening_&_Speaking') {
-                verVentas = ` select 
-  BIN_TO_UUID(r.examen_en_semana_LS_uuid) as id,
-  (semana.cupo_maximo-count(r.uuid)) as disponible,
-  BIN_TO_UUID(semana.uuid) as dia_ID
-  from reserva r
-  join examen_en_semana_LS as semanaLS on semanaLS.uuid=r.examen_en_semana_LS_uuid
-  join semana_LS as semana on semana.uuid=semanaLS.semana_LS_uuid
-  where
-  semana.uuid=UUID_TO_BIN(?)`
-            }
-            const sqlArray = [];
-            for (let index = 0; index < id.length; index++) {
-                sqlArray.push(verVentas)
-            }
-            verVentas = sqlArray.join(' union all ');
-
-            const ventas = await utils.queryAsync(verVentas, id);
-            return ventas;
-        }
-
-    } catch (err) {
-        console.error(err)
-    }
-
-}
-
-async function corroborarCupos(objetoHorario) {
-    try {
-        const horario = objetoHorario;
-        const arrayHorarios = horario.horario;
-        const cupos = horario.cupo;
-        const arrayHorarioLs = horario.horariols;
-        const cupoLS = horario.cupoLs
-
-        arrayHorarios.forEach(horario => {
-            cupos.forEach(cupo => {
-                if (cupo.id != 'null') {
-                    if (horario.id_2 == cupo.dia_ID)
-                        horario.cupo_maximo = cupo.disponible;
+        switch (modalidad) {
+            case "Completo":
+                const reservaTemporalCompleto = await crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana);
+                if (reservaTemporalCompleto) {
+                    return { reserva: reservaTemporalCompleto.reserva, uuid: reservaTemporalCompleto.uuid }
+                }else if(!reservaTemporalCompleto){
+                    return false
                 }
-            })
-        })
+                break;
+            case "Reading & Writing":
+                const reservaTemporalRW = await crearReservaTemporalRW(idExamenEnDia);
+                if(reservaTemporalRW){
+                    return {reserva:reservaTemporalRW.reserva, uuid:reservaTemporalRW.uuid}
+                }else if(!reservaTemporalRW){
+                    return false
+                }
 
-        return {
-            horarios: horario.horario,
-            text: horario.text
+                break;
+
+            case "Listening & Speaking":
+                const reservaTemporalLs =await crearReservaTemporalLs(idExamenEnDia);
+                if(reservaTemporalLs){
+                    console.log(reservaTemporalLs);
+                    return { reserva: reservaTemporalLs.reserva, uuid: reservaTemporalLs.uuid }
+                }else if(!reservaTemporalLs){
+                    console.log(reservaTemporalLs)
+                    return false
+                }
+                break;
+
         }
     } catch (err) {
+        console.error(err);
+        return false;
+
+    }
+}
+
+async function crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana) {
+    try {
+        //Se corrobora que exista los examenes en esos horarios
+        const consultaCompleto = await queries.consultaExistenciaDeExamenEnHorario('Completo');
+        const corroborarExistenciaExamenCompleto = await utils.queryAsync(consultaCompleto, [idExamenEnDia, idExamenEnSemana]);
+        
+        if (corroborarExistenciaExamenCompleto[0].id_semana === 1 && corroborarExistenciaExamenCompleto[0].id_dia === 1) {
+            //Se crea una fecha un UUID y se inserta la reserva con la informacion minima.
+            const fechaReserva = new Date(Date.now()).toISOString();
+            const uuid = uuidv4();
+            const sqlInsertarCompleto = await queries.ingresarReservaEnProcesoExamenCompleto();
+            const insertarReservaCompleto = await utils.queryAsync(sqlInsertarCompleto, [idExamenEnDia, idExamenEnSemana, fechaReserva, 1, 0, uuid]);
+            return { reserva: insertarReservaCompleto, uuid: uuid }
+        }
+
+    } catch (err) {
         console.error(err)
+        return false
     }
 }
-*/
 
-exports.crearReservaEnProceso = async (modalidad,idExamenEnDia, idExamenEnSemana) => {
-    
-    switch (modalidad) {
-        case "Completo":
-            const consultaCompleto = await queries.consultaExistenciaDeExamenEnHorario(modalidad);
-            let corroborarExistenciaExamenCompleto = await utils.queryAsync(consultaCompleto, [idExamenEnDia, idExamenEnSemana]);
-            console.log(corroborarExistenciaExamenCompleto);
-            break;
-        case "Reading & Writing":
-            const consultaRW= await queries.consultaExistenciaDeExamenEnHorario(modalidad);
-            let corroborarExistenciaExamenRW = await utils.queryAsync(consultaRW, idExamenEnDia);
-            console.log(corroborarExistenciaExamenRW)
-            break;
 
-        case "Listening & Speaking":
-            const consultaLS= await queries.consultaExistenciaDeExamenEnHorario(modalidad);
-            let corroborarExistenciaExamenLS = await utils.queryAsync(consultaLS, idExamenEnDia);
-            console.log(corroborarExistenciaExamenLS)
-            break;
 
+async function crearReservaTemporalRW(idExamenEnDia){
+    try{
+    const consultaRw = await queries.consultaExistenciaDeExamenEnHorario('Reading & Writing');
+    const corroborarExistenciaExamenRW = await utils.queryAsync(consultaRw, [idExamenEnDia]);
+    if (corroborarExistenciaExamenRW[0].id===1){
+        const fechaReserva = new Date(Date.now()).toISOString();
+        const uuid = uuidv4();
+        const sqlInsertarRW= await queries.ingresarReservaEnProcesoExamenRW();
+        const insertarReservaRW= await utils.queryAsync(sqlInsertarRW,[idExamenEnDia,fechaReserva,1,0,uuid]);
+        
+        return {reserva:insertarReservaRW,uuid:uuid}
+    }
+    }catch(err){
+        console.log(err);
+        return false
     }
 
 }
+
+
+async function crearReservaTemporalLs(idExamenEnSemana){
+    try {
+        const consultaLs = await queries.consultaExistenciaDeExamenEnHorario('Listening & Speaking');
+        const corroborarExistenciaExamenLs = await utils.queryAsync(consultaLs, [idExamenEnSemana]);
+        if (corroborarExistenciaExamenLs[0].id===1){
+            const fechaReserva = new Date(Date.now()).toISOString();
+            const uuid = uuidv4();
+            const sqlInsertarRW = await queries.ingresarReservaEnProcesoExamenLS();
+            const insertarReservaLs = await utils.queryAsync(sqlInsertarRW, [idExamenEnSemana, fechaReserva, 1, 0, uuid]);
+            return { reserva: insertarReservaLs, uuid: uuid }
+        }
+        
+    } catch (err) {
+        console.log(err)
+        return false
+    }
+}
+
+exports.verReservarPaso3 = async (id) => {
+    const consultaReserva = await queries.consultaReservaPaso3();
+    const verDB = await utils.queryAsync(consultaReserva, id)
+    return verDB
+}
+
+
 
 
 
