@@ -56,6 +56,7 @@
             mostrarChipMateria(huboUnError, estadoTipo, visualizarChipMateriaTipo, chipsMateriaEnTipo);
             break;
           case ("collapsibleNivel"):
+            areaListaNivel.addClass("hidden");
             appendProgressIndeterminate(chipsMateriaEnNivel);
             mostrarChipMateria(huboUnError, chipsMateriaEnNivel, visualizarChipMateriaTipo, chipsMateriaEnNivel);
             break;
@@ -145,6 +146,7 @@
 
     // Inicializo dropDowns
     $("select").formSelect();
+
 
     asignarFuncionalidadBotonesNivel(nivel, lista);
 
@@ -271,9 +273,7 @@
   }
 
   function visualizarChipNivel(data, chipLista) {
-    console.log("sortable chips")
     let dataOrdenada = JSON.parse(JSON.stringify(data));
-    console.log(dataOrdenada)
 
     dataOrdenada.sort((a, b) => (a.orden > b.orden ? 1 : -1));
     chipLista.empty();
@@ -355,7 +355,7 @@
           let idEstadoNivel = $('#estadoNivel');
           idEstadoNivel.append(preloader());
 
-          updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado);
+          updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado);
 
           
           
@@ -860,8 +860,6 @@
 
         } else if (idSelected && ulChips === chipsTipoEnNivel) {
           //Selecciono un Tipo en solapa Nivel
-
-
           areaNivelEnNivel.removeClass("hidden");
           botonesNivel.removeClass("hidden");
           areaListaNivel.addClass("hidden");
@@ -872,13 +870,12 @@
           lugarBotonAgregarNivel.append(botonAgregarNivel());
           asignarFuncionalidadBotonAgregarNivel();
 
-          mostrarChipNivel(idSelected, huboUnError, chipsNivelEnNivel, visualizarChipMateriaTipo);
+          mostrarChipNivel(idSelected, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
 
         } else if (idSelected && ulChips === chipsNivelEnNivel) {
           //Selecciono un Nivel en la solapa nivel
           appendProgressIndeterminate(listaNivel);
           mostrarNivel(idSelected, huboUnError, listaNivel, renderNivel);
-
         }
 
       }
@@ -1084,10 +1081,11 @@
   //////////////////// PRESETS HTML chip sortable (chips de niveles)
   const chipSortableTemplate = elemento => {
     return `
-  <li id="${elemento.uuid}" class="chip enableSelectLi">
-  ${elemento.nombre}
-  <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>  
-</li>`;
+        <li id="${elemento.uuid}" class="chip enableSelectLi">
+          ${elemento.nombre}
+          <i class="material-icons-outlined right button-opacity move-button noSelectable move-button-nivel-margin-top">import_export</i>
+        </li>
+        `;
   };
 
   //////////////////// PRESETS HTML del boton agregar nivel (aparece junto con los chips de niveles)
@@ -1342,7 +1340,7 @@
 
   
 
-  async function updateNivelModalidad(cambios, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado) {
+  async function updateNivelModalidad(cambios, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado) {
     try {
       const response = await fetch(`./examenesUpdateNivelModalidad/`, {
         method: "POST",
@@ -1353,15 +1351,17 @@
       });
       const rta = await response.json();
       // Luego de guardar las cosas en la base de datos, me trae esa info      
-      mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel)
+      //mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel)
+
+      console.log("cambios", cambios)
 
       if (rta.error) {
         huboUnError(idEstadoNivel)
       } else {
         accionExitosa(idEstadoNivel);
         mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
-        mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel);
-        nivelSeleccionado.addClass("ui-selected")
+        //mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel);
+        //nivelSeleccionado.addClass("ui-selected")
         seGuardaOResetea(lista);
       }
 
