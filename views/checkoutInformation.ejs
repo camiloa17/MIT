@@ -92,10 +92,10 @@
     </section>
     <div class="button-wrap">
         <% if(modo==="Completo") {%>
-            <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+            <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>&idreserva=<%=idreserva%>">Regresar</a>
             <% }else {%>
                 <a class="button-checkout backwards"
-                    href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+                    href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idreserva=<%=idreserva %>">Regresar</a>
                 <% }%>
         
         <a class="button-checkout next" href="#">Pagar</a>

@@ -29,7 +29,7 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         res.render('checkoutStep3Co', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_3', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horarioId: req.query.idhorario,horarioLs:req.query.idhorarioL,idreserva:req.query.idreserva});
     }else {
         const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
-        res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_3', materia: datosExamenModalidad.materia, tipo: datosExamenModalidad.tipo, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id, horarioId: req.query.idhorario });
+        res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_3', materia: datosExamenModalidad.materia, tipo: datosExamenModalidad.tipo, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id, horarioId: req.query.idhorario, idreserva: req.query.idreserva});
     }
 });
 
@@ -37,10 +37,21 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req,res)=>{
     const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
     if(req.params.modalidad==='Completo'){
         const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
-        
-        res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_4',materia:datosExamenModalidad.materia,tipo:datosExamenModalidad.tipo,nivel:datosExamenModalidad.nivel,modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id, horarioId:req.query.idhorario});
+        res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_4', materia: datosExamenModalidad.materia, tipo: datosExamenModalidad.tipo, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id, horarioId: req.query.idhorario, horarioLs: req.query.idhorarioL , idreserva: req.query.idreserva});
     }
 })
+
+
+router.get('/ver-horario/:idreserva', async (req,res)=>{
+try {
+    const consultarReserva = await controller.verReservarPaso3(req.params.idreserva);
+    console.log(consultarReserva[0]);
+    res.json(consultarReserva[0])
+} catch (err) {
+    console.log(err)
+}
+});
+
 
 
 router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, res,next) => {
@@ -62,7 +73,7 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
         
     }else{
         const crearReservaTemporalRwLs = await controller.crearReservaEnProceso(examen.modalidad, req.query.idhorario);
-        console.log(crearReservaTemporalRwLs);
+        
         if(!crearReservaTemporalRwLs){
             res.sendStatus(404)
         }else{
@@ -77,6 +88,11 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
 }
     
 });
+
+
+router.put('/horario-selected/:materia/:tipo/:nivel/:modalidad',async(req,res)=>{
+
+})
 
 
 module.exports = router;

@@ -139,6 +139,6 @@ exports.ingresarReservaEnProcesoExamenLS= async()=>{
 }
 
 exports.consultaReservaPaso3 = async()=>{
-  return `select count(BIN_TO_UUID(uuid)) from reserva where uuid=UUID_TO_BIN(?) and en_proceso=1;`
+  return `select count(BIN_TO_UUID(uuid)) as reserva from reserva where uuid=UUID_TO_BIN(?) and en_proceso=1;`
 }
 

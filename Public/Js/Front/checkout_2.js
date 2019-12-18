@@ -43,30 +43,63 @@ function habilitarBoton() {
 
 
 /* Paso 2  */
-function setRoute() {
+async function setRoute() {
     try {
-        const submitRoute = route.replace(/step_2/g, "horario-selected");
-        let horarioSeleccionado;
-        let horarioListening;
-        document.getElementsByName('horario-selector').forEach(horario => {
-            if (horario.checked) {
-                if (horario.classList.length == 2) {
-                    horarioSeleccionado = (horario.classList[0]);
-                    horarioListening = (horario.classList[1])
-                } else {
-                    horarioSeleccionado = (horario.classList[0]);
-                }
-
+        const testIdreserva = /idreserva/g;
+        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
+        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+        if(testIdreserva.test(route)){
+            const idReserva = route.match(/idreserva=(\S{8}-\S{4}-\S{4}-\S{4}-\S{12})/)[1];
+            const verSiEstaLaReerva = await getReserva(idReserva);
+            const respuesta = await verSiEstaLaReerva.json()
+            
+            if(respuesta.reserva===1){
+                const obtenerHorariosReserva = await getHorario()
+                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorariosReserva.horarioSeleccionado}${(obtenerHorariosReserva.horarioListening ? `&idhorarioL=${obtenerHorariosReserva.horarioListening}` : "")}&idreserva=${idReserva}`);
+                document.querySelector('form').setAttribute('method','PUT');
+                habilitarBoton();
+                
+            }else{
+                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+                habilitarBoton()
             }
-        });
-
-        document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${horarioSeleccionado}${(horarioListening ? `&idhorarioL=${horarioListening}` : "")}`);
-        habilitarBoton()
-        /*
-        const ingresarAlServer= await postData(`${submitRoute}&idhorario=${horarioSeleccionado}`,this);
-        */
+            
+        }else{
+            
+            const obtenerHorarios= await getHorario()
+            document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+            habilitarBoton()
+        }
+      
 
     } catch (err) {
         console.log(err)
     }
+}
+
+async function getReserva(id){
+    try{
+        const verSiEstaLaReerva = await fetch(`/checkout/ver-horario/${id}`);
+        return verSiEstaLaReerva
+    }catch(err){
+        console.log(err)
+    }
+}
+
+async function getHorario(){
+    let horarioSeleccionado;
+    let horarioListening;
+    document.getElementsByName('horario-selector').forEach(horario => {
+        if (horario.checked) {
+            if (horario.classList.length == 2) {
+                horarioSeleccionado = (horario.classList[0]);
+                horarioListening = (horario.classList[1])
+            } else {
+                horarioSeleccionado = (horario.classList[0]);
+            }
+
+        }
+    });
+    return{horarioSeleccionado:horarioSeleccionado,horarioListening:horarioListening}
+
 }
