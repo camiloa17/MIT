@@ -26,6 +26,7 @@ class FechasVista {
     this.reservasEnCurso = [];
 
     this.inicializarModalEliminar();
+    this.inicializarCollapsible();
 
   }
 
@@ -33,6 +34,10 @@ class FechasVista {
     $(document).ready(function () {
       $('.modal').modal();
     });
+  }
+
+  inicializarCollapsible() {
+    $('.collapsible').collapsible();
   }
 
   async traerListaDeExamenesDb() {
@@ -450,7 +455,7 @@ class FechasVista {
 
   selectorDiaEscritoUOral() {
     return `
-    <div class="row clear-top-2">    
+    <div class="row clear-top-1">    
         <div class="col s12 m12 l12 xl12">
             <label>
                 <input id="inputLSAgregarDia" name="selectorDiaEscritoUOral" type="radio" />
@@ -1455,12 +1460,25 @@ class FechasVista {
 
     
 
-    <div id="areaReservas" class="row">
-        <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
-        <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
-    </div>
+    <div id="areaReservas" class="row">    
+      <div class="col s12 m12 l12 xl12 ">
+        <ul class="collapsible">
+          <li>
+            <div class="collapsible-header">
+                <i class="material-icons">assignment</i>Reservas en fecha
+            </div>
 
-    <div id="areaMailSeleccionados" class="row">
+            <div class="collapsible-body">
+              <div class="row margin0">
+                <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
+                <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
+                <div id="areaMailSeleccionados" class="row margin0">
+              </div>
+            </div>
+          </li>   
+
+        </ul>
+      </div>
     </div>
     `
   }
@@ -1932,7 +1950,6 @@ class FechasVista {
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
     this.mostrarEnviarMailASeleccionados();
     this.asignarFuncionalidadBotonEnviarMails()
-    $('.collapsible').collapsible();
     M.updateTextFields();
     let descriptionTextArea = $('#textarea_Mail')
     M.textareaAutoResize(descriptionTextArea);
@@ -2240,7 +2257,7 @@ class FechasVista {
 
   mostrarEnviarMailASeleccionados() {
     $('#areaMailSeleccionados').empty().append(`
-            <div class="col s10 m10 l10 xl10 ">
+            <div class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1">
             <ul class="collapsible">
                 <li>
                     <div class="collapsible-header">
@@ -2256,9 +2273,8 @@ class FechasVista {
                                         <label for="mail_asunto">Asunto</label>
                                     </div>
                                     <div class="input-field col l12">
-                                        <textarea id="textarea_Mail" contenteditable="true" class="materialize-textarea gris-texto">Hola {alumno.nombre} {alumno.apellido},
-Ya estás inscripto al examen {examen.nombre} el día {examen.dia} en el horario {examen.hora}.
-#hola como estas #vos
+                                        <textarea id="textarea_Mail" contenteditable="true" class="materialize-textarea gris-texto">Hola {nombre} {apellido},
+Ya estás inscripto al examen {examen} el día {dia} en el horario {hora}.
 Debés presentarte en Av Cordoba 1659 - 3er piso con una anticipación de 30 minutos.
 Cualquier duda te podés comunicar vía telefónica al +34 952 202322.
 Saludos!</textarea>
@@ -2270,7 +2286,7 @@ Saludos!</textarea>
 
                         <div class="row">
                             <div class="col">
-                                <a id="enviarMails" class="waves-effect waves-light btn btn-medium weight400 background-azul right">ENVIAR MAILS</a>
+                                <a id="enviarMails" class="waves-effect waves-light btn btn-medium weight400 background-azul left">ENVIAR MAILS</a>
                                 <span id="estadoEnviarMails" class="padding-left2-4 rojo-texto"></span>
                             </div>
                         </div>
@@ -2698,12 +2714,15 @@ Saludos!</textarea>
     console.log(datosParaEnviarMail)
 
     let idEstado = $('#estadoEnviarMails')
+    this.appendProgressIndeterminate(idEstado);
     this.fechasServicio.enviarMails(datosParaEnviarMail, this.mostrarMensaje, this.huboUnError, idEstado)
 
   }
 
   mostrarMensaje(id, mensaje) {
-    id.append(`${mensaje}`)
+    let mensajeInline = mensaje.replace("./", ". <br />").replace("./", ". <br />")
+    console.log(mensajeInline)
+    id.empty().append(`<div>${mensajeInline}</div>`)
   }
 
   convertirUuidExamenEnTexto(uuidExamen) {
