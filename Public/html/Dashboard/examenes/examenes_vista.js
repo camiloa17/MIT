@@ -279,7 +279,7 @@
     chipLista.empty();
 
     dataOrdenada.forEach(elemento => {
-      elemento.activo ? chipLista.append(chipSortableTemplate(elemento)) : null; ///////debe ser sortable este
+      elemento.activo ? chipLista.append(chipSortableTemplate(elemento)) : null; 
     });
     habilitaSortableChip(chipLista);
   }
@@ -356,9 +356,8 @@
           idEstadoNivel.append(preloader());
 
           updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado);
-
           
-          
+             
 
           break;
       }
@@ -384,17 +383,14 @@
         case listaNivel:
           let tipoSeleccionado = chipsTipoEnNivel.find(".ui-selected").attr("id")
           let nivelSeleccionado = chipsNivelEnNivel.find(".ui-selected").attr("id");
-          console.log("resetiamo nivel")
-
+  
           if (nivelSeleccionado) {
             // Cuando ya tengo otros niveles
-            console.log("con nivel seleccionado")
             seGuardaOResetea(lista);
             mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
             mostrarNivel(nivelSeleccionado, huboUnError, listaNivel, renderNivel)
           } else {
             // Cuando es el primer nivel que creo
-            console.log("SIN nivel seleccionado")
             areaListaNivel.addClass("hidden");
             deshabilitarBotonera(listaNivel);
             seGuardaOResetea(lista);
@@ -1351,17 +1347,13 @@
       });
       const rta = await response.json();
       // Luego de guardar las cosas en la base de datos, me trae esa info      
-      //mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel)
-
-      console.log("cambios", cambios)
 
       if (rta.error) {
         huboUnError(idEstadoNivel)
       } else {
+        await mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
+        await mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel);
         accionExitosa(idEstadoNivel);
-        mostrarChipNivel(tipoSeleccionado, huboUnError, chipsNivelEnNivel, visualizarChipNivel);
-        //mostrarNivel(cambios.uuid, huboUnError, listaNivel, renderNivel);
-        //nivelSeleccionado.addClass("ui-selected")
         seGuardaOResetea(lista);
       }
 
@@ -1370,7 +1362,6 @@
       err ? huboUnError(idEstadoNivel) : null;
     }
   }
-
 
 
   function accionExitosa(id) {
@@ -1465,6 +1456,7 @@
 
       if (rta.error) {
         error(idEstado)
+        console.log(rta.error)
       } else {
         exito(idEstado);
         accionExitosa(error, idEstado, renderListaMateriaOTipo, listaMateria, seGuardaOResetea);
@@ -1529,7 +1521,6 @@
         console.log(rta.error);
       } else {
         renderModalidad(rta, $("#modalidadNivel")); // modalidadNivel no la ingreso en las const de arriba porque no existe al inicio
-
       }
 
     } catch (err) {
@@ -1537,7 +1528,6 @@
       console.log(err);
     }
   }
-
 
 
   // Busca los tipos en la DB y renderiza los chips
@@ -1578,8 +1568,6 @@
       console.log(err);
     }
   }
-
-
 
 }());
 

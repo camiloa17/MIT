@@ -490,3 +490,16 @@ td{
   width: 20px;
   height: 20px;
 }
+
+
+#textarea_Mails {
+  background-color: #444;
+  color: white;
+  font-size: 14px;
+  font-family: monospace;
+}
+
+.statement {
+  color: orange;
+}
+

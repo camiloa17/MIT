@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const controladorDashboard = require('./controlador/controladorDashboard')
+const controladorMailSender = require('./mailSender/controladorMailSender')
 const controladorExcel = require('./exceljs/controlador_excel')
 const cors = require('cors');
 const port  = process.env.PORT || 8080;
@@ -92,6 +93,8 @@ app.post('/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFecha
 // EXCELS 
 app.get('/excelAsistencia/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelAsistencia))
 app.get('/excelTrinity/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelTrinity))
+
+app.post('/enviarMails/',  asyncErrorWrap(controladorMailSender.enviarMails))
 
 
 app.use(errorHandler);

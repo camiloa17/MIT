@@ -23,12 +23,14 @@ class FechasVista {
     //se usa para chequear cupos suficientes al reservas a asignar a dia ls en la seccion de semanaLS
     this.cupoExamenSeleccionado = [];
 
+    this.reservasEnCurso = [];
+
     this.inicializarModalEliminar();
-    
+
   }
 
   inicializarModalEliminar() {
-    $(document).ready(function(){
+    $(document).ready(function () {
       $('.modal').modal();
     });
   }
@@ -418,7 +420,7 @@ class FechasVista {
     });
   }
 
- 
+
 
   cleanEstadoListaExamen() {
     this.addExamenesFechaDia = [];
@@ -1929,6 +1931,7 @@ class FechasVista {
     this.asignarFuncionBotonExportarTrinity();
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
     this.mostrarEnviarMailASeleccionados();
+    this.asignarFuncionalidadBotonEnviarMails()
     $('.collapsible').collapsible();
     M.updateTextFields();
     let descriptionTextArea = $('#textarea_Mail')
@@ -2009,6 +2012,8 @@ class FechasVista {
 
   mostrarElementosListaReservasEnSemanasLs(reservasSemanaLs) {
     $('#bodyListadoReservasEnFechas').empty();
+
+    this.reservasEnCurso = reservasSemanaLs;
 
     reservasSemanaLs.sort(function (objA, objB) {
       // Primero ordeno por fecha diaLS asignado
@@ -2234,8 +2239,8 @@ class FechasVista {
   };
 
   mostrarEnviarMailASeleccionados() {
-    $('#areaMailSeleccionados').empty().append(`    
-        <div class="col s10 m10 l10 xl10 ">
+    $('#areaMailSeleccionados').empty().append(`
+            <div class="col s10 m10 l10 xl10 ">
             <ul class="collapsible">
                 <li>
                     <div class="collapsible-header">
@@ -2251,13 +2256,12 @@ class FechasVista {
                                         <label for="mail_asunto">Asunto</label>
                                     </div>
                                     <div class="input-field col l12">
-                                        <textarea id="textarea_Mail" class="materialize-textarea gris-texto">
-                                            Hola {alumno.nombre} {alumno.apellido},
-                                            Ya estás inscripto al examen {examen.nombre} el día {examen.dia} y en el horario {examen.hora}.
-                                            Debés presentarte en Av Cordoba 1659 - 3er piso con una anticipación de 30 minutos.
-                                            Cualquier duda te podés comunicar vía telefónica al +34 952 202322
-                                            Saludos!
-                                        </textarea>
+                                        <textarea id="textarea_Mail" contenteditable="true" class="materialize-textarea gris-texto">Hola {alumno.nombre} {alumno.apellido},
+Ya estás inscripto al examen {examen.nombre} el día {examen.dia} en el horario {examen.hora}.
+#hola como estas #vos
+Debés presentarte en Av Cordoba 1659 - 3er piso con una anticipación de 30 minutos.
+Cualquier duda te podés comunicar vía telefónica al +34 952 202322.
+Saludos!</textarea>
                                         <label for="textarea_Mail">Cuerpo de Mail</label>
                                     </div>
                                 </div>
@@ -2266,16 +2270,16 @@ class FechasVista {
 
                         <div class="row">
                             <div class="col">
-                                <a class="waves-effect waves-light btn btn-medium weight400 background-azul right">ENVIAR MAILS</a>
+                                <a id="enviarMails" class="waves-effect waves-light btn btn-medium weight400 background-azul right">ENVIAR MAILS</a>
+                                <span id="estadoEnviarMails" class="padding-left2-4 rojo-texto"></span>
                             </div>
                         </div>
                     </div>
                 </li>
             </ul>
         </div>
-  `)}
-
-
+    `)
+  }
 
 
 
@@ -2302,7 +2306,10 @@ class FechasVista {
 
   asignarFuncionBotonAsignarDiaOralASemana() {
     $('#botonAsignarDiaOralASemana').on('click', () => {
-      this.asignarDiaASemanaExamenOral()
+      this.asignarDiaASemanaExamenOral();
+      let reservasActualizadad = this.fechasServicio.getElementosListaReservasEnSemanasLs();
+      this.reservasEnCurso = reservasActualizadad;
+
     })
   }
 
@@ -2334,11 +2341,11 @@ class FechasVista {
         cuposLibres = par[1];
       }
     })
-    
+
     alumnosSeleccionados = $("#bodyListadoReservasEnFechas :checkbox:checked").length;
-    
-    if(diaOralSeleccionado != "" && alumnosSeleccionados > 0 ) {
-      if (alumnosSeleccionados > 0  && alumnosSeleccionados <= cuposLibres) {
+
+    if (diaOralSeleccionado != "" && alumnosSeleccionados > 0) {
+      if (alumnosSeleccionados > 0 && alumnosSeleccionados <= cuposLibres) {
         $('#botonAsignarDiaOralASemana').removeClass("disabled");
         $('#estadoReserva').empty();
       } else {
@@ -2347,11 +2354,11 @@ class FechasVista {
         setTimeout(() => $('#estadoReserva').empty(), 6000)
       }
     }
-    
+
   }
 
 
-  asignarDiaASemanaExamenOral() {
+  async asignarDiaASemanaExamenOral() {
     // Obtengo el día del oral seleccionado
     $("select").formSelect();
     let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
@@ -2646,6 +2653,57 @@ class FechasVista {
       });
     });
     return examenesEnUl;
+  }
+
+  asignarFuncionalidadBotonEnviarMails() {
+    $('#enviarMails').on('click', () => {
+      console.log("click mails")
+      this.generarDatosAEnviarPorMail();
+    })
+  }
+
+  generarDatosAEnviarPorMail() {
+    let infoDestinatarios = [];
+
+    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function () {
+      return this.id
+    }).get();
+
+    console.log("ids de reservas", reservasSeleccionadas);
+    console.log("reservas en curso", this.reservasEnCurso);
+
+    reservasSeleccionadas.forEach(reserva => {
+
+      this.reservasEnCurso.map(res => {
+        if (res.reserva_uuid === reserva) {
+          infoDestinatarios.push({
+            nombre: res.alumno_nombre,
+            apellido: res.alumno_apellido,
+            cd: res.alumno_candidate_number,
+            email: res.alumno_email,
+            examen: "aca va el examen",
+            dia: this.fechasServicio.stringDiaEspanol(res.dia_LS_fecha_examen),
+            hora: this.fechasServicio.stringHoraEspanol(res.dia_LS_fecha_examen),
+          })
+        }
+      })
+    })
+
+    let datosParaEnviarMail = {
+      destinatarios: infoDestinatarios,
+      asunto: $('#mail_asunto').val(),
+      cuerpo: $('#textarea_Mail').val(),
+    }
+
+    console.log(datosParaEnviarMail)
+
+    let idEstado = $('#estadoEnviarMails')
+    this.fechasServicio.enviarMails(datosParaEnviarMail, this.mostrarMensaje, this.huboUnError, idEstado)
+
+  }
+
+  mostrarMensaje(id, mensaje) {
+    id.append(`${mensaje}`)
   }
 
   convertirUuidExamenEnTexto(uuidExamen) {

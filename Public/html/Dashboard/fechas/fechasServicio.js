@@ -1,5 +1,31 @@
 class FechasServicio {
 
+  async enviarMails(datos, printMensaje, error, id) {
+    try {
+      const response = await fetch(`./enviarMails/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+      });
+      const rta = await response.json();
+
+      if(rta.error) {
+        printMensaje(id, rta.error)     
+        console.log(rta.error)
+        console.log(rta.mensaje)
+      } else {
+        printMensaje(id, rta.status);
+        console.log("EXITO", rta);
+      }
+
+    } catch (err) {
+      err ? error(id) : null;
+      console.log(err);
+    }
+  }
+
   async agregarFechaDia(datos, exito, error, clean, id) {
     try {
       const response = await fetch(`./agregarFechaDia/`, {
@@ -378,5 +404,49 @@ class FechasServicio {
 
     let stringDia = `${weekday[numeroDia]} ${dia} de ${meses[mes]} ${anio} - ${hora} hs`;
     return stringDia;
+  }
+
+  stringDiaEspanol(datetime){
+    let anio = datetime.slice(0, 4);
+    let mes = datetime.slice(5, 7);
+    let dia = datetime.slice(8, 10);
+
+    let fechaJs = new Date(anio, mes-1, dia);
+ 
+    let numeroDia = fechaJs.getDay();
+
+
+    const weekday = new Array(7);
+    weekday[0] = "Domingo";
+    weekday[1] = "Lunes";
+    weekday[2] = "Marrtes";
+    weekday[3] = "Miércoles";
+    weekday[4] = "Jueves";
+    weekday[5] = "Viernes";
+    weekday[6] = "Sábado";
+
+    const meses = new Array(12);
+    meses['01'] = "Enero";
+    meses['02'] = "Febrero";
+    meses['03'] = "Marzo";
+    meses['04'] = "Abril";
+    meses['05'] = "Mayo";
+    meses['06'] = "Junio";
+    meses['07'] = "Julio";
+    meses['08'] = "Agosto";
+    meses['09'] = "Septiembre";
+    meses['10'] = "Octubre";
+    meses['11'] = "Noviembre";
+    meses['12'] = "Diciembre";
+
+    let stringDia = `${weekday[numeroDia]} ${dia} de ${meses[mes]} ${anio}`;
+    return stringDia;
+  }
+
+  stringHoraEspanol(datetime){
+    let hora = datetime.slice(11, 16);
+
+    let stringHora = `${hora} hs`;
+    return stringHora;
   }
 }
