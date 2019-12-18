@@ -93,7 +93,7 @@ class FechasVista {
   }
 
   habilitarTostadaGuardarResetear() {
-    $('.noSelectable').on(
+    $('.noSelectable, .collapsible-header').on(
       'click',
       function () {
         M.toast({ html: "Debe Guardar o Resetear cambios para proceder" });
@@ -102,7 +102,7 @@ class FechasVista {
   }
 
   deshabilitarTostadaGuardarResetear() {
-    $('.noSelectable').off('click');
+    $('.noSelectable, .collapsible-header').off('click');
   }
 
   aplicarClaseNoSelectableChips(ulChips) {
@@ -221,6 +221,9 @@ class FechasVista {
 
           // Asigno a una variable temporal el ultimo id seleccionado (porque si apreto el scrollbar me deselecciona el elemento)
           this.lastExamSelected = idSelected;
+
+          // Habilito la posibilidad de Ingresar al acordeon para editar fechas o ver reservas
+          $('.collapsible').collapsible();
 
           // SE SELECCIONA UN DIA RW ///////////////////////////////////////
           if (tipoSelected === "RW") {
@@ -1037,6 +1040,9 @@ class FechasVista {
       this.aplicarClaseNoSelectableChips($('#listaHorarios'));
       this.habilitarTostadaGuardarResetear();
       $('#fechasAntiguas').prop('disabled', true);
+      $('#collapsibleEdicionReservas').removeClass('collapsible');
+      M.Collapsible.getInstance($('#collapsibleEdicionReservas')).open(0);
+
     }
     this.yaSeHizoUnCambio = true;
   }
@@ -1051,6 +1057,8 @@ class FechasVista {
 
     $('#botonGuardarExamenesEnFecha').addClass('disabled');
     $('#resetExamenesEnFecha').addClass('disabled');
+    $('#collapsibleEdicionReservas').addClass('collapsible');
+
 
   }
 
@@ -1076,7 +1084,7 @@ class FechasVista {
       this.seProdujoUnCambio();
     });
 
-    $('#inputCupoCambio').on('change', () => {
+    $('#inputCupoCambio').on('input', () => {
       $('#botonGuardarExamenesEnFecha').removeClass('disabled');
       $('#resetExamenesEnFecha').removeClass('disabled');
       this.cambioInputFecha = true;
@@ -1434,43 +1442,65 @@ class FechasVista {
   mostrarAreaEdicionFechas() {
     return `
 
-    <div class="row">
-      <div class="col s12 m12 l7 xl6 clear-top-2 ">
-        <ul id="listaHorarios" class="collection height24rem content-scroll margin-bottom22"></ul>
+    <div id="ambasListas" class="row">
+      <div class="col s12 m12 l7 xl6 clear-top-1 ">
+        <div class="azul-texto weight700">Fechas:</div>
+        <ul id="listaHorarios" class="collection height24rem content-scroll margin0"></ul>
       </div>
 
-      <div class="col s12 m12 l5 xl6">
-        <div id="inputSelectarExamenes" class="input-field margin-top-0 margin-bottom-0 heigth78px notVisible">
-          <select id="selectarExamenes" multiple>
-            <option value="" disabled>Seleccionar</option>
-          </select>
-          <label>Listado de Exámenes</label>
-       
-          <a id="botonAgregarExamenesAFecha" class="azul-texto cursorPointer">
-            <i class="material-icons-outlined left secondary-content button-opacity pointer azul-texto">arrow_downward</i>Agregar
-          </a>
-        </div>
-         
-        <ul id="listaExamenes" class="collection height24rem content-scroll "></ul>
+      <div class="col s12 m12 l5 xl6 clear-top-1 ">
+        <div class="azul-texto weight700">Exámenes Asignados:</div>
+        <ul id="listaExamenes" class="collection height24rem content-scroll margin0"></ul>
+      </div>
+        
+        
       </div>
     </div>
 
-    <div id="areaCambios" class="row margin0">
-    </div>
+    
 
     
 
     <div id="areaReservas" class="row">    
       <div class="col s12 m12 l12 xl12 ">
-        <ul class="collapsible">
+        <ul id="collapsibleEdicionReservas" class="collapsible collapsible-no-shadow ">
           <li>
-            <div class="collapsible-header">
-                <i class="material-icons">assignment</i>Reservas en fecha
+            <div class="collapsible-header grey lighten-3 azul-texto">
+              <i class="material-icons">edit</i>Editar Fecha y Asignar Exámenes a Fecha
+            </div>
+
+            <div class="collapsible-body">
+
+              <div class="row margin0">
+                <div id="areaCambios" class="col s6 m6 l6 xl6 margin0"></div>
+              
+
+                <div class="col s6 m6 l6 xl6">
+                  <div id="inputSelectarExamenes" class="input-field notVisible">
+                    <select id="selectarExamenes" multiple>
+                      <option value="" disabled>Seleccionar</option>
+                    </select>
+                    <label>Listado de Exámenes</label>
+                
+                    <a id="botonAgregarExamenesAFecha" class="azul-texto cursorPointer">
+                      <i class="material-icons-outlined left secondary-content button-opacity pointer azul-texto">arrow_upward</i>Agregar
+                    </a>
+                  </div>
+                </div>
+
+            </div>
+
+          </li>   
+
+
+          <li>
+            <div class="collapsible-header grey lighten-3 azul-texto">
+                <i class="material-icons">assignment</i>Ver Reservas en Fecha, Imprimir Planillas y Enviar Emails
             </div>
 
             <div class="collapsible-body">
               <div class="row margin0">
-                <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
+                <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 "></div>
                 <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
                 <div id="areaMailSeleccionados" class="row margin0">
               </div>
@@ -1486,33 +1516,35 @@ class FechasVista {
   areaCambiosFechaDia() {
     $('#areaCambios').empty();
     $('#areaCambios').append(`
-    <div class="col s3 m3 l2 xl2 offset-l6 offset-xl6">
-        <input id="diaExamenCambio" type="text" class="datepicker">
-        <label class="gris-texto">DIA</label>
-      </div>
+      <div class="row margin0">
+        <div class="col s6 m6 l4 xl4 ">
+          <input id="diaExamenCambio" type="text" class="datepicker">
+          <label class="gris-texto">DIA</label>
+        </div>
 
-      <div class="col s2 m2 l1 xl1">
-        <input id="horaExamenCambio" type="text" class="timepicker">
-        <label class="gris-texto">HORA</label>
-      </div>
+        <div class="col s4 m4 l2 xl2">
+          <input id="horaExamenCambio" type="text" class="timepicker">
+          <label class="gris-texto">HORA</label>
+        </div>
 
-      <div class="col s3 m3 l2 xl2 ">
-      <input id="finalizaDiaInscripcionCambio" type="text" class="datepicker">
-      <label class="gris-texto">Finaliza DIA</label>
-      </div>
+        <div class="col s6 m6 l4 xl4 ">
+          <input id="finalizaDiaInscripcionCambio" type="text" class="datepicker">
+          <label class="gris-texto">Finaliza DIA</label>
+        </div>
 
-      <div class="input-field col s2 m2 l1 xl1 ">
-        <input id="inputCupoCambio" type="number" autocomplete="off" >
-        <label for="inputCupoCambio">Cupo</label>
+        <div class="input-field col s4 m4 l2 xl2 ">
+          <input id="inputCupoCambio" type="number" autocomplete="off" >
+          <label for="inputCupoCambio">Cupo</label>
+        </div>
       </div>
 
       <div class="row">
-    <div class="col s6 m6 l6 xl6 offset-l6 offset-xl6 valign-wrapper">
-      <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
-      <a id="resetExamenesEnFecha" class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
-      <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>
-    </div>
-  </div>
+        <div class="col s12 m12 l12 xl12 valign-wrapper">
+          <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
+          <a id="resetExamenesEnFecha" class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
+          <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>
+        </div>
+      </div>
     `)
     this.aceptarSoloNumerosEnInput("inputCupoCambio");
   }
@@ -1522,30 +1554,33 @@ class FechasVista {
   areaCambiosFechaSemana() {
     $('#areaCambios').empty();
     $('#areaCambios').append(`
-       <div id="listadoSemanasListenChange" class="input-field col s5 m5 l3 xl3 offset-l6 offset-xl6">
-          <select id="listadoSemanas">
-          </select>
-          <label>Seleccionar Semana</label>
+      <div class="row margin0">
+        <div id="listadoSemanasListenChange" class="input-field col s11 m11 l10 xl10 ">
+            <select id="listadoSemanas">
+            </select>
+            <label>Seleccionar Semana</label>
+        </div>
       </div>
       
-      <div class="col s3 m3 l2 xl2 ">
-      <input id="finalizaDiaInscripcionCambio" type="text" class="datepicker">
-      <label class="gris-texto">Finaliza DIA</label>
-      </div>
+      <div class="row margin0">
+        <div class="col s6 m6 l4 xl4 ">
+          <input id="finalizaDiaInscripcionCambio" type="text" class="datepicker">
+          <label class="gris-texto">Finaliza DIA</label>
+        </div>
 
-      <div class="input-field col s2 m2 l1 xl1 ">
-        <input id="inputCupoCambio" type="number" autocomplete="off" >
-        <label for="inputCupoCambio">Cupo</label>
+        <div class="input-field col s4 m4 l2 xl2 ">
+          <input id="inputCupoCambio" type="number" autocomplete="off" >
+          <label for="inputCupoCambio">Cupo</label>
+        </div>
       </div>
 
       <div class="row">
-    <div class="col s6 m6 l6 xl6 offset-l6 offset-xl6 valign-wrapper">
-      <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
-      <a id="resetExamenesEnFecha" class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
-      <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>      
-    </div>
-  </div>
-         
+        <div class="col s12 m12 l12 xl12 valign-wrapper clear-top-2">
+          <a id="botonGuardarExamenesEnFecha" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
+          <a id="resetExamenesEnFecha" class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
+          <span id="estadoCambiosFechaExamenes" class="padding-left2-4"></span>      
+        </div>
+      </div>        
 
     `)
     this.aceptarSoloNumerosEnInput("inputCupoCambio");
@@ -1554,7 +1589,7 @@ class FechasVista {
   areaCambiosFechaRendida() {
     $('#areaCambios').empty();
     $('#areaCambios').append(`
-    <div class=" col s12 m12 l6 xl6 offset-l6 offset-xl6 azul-texto weight700">La fecha seleccionada no puede editarse porque es anterior a la fecha actual.</div>
+    <div class=" col s12 m12 l12 xl12 azul-texto weight700">La fecha seleccionada no puede editarse porque es anterior a la fecha actual.</div>
     `);
   }
 
@@ -2236,9 +2271,6 @@ class FechasVista {
             <td>${reserva.alumno_documento_id}</td>
           </tr>`)
     });
-
-
-
   };
 
   mostrarBotoneraReservasEnDiaLs() {
@@ -2441,7 +2473,7 @@ Saludos!</textarea>
       $(`#${id}`).remove();
 
       if (!$('#listaExamenes').find('li').length) {
-        $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
+        $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha todavía.</div>')
       }
 
     });
@@ -2503,7 +2535,7 @@ Saludos!</textarea>
   renderExamenesEnLista = (fechaEditable, examenes, tipoSelected) => {
     $("#listaExamenes").empty();
     if (examenes.length === 0) {
-      $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha.</div>')
+      $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha todavía.</div>')
     }
 
     // Los examenes que vienen de la DB vienen ordenados por el uuid. Vamos a ordeñarlos.
