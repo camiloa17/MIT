@@ -8,98 +8,131 @@
 </div>
 <main>
     <form action="/pay" method="POST">
-    <section id="checkout_information">
-        <%- include("partials/checkoutSteps") -%>
-        
-        <div class="pago">
+        <section id="checkout_information">
+            <%- include("partials/checkoutSteps") -%>
 
-            <div id="person-information">
-                <h2>COMPLETAR TUS DATOS</h2>
-                <P>Completa todos los campos obligatorios *</P>
-                <div id="information-wrapper">
-                    <label for="">Nombre</label>
-                    <input type="text" placeholder="Nombre" name="mombre" required>
-                    <label for="">Apellido/s</label>
-                    <input type="text" placeholder="Apellido/s" name="apellido" required>
-                    <label>Fecha Nacimiento</label>
-                    <input type="date" name="fecha-nacimiento" value="1987-06-21" required>
-                    <span>Genero</span>
-                    <label for="" class="genero-inp">Masculino</label>
-                    <input type="radio" name="genero" class="genero-inp" required>
-                    <label for="" class="genero-inp">Femenino</label required>
-                    <input type="radio" name="genero" class="genero-inp">
-                    <label for="">DNI</label>
-                    <input type="text" name="documento" placeholder="A96554621" min="0">
-                    <label for="">Email</label>
-                    <input type="email" name="email">
-                    <label for="">Telefono fijo</label>
-                    <input type="tel" name="">
-                    <label for="">Telefono movile</label>
-                    <input type="tel" name="">
-                    <label for="">Localidad de Residencia</label>
-                    <input type="text" name="localidad">
-                    <label for="">Direccion</label>
-                    <input type="text" name="direccion">
-                    <label for="">Provincia</label>
-                    <select name="" id="">
-                        <option value="albacete">albacete</option>
-                        <option value="alicante/alacant">alicante/alacant</option>
-                    </select>
-                </div>
+            <div class="pago">
 
-            </div>
-            <div id="pago-stripe">
-                <h2>PAGO CON STRIPE</h2>
-                <p>Paga tranquilo con la seguridad de stripe, no guardamos informacion de la tarjeta</p>
-                <div class="form-row">
-                    <label for="card-element">
-                        Credit or debit card
-                    </label>
-                    <div id="card-element">
-                        <!-- A Stripe Element will be inserted here. -->
-                    </div>
-                    <!-- Used to display form errors. -->
-                    <div id="card-errors" role="alert"></div>
-                </div>
+                <div id="person-information">
+                    <h2>COMPLETAR TUS DATOS</h2>
+                    <P>Completa todos los campos obligatorios *</P>
+                    <div id="information-wrapper">
+                        <label for="">Nombre</label>
+                        <input type="text" placeholder="Nombre" name="mombre" class="input-checkout" required>
+                        <label for="">Apellido/s</label>
+                        <input type="text" placeholder="Apellido/s" name="apellido" class="input-checkout" required>
+                        <label>Fecha Nacimiento</label>
+                        <input type="date" name="fecha-nacimiento" value="1987-06-21" class="input-checkout" required>
+                        <label for="">DNI</label>
+                        <input type="text" name="documento" placeholder="Documento de identificacion(DNI o Pasaporte)"
+                            class="input-checkout" min="0">
+                        <div class="genero-section">
+                            <span>Genero</span>
+                            <input type="radio" name="genero" class="genero-inp" required>
+                            <label for="" class="genero-inp">Masculino</label>
+                            <input type="radio" name="genero" class="genero-inp">
+                            <label for="" class="genero-inp">Femenino</label required>
+                        </div>
 
-                <div class="envio-domicilio">
-                    <p>¿Quieres adicionar al envío del certificado a tu domicilio?</p>
-                    <div class="wrapper-decision-domicilio">
-                        <input type="radio" name="other-address" id="b1">
-                        <input type="radio" name="other-address" id="b2" checked>
-                        <label for="b1" class="button-address" id="label-si">Si</label>
-                        <label for="b2" class="button-address" id="label-no">No</label>
-                    </div>
-                    <div class="wrapper-nuevo-domicilio">
-                        <input type="checkbox" name="nuevo-domicilio" id="adicion-nuevo-domicilio">
-                        <label for="nuevo-domicilio">Cargar nuevo domicilio de envío</label>
-                        <div id="seccion-nuevo-domicilio">
-                            
-                            <label for="">Provincia</label>
-                            <select name="" id="">
-                                <option value="albacete">albacete</option>
-                                <option value="alicante/alacant">alicante/alacant</option>
-                            </select>
-                            <label for="">Localidad de Residencia</label>
-                            <input type="text" name="localidad">
-                            <label for="">Direccion</label>
-                            <input type="text" name="direccion">
+                        <label for="">Email</label>
+                        <input type="email" name="email" class="input-checkout" placeholder="Mail">
+                        <label for="">Telefono fijo</label>
+                        <input type="tel" name="tfijo" class="input-checkout" placeholder="Numero de Telefono">
+                        <label for="">Telefono movile</label>
+                        <input type="tel" name="tmovile" class="input-checkout" placeholder="Numero de Celular">
+                        <label for="">Provincia</label>
+                        <select name="provincia" id="prov" class="input-checkout">
+                            <option value="">provincia</option>
+                            <option value="albacete">albacete</option>
+                            <option value="alicante/alacant">alicante/alacant</option>
+                        </select>
+                        <label for="">Localidad de Residencia</label>
+                        <input type="text" name="localidad" class="input-checkout"
+                            placeholder="Localidad de Residencia">
+                        <label for="">Direccion</label>
+                        <input type="text" name="direccion" class="input-checkout" placeholder="Direccion">
+
+                        </br>
+                        <input type="checkbox" name="discapacidad" id="selector-discapacidad">
+                        <label for="discapacidad" id='discapacidad-label'>Sufro alguna condicion fisica o mental
+                            especial?</label>
+
+                        <div class='seccion-numero-trinity'>
+                            <input type="checkbox" name="numeroTrinity" id="idTrinity">
+                            <label for="idTrinity" class='trinity'>Cuento con un Numoero de Trinity?</label>
+                            <div class="seccion-input-trinity">
+                                <input type="text" placeholder="Número Trinity" id="input-trinity">
+                            </div>
+
                         </div>
                     </div>
+
+                </div>
+                <div id="pago-stripe">
+                    <h2>PAGO CON STRIPE</h2>
+                    <p>Paga tranquilo con la seguridad de stripe, no guardamos informacion de la tarjeta</p>
+                    <div class="form-row">
+                        <label for="card-element">
+                            Credit or debit card
+                        </label>
+                        <div id="card-element">
+                            <!-- A Stripe Element will be inserted here. -->
+                        </div>
+                        <!-- Used to display form errors. -->
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+
+                    <div class="envio-domicilio">
+                        <p>¿Quieres adicionar al envío del certificado a tu domicilio?</p>
+                        <div class="wrapper-decision-domicilio">
+                            <input type="radio" name="other-address" class="envio-seleccion" id="b1" value="si">
+                            <input type="radio" name="other-address" class="envio-seleccion" id="b2" value="no" checked>
+                            <label for="b1" class="button-address" id="label-si">Si</label>
+                            <label for="b2" class="button-address" id="label-no">No</label>
+                        </div>
+                        <div class="wrapper-nuevo-domicilio">
+                            <input type="checkbox" name="nuevo-domicilio" id="adicion-nuevo-domicilio">
+                            <label for="nuevo-domicilio">Cargar nuevo domicilio de envío</label>
+                            <div id="seccion-nuevo-domicilio">
+
+                                <label for="">Provincia</label>
+                                <select name="" id="">
+                                    <option value="albacete">albacete</option>
+                                    <option value="alicante/alacant">alicante/alacant</option>
+                                </select>
+                                <label for="">Localidad de Residencia</label>
+                                <input type="text" name="localidad">
+                                <label for="">Direccion</label>
+                                <input type="text" name="direccion">
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="checkbox" name="aceptar-uso-datos" id="uso-datos">
+                    <label for="aceptar-uso-datos">Acepta los términos y condiciones</label>
+                    <p>*<i> No vamos a almacenar ningún tipo de información en nuestra base de datos de las tarjetas de
+                            crédito.</i></p>
                 </div>
             </div>
-        </div>
-    </section>
-    <div class="button-wrap">
-        <% if(modo==="Completo") {%>
-            <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>&idreserva=<%=idreserva%>">Regresar</a>
+        </section>
+
+        <section id='detalles-compra'>
+            <h3>Detalles de la compra</h3>
+            <!--Total--> 
+            <p>Examen de ingles ISE1 Reading & Writing</p>
+            <h2>€<span id="precio"><%=precio%></span></h2>
+        </section>
+        <div class="button-wrap">
+            <% if(modo==="Completo") {%>
+            <a class="button-checkout backwards"
+                href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>">Regresar</a>
             <% }else {%>
-                <a class="button-checkout backwards"
-                    href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idreserva=<%=idreserva %>">Regresar</a>
-                <% }%>
-        
-        <a class="button-checkout next" href="#">Pagar</a>
-    </div>
+            <a class="button-checkout backwards"
+                href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+            <% }%>
+
+            <button type="submit" class="button-checkout" id="button-horario" disabled>Siguiente</button>
+        </div>
     </form>
 </main>
 

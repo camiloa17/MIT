@@ -17,7 +17,6 @@
         
                 <% horario.horarios.forEach((opcion,index)=> {%>
                  <% if(opcion.id_semanaEx){%>
-                    
                 <input type="radio" name="horario-selector" id="h<%= index+1 %>" class="<%=opcion.id_diaEx%> <%=opcion.id_semanaEx%>">
 
                  <% }else {%>

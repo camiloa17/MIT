@@ -3,14 +3,13 @@
 document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
 
-/*step2 */
-document.getElementsByName('horario-selector').forEach(input=>{
-  input.addEventListener('change', setRoute)
+document.querySelector('#adicion-nuevo-domicilio').addEventListener('change', mostrarNuevoDomicilio);
+document.querySelector('#idTrinity').addEventListener('change', mostrarNumeroTrinity);
+document.querySelectorAll('.envio-seleccion').forEach(element=>{
+  element.addEventListener('change', sumarEnvio)
 })
 
-/* ruta para el step2 */
-let route=window.location.href;
-
+const precio = document.querySelector("#precio").innerText;
 
 function openNav(item) {
   const clickItems = item.target.classList;
@@ -34,66 +33,6 @@ function closeNav(item) {
     document.querySelector('.overflow').classList.remove('overflow-menu');
   }
 }
-
-
-
-function habilitarBoton() {
-  const boton = document.querySelector('button.button-checkout');
-  if (boton) {
-    boton.disabled = false;
-  }
-
-}
-
-
-/* Paso 2  */
- function setRoute(){
-  try{
-  const submitRoute = route.replace(/step_2/g,"horario-selected");
-  let horarioSeleccionado;
-  let horarioListening;
-  document.getElementsByName('horario-selector').forEach(horario => {
-      if (horario.checked) {
-        if(horario.classList.length==2){
-          horarioSeleccionado = (horario.classList[0]);
-          horarioListening =(horario.classList[1])
-        }else{
-          horarioSeleccionado = (horario.classList[0]);
-        }
-        
-      }
-    });
-    
-    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${horarioSeleccionado}${(horarioListening?`&idhorarioL=${horarioListening}`:"")}`);
-    habilitarBoton()
-  /*
-  const ingresarAlServer= await postData(`${submitRoute}&idhorario=${horarioSeleccionado}`,this);
-  */
-  
-  }catch(err){
-    console.log(err)
-  }
-}
-/*
-async function postData(url='',data={}){
-  try{
-  const response = await fetch(url,{
-    method:'POST',
-    mode:'cors',
-    cache:'no-cache',
-    credentials:'same-origin',
-    headers:{'Content-type':'application/json'},
-    redirect:'follow',
-    referrer:'no-referrer',
-    body:JSON.stringify(data)
-  })
-}catch(err){
-  console.log(err)
-}
-}
-*/
-
-
 
 
 
@@ -143,10 +82,6 @@ card.addEventListener('change', function (event) {
 /*Codigo Stripe */
 
 
-/*Paso3 y 4 */
-
-document.querySelector('#adicion-nuevo-domicilio').addEventListener('change',mostrarNuevoDomicilio);
-
 function mostrarNuevoDomicilio(){
   let estado= this.checked;
   const elementoDomicilio = document.querySelector('#seccion-nuevo-domicilio');
@@ -157,4 +92,29 @@ function mostrarNuevoDomicilio(){
   }
   
 }
+
+function mostrarNumeroTrinity(){
+  let estado = this.checked;
+  const elementoNumero = document.querySelector('.seccion-input-trinity');
+  if (estado === true) {
+    elementoNumero.style.height = `${elementoNumero.scrollHeight + 10}px`;
+    document.querySelector('#input-trinity').required=true;
+  } else if (estado === false) {
+    elementoNumero.style.height = `0px`;
+    document.querySelector('#input-trinity').required = false;
+  }
+}
+
+function sumarEnvio(){
+  let botonSeleccionado = document.querySelector('.envio-seleccion:checked').value;
+  console.log(botonSeleccionado)
+  if(botonSeleccionado==="si"){
+  document.querySelector('#precio').innerText= parseInt(document.querySelector("#precio").innerText)+10;
+    document.querySelector('#detalles-compra p').innerText ="Examen de ingles ISE1 Reading & Writing + Envio"
+  }else if(botonSeleccionado==="no"){
+    document.querySelector("#precio").innerText=precio;
+    document.querySelector('#detalles-compra p').innerText = "Examen de ingles ISE1 Reading & Writing"
+  }
+}
+
 

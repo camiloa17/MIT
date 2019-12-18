@@ -158,26 +158,26 @@ exports.crearReservaEnProceso = async (modalidad, idExamenEnDia, idExamenEnSeman
                 const reservaTemporalCompleto = await crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana);
                 if (reservaTemporalCompleto) {
                     return { reserva: reservaTemporalCompleto.reserva, uuid: reservaTemporalCompleto.uuid }
-                }else if(!reservaTemporalCompleto){
+                } else if (!reservaTemporalCompleto) {
                     return false
                 }
                 break;
             case "Reading & Writing":
                 const reservaTemporalRW = await crearReservaTemporalRW(idExamenEnDia);
-                if(reservaTemporalRW){
-                    return {reserva:reservaTemporalRW.reserva, uuid:reservaTemporalRW.uuid}
-                }else if(!reservaTemporalRW){
+                if (reservaTemporalRW) {
+                    return { reserva: reservaTemporalRW.reserva, uuid: reservaTemporalRW.uuid }
+                } else if (!reservaTemporalRW) {
                     return false
                 }
 
                 break;
 
             case "Listening & Speaking":
-                const reservaTemporalLs =await crearReservaTemporalLs(idExamenEnDia);
-                if(reservaTemporalLs){
+                const reservaTemporalLs = await crearReservaTemporalLs(idExamenEnDia);
+                if (reservaTemporalLs) {
                     console.log(reservaTemporalLs);
                     return { reserva: reservaTemporalLs.reserva, uuid: reservaTemporalLs.uuid }
-                }else if(!reservaTemporalLs){
+                } else if (!reservaTemporalLs) {
                     console.log(reservaTemporalLs)
                     return false
                 }
@@ -196,7 +196,7 @@ async function crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana) {
         //Se corrobora que exista los examenes en esos horarios
         const consultaCompleto = await queries.consultaExistenciaDeExamenEnHorario('Completo');
         const corroborarExistenciaExamenCompleto = await utils.queryAsync(consultaCompleto, [idExamenEnDia, idExamenEnSemana]);
-        
+
         if (corroborarExistenciaExamenCompleto[0].id_semana === 1 && corroborarExistenciaExamenCompleto[0].id_dia === 1) {
             //Se crea una fecha un UUID y se inserta la reserva con la informacion minima.
             const fechaReserva = new Date(Date.now()).toISOString();
@@ -214,19 +214,19 @@ async function crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana) {
 
 
 
-async function crearReservaTemporalRW(idExamenEnDia){
-    try{
-    const consultaRw = await queries.consultaExistenciaDeExamenEnHorario('Reading & Writing');
-    const corroborarExistenciaExamenRW = await utils.queryAsync(consultaRw, [idExamenEnDia]);
-    if (corroborarExistenciaExamenRW[0].id===1){
-        const fechaReserva = new Date(Date.now()).toISOString();
-        const uuid = uuidv4();
-        const sqlInsertarRW= await queries.ingresarReservaEnProcesoExamenRW();
-        const insertarReservaRW= await utils.queryAsync(sqlInsertarRW,[idExamenEnDia,fechaReserva,1,0,uuid]);
-        
-        return {reserva:insertarReservaRW,uuid:uuid}
-    }
-    }catch(err){
+async function crearReservaTemporalRW(idExamenEnDia) {
+    try {
+        const consultaRw = await queries.consultaExistenciaDeExamenEnHorario('Reading & Writing');
+        const corroborarExistenciaExamenRW = await utils.queryAsync(consultaRw, [idExamenEnDia]);
+        if (corroborarExistenciaExamenRW[0].id === 1) {
+            const fechaReserva = new Date(Date.now()).toISOString();
+            const uuid = uuidv4();
+            const sqlInsertarRW = await queries.ingresarReservaEnProcesoExamenRW();
+            const insertarReservaRW = await utils.queryAsync(sqlInsertarRW, [idExamenEnDia, fechaReserva, 1, 0, uuid]);
+
+            return { reserva: insertarReservaRW, uuid: uuid }
+        }
+    } catch (err) {
         console.log(err);
         return false
     }
@@ -234,18 +234,18 @@ async function crearReservaTemporalRW(idExamenEnDia){
 }
 
 
-async function crearReservaTemporalLs(idExamenEnSemana){
+async function crearReservaTemporalLs(idExamenEnSemana) {
     try {
         const consultaLs = await queries.consultaExistenciaDeExamenEnHorario('Listening & Speaking');
         const corroborarExistenciaExamenLs = await utils.queryAsync(consultaLs, [idExamenEnSemana]);
-        if (corroborarExistenciaExamenLs[0].id===1){
+        if (corroborarExistenciaExamenLs[0].id === 1) {
             const fechaReserva = new Date(Date.now()).toISOString();
             const uuid = uuidv4();
             const sqlInsertarRW = await queries.ingresarReservaEnProcesoExamenLS();
             const insertarReservaLs = await utils.queryAsync(sqlInsertarRW, [idExamenEnSemana, fechaReserva, 1, 0, uuid]);
             return { reserva: insertarReservaLs, uuid: uuid }
         }
-        
+
     } catch (err) {
         console.log(err)
         return false
@@ -256,6 +256,21 @@ exports.verReservarPaso3 = async (id) => {
     const consultaReserva = await queries.consultaReservaPaso3();
     const verDB = await utils.queryAsync(consultaReserva, id)
     return verDB
+}
+
+
+/** */
+exports.corroborarCambioDeHorario = async (modalidad,idReserva, idHorario, idHorarioSemana) => {
+    console.log(idReserva,idHorario,idHorarioSemana)
+    if (modalidad==="Completo") {
+        console.log('completo')
+    } else {
+        console.log('R&W')
+    }
+}
+
+exports.actualizarReservaEnProceso =async(modalidad,horario,reserva,horarioSemana)=>{
+console.log(modalidad,horario,reserva,horarioSemana);
 }
 
 

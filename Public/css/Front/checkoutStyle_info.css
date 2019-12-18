@@ -219,10 +219,14 @@ h3{
     margin:0 auto;
 }
 
+#information-wrapper{
+    margin-left: 20px;
+}
 
-
+#information-wrapper label{
+    display: none;
+}
 #information-wrapper input,
-#information-wrapper label,
 #information-wrapper span{
     display: block;
     width: 250px;
@@ -231,6 +235,15 @@ h3{
 #information-wrapper input{
     margin-bottom:15px;
     padding-left: 5px;
+    border:none;
+    border-bottom: 2px solid #085796;
+    height:25px;
+}
+
+#information-wrapper input:focus{
+    border:none;
+    border-bottom: 2px solid #085796;
+    outline: none;
 }
 
 
@@ -239,14 +252,36 @@ h3{
     width:80px;
 }
 
-#information-wrapper input[name='genero'].genero-inp{
+#information-wrapper #discapacidad-label,
+#information-wrapper #selector-discapacidad,
+#information-wrapper label[class="trinity"],
+#information-wrapper input[name='numeroTrinity']{
+    display: inline-block;
+    margin-top:10px;
+    color:black;
+}
+
+
+#information-wrapper input[name='genero'].genero-inp,
+#information-wrapper input[name='discapacidad'],
+#pago-stripe input[name='aceptar-uso-datos'],
+#pago-stripe input[name='nuevo-domicilio'],
+#information-wrapper input[name='numeroTrinity']{
     width:20px;
+    height:20px;
 }
 
 #information-wrapper label,
 #information-wrapper span{
     color:rgba(0, 0, 0, 0.534);
     font-size: 16px;
+}
+
+.seccion-input-trinity{
+    height: 0;
+    overflow:hidden;
+    transition: 0.2s;
+
 }
 
 /*Seccion pago con stripe*/
@@ -266,15 +301,11 @@ h3{
 /*inicio de estilos tarjeta stripe*/
 .StripeElement {
     box-sizing: border-box;
-  
     height: 40px;
-  
     padding: 10px 12px;
-  
     border: 1px solid transparent;
     border-radius: 4px;
     background-color: white;
-  
     box-shadow: 0 1px 3px 0 #e6ebf1;
     -webkit-transition: box-shadow 150ms ease;
     transition: box-shadow 150ms ease;
@@ -363,6 +394,21 @@ input[id="b2"]:checked ~ #label-no{
     background-color: #073f6d;
 }
 
+#button-horario{
+        padding-top:0;
+    }
+
+    button.button-checkout:disabled{
+    cursor:not-allowed;
+    background:#BBBBBB;
+    border: 1px solid #BBBBBB;
+}
+
+#detalles-compra{
+    display:flex;
+    align-items: center;
+    flex-direction: column;
+}
 
 
 /*footer politicas*/
@@ -500,8 +546,27 @@ input[id="b2"]:checked ~ #label-no{
         padding-left:0;
         width:500px;
         height: 350px;
-        overflow-y:scroll;
     }
+
+    #information-wrapper .input-checkout{
+        width:220px;
+        display:inline-block;
+        margin-right: 10px;
+    }
+
+    .genero-section{
+        display:flex;
+        justify-content: flex-start;
+    }
+    #information-wrapper span{
+        width:150px;
+    }
+    #information-wrapper .genero-inp{
+        width:120px;
+        margin-left: 10px;
+    }
+
+   
 
     #information-wrapper label{
         margin-bottom:5px;

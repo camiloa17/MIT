@@ -41,42 +41,32 @@ function habilitarBoton() {
 
 }
 
+function desHabilitarBotton() {
+    const boton = document.querySelector('button.button-checkout');
+    if (boton) {
+        boton.disabled = true;
+    }
+}
+
 
 /* Paso 2  */
 async function setRoute() {
     try {
-        const testIdreserva = /idreserva/g;
+        desHabilitarBotton()
         const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
         const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
-        if(testIdreserva.test(route)){
-            const idReserva = route.match(/idreserva=(\S{8}-\S{4}-\S{4}-\S{4}-\S{12})/)[1];
-            const verSiEstaLaReerva = await getReserva(idReserva);
-            const respuesta = await verSiEstaLaReerva.json()
-            
-            if(respuesta.reserva===1){
-                const obtenerHorariosReserva = await getHorario()
-                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorariosReserva.horarioSeleccionado}${(obtenerHorariosReserva.horarioListening ? `&idhorarioL=${obtenerHorariosReserva.horarioListening}` : "")}&idreserva=${idReserva}`);
-                document.querySelector('form').setAttribute('method','PUT');
-                habilitarBoton();
-                
-            }else{
-                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-                habilitarBoton()
-            }
-            
-        }else{
-            
-            const obtenerHorarios= await getHorario()
-            document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-            habilitarBoton()
-        }
-      
+        const obtenerHorarios = await getHorario()
+        document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+        habilitarBoton()
+
+
 
     } catch (err) {
         console.log(err)
     }
 }
 
+/*
 async function getReserva(id){
     try{
         const verSiEstaLaReerva = await fetch(`/checkout/ver-horario/${id}`);
@@ -85,8 +75,9 @@ async function getReserva(id){
         console.log(err)
     }
 }
+*/
 
-async function getHorario(){
+async function getHorario() {
     let horarioSeleccionado;
     let horarioListening;
     document.getElementsByName('horario-selector').forEach(horario => {
@@ -100,6 +91,42 @@ async function getHorario(){
 
         }
     });
-    return{horarioSeleccionado:horarioSeleccionado,horarioListening:horarioListening}
+    return { horarioSeleccionado: horarioSeleccionado, horarioListening: horarioListening }
 
 }
+
+
+/*/* Paso 2  para
+async function setRoute() {
+    try {
+        desHabilitarBotton()
+        const testIdreserva = /idreserva/g;
+        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
+        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+
+        if (testIdreserva.test(route)) {
+            const idReserva = route.match(/idreserva=(\S{8}-\S{4}-\S{4}-\S{4}-\S{12})/)[1];
+            const verSiEstaLaReerva = await getReserva(idReserva);
+            const respuesta = await verSiEstaLaReerva.json()
+            if (respuesta.reserva === 1) {
+                const obtenerHorariosReserva = await getHorario()
+                const updateRoute = linkConId.replace(/step_2/g, "horario-updated");
+                console.log(obtenerHorariosReserva);
+                document.querySelector('form').setAttribute('action', `${updateRoute}&idhorario=${obtenerHorariosReserva.horarioSeleccionado}${(obtenerHorariosReserva.horarioListening ? `&idhorarioL=${obtenerHorariosReserva.horarioListening}` : "")}&idreserva=${idReserva}`);
+                habilitarBoton();
+            } else {
+                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+                habilitarBoton()
+            }
+
+        } else {
+            const obtenerHorarios = await getHorario()
+            document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+            habilitarBoton()
+        }
+
+
+    } catch (err) {
+        console.log(err)
+    }
+} */
