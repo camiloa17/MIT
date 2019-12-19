@@ -1975,7 +1975,7 @@ class FechasVista {
     this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
-    this.asignarFuncionBotonExportarTrinity();    
+    this.asignarFuncionBotonExportarTrinity();
 
     this.mostrarListadoDiasOralesParaSemana()
     let diasOral = await this.fechasServicio.getListaHorariosOrales();
@@ -1984,7 +1984,7 @@ class FechasVista {
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
 
     this.mostrarEnviarMailASeleccionados()
-     
+
   }
 
   //cuando asigno diasLS a semanas, actualizo la lista de reservas
@@ -2003,7 +2003,7 @@ class FechasVista {
   async generarListaReservaDiaRw(idSelected) {
     $('#listadoReservasEnFechas').empty();
     $('#collapsibleReservas').empty()
-    
+
     this.mostrarTablaReservasEnDiaRw();
 
     let idEstado = $('#estadoListadoReservas');
@@ -2016,7 +2016,7 @@ class FechasVista {
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
-    
+
     this.mostrarEnviarMailASeleccionados()
   }
 
@@ -2029,21 +2029,21 @@ class FechasVista {
     let idEstado = $('#estadoListadoReservas');
     this.appendProgressIndeterminate(idEstado);
 
-    let reservasLs= await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaLs, idEstado);
+    let reservasLs = await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaLs, idEstado);
     this.reservasEnCurso = reservasLs;
 
-    this.mostrarBotoneraYEdicionReservas();    
+    this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
-    
-    this.mostrarEnviarMailASeleccionados() 
+
+    this.mostrarEnviarMailASeleccionados()
 
   }
 
   habilitarToggleCheckboxAll() {
     $("#ckbCheckAll").click(function () {
-      $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+      $(".checkBoxClass").not('.disabled').prop('checked', $(this).prop('checked'));
     });
   }
 
@@ -2097,7 +2097,7 @@ class FechasVista {
   `)
   }
 
-  
+
   mostrarTablaReservasEnDiaLs() {
     $('#listadoReservasEnFechas').empty().append(
       `<table>
@@ -2127,7 +2127,7 @@ class FechasVista {
 
   mostrarElementosListaReservasEnSemanasLs = (reservasSemanaLs) => {
     $('#bodyListadoReservasEnFechas').empty();
-    $('#estadoListadoReservas').empty();    
+    $('#estadoListadoReservas').empty();
 
     if (reservasSemanaLs.length) {
       reservasSemanaLs.sort(function (objA, objB) {
@@ -2159,7 +2159,7 @@ class FechasVista {
           `<tr>
             <td class="th-width-short">
               <label>
-                <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass ${reserva.dia_LS_uuid ? "" : "sinAsignar"}"   type="checkbox"   />
                 <span class="margin-top-5px"></span>
               </label>
             </td>
@@ -2167,14 +2167,14 @@ class FechasVista {
             <td>${reserva.alumno_apellido}</td>
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
-            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen)   : "sin asignar"}</td>
+            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen) : "sin asignar"}</td>
           </tr>`)
       });
     } else {
       $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
     }
   }
- 
+
   mostrarElementosListaReservasEnDiaRw(reservaDiaRw) {
     $('#bodyListadoReservasEnFechas').empty();
     $('#estadoListadoReservas').empty();
@@ -2273,7 +2273,22 @@ class FechasVista {
       </div>      
       `)
 
-      $('.collapsible').collapsible()
+    $('#collapsibleReservas').collapsible({
+
+      onOpenEnd: () => {
+        if ($("#collapsibleReservas").find("li.active").attr("id") === "collapsibleMail") {
+          //$(".checkBoxClass, #ckbCheckAll").prop('checked', "");
+          $('.sinAsignar').prop('checked', "").attr('disabled', true).addClass('disabled');
+          this.chequearCantidadDeReservasSeleccionadas();
+        }
+      },
+
+      onCloseStart: () => {
+        if ($("#collapsibleReservas").find("li.active").attr("id") === "collapsibleMail") {
+          $('.sinAsignar').attr('disabled', false).removeClass('disabled');
+        }
+      }
+    });
   };
 
   mostrarListadoDiasOralesParaSemana() {
@@ -2302,37 +2317,50 @@ class FechasVista {
 
   mostrarEnviarMailASeleccionados() {
     $('#collapsibleReservas').append(`
-                <li>
+                <li id="collapsibleMail">
                     <div class="collapsible-header grey lighten-3 azul-texto">
                         <i class="material-icons">mail</i>Enviar Email con Fechas a Seleccionados
                     </div>
 
                     <div class="collapsible-body">
-                        <div class="row">
-                            <form class="col s12">
-                                <div class="row">
-                                    <div class="input-field col l8">
-                                        <input placeholder="Placeholder" id="mail_asunto" type="text" class="validate" value="Fechas de Examen MIT">
-                                        <label for="mail_asunto">Asunto</label>
-                                    </div>
-                                    <div class="input-field col l12">
-                                        <textarea id="textarea_Mail" contenteditable="true" class="materialize-textarea gris-texto">Hola {nombre} {apellido},
+                      <div class="row">
+                          <form class="col s12">
+                              <div class="row">
+                                  <div class="input-field col s12 m12 l12 xl12">
+                                      <input placeholder="Placeholder" id="mail_asunto" type="text" class="validate" value="Fechas de Examen MIT">
+                                      <label for="mail_asunto">Asunto</label>
+                                  </div>
+                                  <div class="input-field col s12 m12 l12 xl12">
+                                      <textarea id="textarea_Mail" contenteditable="true" class="materialize-textarea gris-texto">Hola {nombre} {apellido},
 Ya estás inscripto al examen {examen} el día {dia} en el horario {hora}.
 Debés presentarte en Av Cordoba 1659 - 3er piso con una anticipación de 30 minutos.
 Cualquier duda te podés comunicar vía telefónica al +34 952 202322.
 Saludos!</textarea>
-                                        <label for="textarea_Mail">Cuerpo de Mail</label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                                      <label for="textarea_Mail">Cuerpo de Mail</label>
+                                  </div>
+                              </div>
+                              <div class="azul-texto weight500 col s12 m12 l12 xl12 padding0">
+                            Palabras Clave  ->   {nombre}   {apellido}   {dia}   {hora}   {examen}
+                          </div>
+                          </form>
+                          
+                      </div>
 
-                        <div class="row">
-                            <div class="col">
-                                <a id="enviarMails" class="waves-effect waves-light btn btn-medium weight400 background-azul left">ENVIAR MAILS</a>
-                                <span id="estadoEnviarMails" class="padding-left2-4 rojo-texto"></span>
-                            </div>
+                      <div class="row">
+                          <div class="col s12 m12 l12 xl12">
+                              <div class="azul-texto">Seleccionados: <span id="cantidadSeleccionados" class="azul-texto">0</span></div>
+                              <a id="enviarMails" class="waves-effect waves-light btn btn-medium weight400 background-azul left disabled">ENVIAR MAILS</a>                                
+                          </div>
+                      </div>
+
+                      <div class="row">
+                          <div class="col s12 m12 l12 xl12">
+
+                            <div id="estadoEnviarMails" class="padding-left2-4 azul-texto"></div>
                         </div>
+                      </div>
+
+                      
                     </div>
                 </li>
             </ul>
@@ -2342,7 +2370,10 @@ Saludos!</textarea>
     this.asignarFuncionalidadBotonEnviarMails();
     M.updateTextFields();
     let descriptionTextArea = $('#textarea_Mail');
-    M.textareaAutoResize(descriptionTextArea);    
+    M.textareaAutoResize(descriptionTextArea);
+    this.listenCantidadReservasSeleccionadas();
+
+
 
   }
 
@@ -2396,13 +2427,22 @@ Saludos!</textarea>
     });
 
     $('#listadoDiasOralesParaSemana').append(
-          `<option value="" disabled selected>Seleccionar</option>`
+      `<option value="" disabled selected>Seleccionar</option>`
     );
 
     this.habilitarFormSelect();
 
   }
 
+  listenCantidadReservasSeleccionadas() {
+    $('.checkBoxClass').on('change', () => {
+      this.chequearCantidadDeReservasSeleccionadas();
+    });
+
+    $('#ckbCheckAll').on('change', () => {
+      this.chequearCantidadDeReservasSeleccionadas()
+    });
+  }
 
 
   listenChequearSiHayCuposLibresParaAsignarExamen() {
@@ -2420,7 +2460,7 @@ Saludos!</textarea>
   }
 
   chequearSiHayCuposLibresParaAsignarExamen() {
-     $("select").formSelect();
+    $("select").formSelect();
     let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
     let diaOralSeleccionado = instance.getSelectedValues();
     let cuposLibres;
@@ -2751,6 +2791,23 @@ Saludos!</textarea>
     })
   }
 
+  chequearCantidadDeReservasSeleccionadas() {
+    let reservasSeleccionadas = $("#bodyListadoReservasEnFechas :checkbox:checked").map(function () {
+      return this.id
+    }).get();
+    console.log(reservasSeleccionadas.length)
+
+    $('#cantidadSeleccionados').empty().append(`
+    ${reservasSeleccionadas.length}
+    `)
+
+    if (reservasSeleccionadas.length === 0) {
+      $('#enviarMails').addClass("disabled")
+    } else {
+      $('#enviarMails').removeClass("disabled")
+    }
+  }
+
   generarDatosAEnviarPorMail() {
     let infoDestinatarios = [];
 
@@ -2761,18 +2818,41 @@ Saludos!</textarea>
     console.log("ids de reservas", reservasSeleccionadas);
     console.log("reservas en curso", this.reservasEnCurso);
 
+
+
     reservasSeleccionadas.forEach(reserva => {
 
       this.reservasEnCurso.map(res => {
+
+        let tipo = $('#listaHorarios .ui-selected').attr('tipo');
+        let examen;
+        let dia;
+        let hora;
+
         if (res.reserva_uuid === reserva) {
+
+          if (tipo === "RW") {
+            examen = this.convertirUuidExamenEnTexto(res.rw_modalidad_uuid)[0];
+            dia = this.fechasServicio.stringDiaEspanol(res.dia_RW_fecha_examen);
+            hora = this.fechasServicio.stringHoraEspanol(res.dia_RW_fecha_examen);
+          } else if (tipo === "LS") {
+            examen = this.convertirUuidExamenEnTexto(res.ls_modalidad_uuid)[0];
+            dia = this.fechasServicio.stringDiaEspanol(res.dia_LS_fecha_examen);
+            hora = this.fechasServicio.stringHoraEspanol(res.dia_LS_fecha_examen);
+          } else if (tipo.length === 6) {
+            examen = this.convertirUuidExamenEnTexto(res.sem_modalidad_uuid)[0];
+            dia = this.fechasServicio.stringDiaEspanol(res.dia_LS_fecha_examen);
+            hora = this.fechasServicio.stringHoraEspanol(res.dia_LS_fecha_examen);
+          }
+
           infoDestinatarios.push({
             nombre: res.alumno_nombre,
             apellido: res.alumno_apellido,
             cd: res.alumno_candidate_number,
             email: res.alumno_email,
-            examen: "aca va el examen",
-            dia: this.fechasServicio.stringDiaEspanol(res.dia_LS_fecha_examen),
-            hora: this.fechasServicio.stringHoraEspanol(res.dia_LS_fecha_examen),
+            examen: examen,
+            dia: dia,
+            hora: hora,
           })
         }
       })

@@ -761,16 +761,14 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
     r.discapacidad as discapacidad,
     BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+        
+    BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as sem_modalidad_uuid,
     
-    
-    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_semana_LS_uuid,
-    BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) as uuid_semana_LS,
     semana_LS.semana_examen as fecha_semana_examen,
 
     BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
     dia_LS.fecha_Examen as dia_LS_fecha_examen,
-    
-    
+        
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
     a.documento as alumno_documento_id,
@@ -780,6 +778,7 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
+    LEFT JOIN examen_en_dia_RW on BIN_TO_UUID(examen_en_dia_RW.uuid) = BIN_TO_UUID(r.examen_en_dia_RW_uuid)
     LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
     LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
     LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
@@ -807,7 +806,14 @@ async function buscarEnDbReservaDiaRw(fecha) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
-    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
+    r.discapacidad as discapacidad,
+
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_en_semana_LS_uuid,
+    
+    BIN_TO_UUID(modalidad.uuid) as rw_modalidad_uuid,
+    dia_RW.fecha_Examen as dia_RW_fecha_examen,
+    
 
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
@@ -819,10 +825,9 @@ async function buscarEnDbReservaDiaRw(fecha) {
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
     LEFT JOIN examen_en_dia_RW on BIN_TO_UUID(examen_en_dia_RW.uuid) = BIN_TO_UUID(r.examen_en_dia_RW_uuid)
-    LEFT JOIN dia_RW on BIN_TO_UUID(dia_RW.uuid) = BIN_TO_UUID(examen_en_dia_RW.uuid)
+    LEFT JOIN modalidad on BIN_TO_UUID(examen_en_dia_RW.modalidad_uuid) = BIN_TO_UUID(modalidad.uuid)
+    LEFT JOIN dia_RW on BIN_TO_UUID(dia_RW.uuid) = BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)
     WHERE BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid) = ${connection.escape(fecha)};`;
-
-    console.log("BUSCANDO RESERVAS DIA RW")
 
     const data = await queryToDb(connection, query);
     return data;
@@ -830,8 +835,6 @@ async function buscarEnDbReservaDiaRw(fecha) {
     if (connection) connection.release();
   }
 }
-
-
 
 async function listarReservaDiaLs(req, res) {
   let fecha = req.params.fecha;
@@ -847,7 +850,14 @@ async function buscarEnDbReservaDiaLs(fecha) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
+    r.discapacidad as discapacidad,
+
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_en_semana_LS_uuid,
     BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+
+    BIN_TO_UUID(modalidad.uuid) as ls_modalidad_uuid,
+    dia_LS.fecha_Examen as dia_LS_fecha_examen,
 
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
@@ -859,6 +869,8 @@ async function buscarEnDbReservaDiaLs(fecha) {
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
     LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) =  BIN_TO_UUID(r.dia_LS_uuid)
+    LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) = BIN_TO_UUID(r.examen_en_semana_LS_uuid)
+    LEFT JOIN modalidad on BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) = BIN_TO_UUID(modalidad.uuid)
     WHERE BIN_TO_UUID(dia_LS.uuid) = ${connection.escape(fecha)};`;
 
     console.log("BUSCANDO RESERVAS DIA LS")
@@ -869,13 +881,6 @@ async function buscarEnDbReservaDiaLs(fecha) {
     if (connection) connection.release();
   }
 }
-
-
-
-
-
-
-
 
 
 
