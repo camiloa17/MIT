@@ -55,27 +55,26 @@ async function setRoute() {
         desHabilitarBotton()
         const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
         const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+        const modalidad = route.match(/(Completo|Reading_&_Writing|Listening_&_Speaking)/)[0].replace(/_/g," ");
         const obtenerHorarios = await getHorario()
+        const verFueraDeTermino =await verFueraDeTermino(modalidad,obtenerHorarios);
         document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
         habilitarBoton()
-
-
-
     } catch (err) {
         console.log(err)
     }
 }
 
-/*
+
 async function getReserva(id){
     try{
-        const verSiEstaLaReerva = await fetch(`/checkout/ver-horario/${id}`);
+        const verSiEstaLaReerva = await fetch(`/checkout/ver-fuera-de-termino/${id}`);
         return verSiEstaLaReerva
     }catch(err){
         console.log(err)
     }
 }
-*/
+
 
 async function getHorario() {
     let horarioSeleccionado;
@@ -95,38 +94,11 @@ async function getHorario() {
 
 }
 
-
-/*/* Paso 2  para
-async function setRoute() {
+async function verFueraDeTermino(modalidad,horario){
     try {
-        desHabilitarBotton()
-        const testIdreserva = /idreserva/g;
-        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
-        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
-
-        if (testIdreserva.test(route)) {
-            const idReserva = route.match(/idreserva=(\S{8}-\S{4}-\S{4}-\S{4}-\S{12})/)[1];
-            const verSiEstaLaReerva = await getReserva(idReserva);
-            const respuesta = await verSiEstaLaReerva.json()
-            if (respuesta.reserva === 1) {
-                const obtenerHorariosReserva = await getHorario()
-                const updateRoute = linkConId.replace(/step_2/g, "horario-updated");
-                console.log(obtenerHorariosReserva);
-                document.querySelector('form').setAttribute('action', `${updateRoute}&idhorario=${obtenerHorariosReserva.horarioSeleccionado}${(obtenerHorariosReserva.horarioListening ? `&idhorarioL=${obtenerHorariosReserva.horarioListening}` : "")}&idreserva=${idReserva}`);
-                habilitarBoton();
-            } else {
-                document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-                habilitarBoton()
-            }
-
-        } else {
-            const obtenerHorarios = await getHorario()
-            document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-            habilitarBoton()
-        }
-
-
+        
     } catch (err) {
         console.log(err)
     }
-} */
+}
+

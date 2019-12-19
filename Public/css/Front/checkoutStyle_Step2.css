@@ -228,7 +228,7 @@ input[name="horario-selector"]{
 }
 .horario-wrapper label{
     display: block;
-    height: 40px;
+    height: auto;
     width: 300px;
     text-align: center;
     padding-top:10px;

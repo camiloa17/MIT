@@ -1,5 +1,6 @@
 const utils = require('../utils');
 const queries = require('../database/consultasSqlFront');
+const { DateTime } = require('luxon');
 
 const uuidv4 = require('uuid/v4');
 
@@ -99,10 +100,13 @@ exports.consultaHorarios = async (modalidad, id) => {
             case "Completo":
                 sql = await queries.consultaExamenCompletoCupos()
                 const horariosCo = await utils.queryAsync(sql, [id, id]);
-
+                
                 horarios = {
-                    horarios: horariosCo,
+                    horarios: horariosCo
                 }
+                const horarioTextCo = await diasATexto(horarios,'dia');
+                horarios=horarioTextCo;
+
                 break
 
             case "Reading_&_Writing":
@@ -112,6 +116,8 @@ exports.consultaHorarios = async (modalidad, id) => {
                 horarios = {
                     horarios: horariosRW,
                 }
+                const horarioTextRw = await diasATexto(horarios, 'dia');
+                horarios = horarioTextRw;
                 break;
             case "Listening_&_Speaking":
                 sql = await queries.consultaExamenListeningAndSpeaking();
@@ -121,6 +127,8 @@ exports.consultaHorarios = async (modalidad, id) => {
                 horarios = {
                     horarios: horariosLS,
                 }
+                const horarioTextLs = await diasATexto(horarios, 'semana');
+                horarios = horarioTextLs;
 
                 break
         }
@@ -132,17 +140,25 @@ exports.consultaHorarios = async (modalidad, id) => {
     }
 }
 
-async function diasATexto(horarios) {
-    const textoHorarios = [];
+async function diasATexto(horarios,tipo) {
+    const horariosConTexto = horarios;
     try {
-        horarios.forEach(horario => {
-            if (horario.fecha_Examen) {
-                textoHorarios.push(horario.fecha_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', hour: 'numeric', minute: 'numeric' }));
-            } else if (horario.semana_Examen) {
-                textoHorarios.push(horario.semana_Examen.toLocaleString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }));
-            }
-        });
-        return textoHorarios;
+        if(tipo==="dia"){
+            horariosConTexto.horarios.forEach(horario => {
+            let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').toLocaleString({day:'numeric',month:'long',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+                horario.fecha_Examen = fecha;
+            });
+        }else if(tipo==='semana'){
+            horariosConTexto.horarios.forEach(horario => {
+            let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekNumber;
+            let año = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekYear;
+            let mes = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').monthLong;
+            console.log(fecha)
+                horario.fecha_Examen = `Semana ${fecha} del año ${año} (${mes} )`;
+            });
+        }
+        
+        return horariosConTexto;
 
     } catch (err) {
         console.error(err)
@@ -252,6 +268,8 @@ async function crearReservaTemporalLs(idExamenEnSemana) {
     }
 }
 
+
+/*Queda en hold para luego corroborar las reservas */
 exports.verReservarPaso3 = async (id) => {
     const consultaReserva = await queries.consultaReservaPaso3();
     const verDB = await utils.queryAsync(consultaReserva, id)
@@ -259,7 +277,14 @@ exports.verReservarPaso3 = async (id) => {
 }
 
 
-/** */
+exports.verFechaFueraDeTermino= async(id)=>{
+    
+}
+
+
+
+/* Queda on hold hasta ver si es necesario actualizar las reservas*/
+/*
 exports.corroborarCambioDeHorario = async (modalidad,idReserva, idHorario, idHorarioSemana) => {
     console.log(idReserva,idHorario,idHorarioSemana)
     if (modalidad==="Completo") {
@@ -272,7 +297,7 @@ exports.corroborarCambioDeHorario = async (modalidad,idReserva, idHorario, idHor
 exports.actualizarReservaEnProceso =async(modalidad,horario,reserva,horarioSemana)=>{
 console.log(modalidad,horario,reserva,horarioSemana);
 }
-
+*/
 
 
 

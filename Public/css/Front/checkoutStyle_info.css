@@ -223,7 +223,8 @@ h3{
     margin-left: 20px;
 }
 
-#information-wrapper label{
+#information-wrapper label,
+#seccion-nuevo-domicilio label{
     display: none;
 }
 #information-wrapper input,
@@ -232,7 +233,11 @@ h3{
     width: 250px;
 }
 
-#information-wrapper input{
+#seccion-nuevo-domicilio select{
+    margin-bottom: 15px;
+}
+#information-wrapper input,
+.input-checkout{
     margin-bottom:15px;
     padding-left: 5px;
     border:none;
@@ -240,7 +245,8 @@ h3{
     height:25px;
 }
 
-#information-wrapper input:focus{
+#information-wrapper input:focus,
+.input-checkout:focus{
     border:none;
     border-bottom: 2px solid #085796;
     outline: none;
