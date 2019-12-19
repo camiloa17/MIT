@@ -416,12 +416,17 @@ button.button-checkout:disabled{
         padding-top:0;
     }
 
-    /*Lower footer- privacidad*/
-    footer{
-        position:absolute;
-        width:100%;
-        bottom:0;
+    #notificacion{
+        position: relative;
     }
+    .texto-notificacion{
+        width: 300px;
+        font-weight: bold;
+        
+    }
+
+    /*Lower footer- privacidad*/
+    
      #lower-footer{
         flex-direction: row;
         justify-content: space-between;

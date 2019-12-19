@@ -142,3 +142,39 @@ exports.consultaReservaPaso3 = async()=>{
   return `select count(BIN_TO_UUID(uuid)) as reserva from reserva where uuid=UUID_TO_BIN(?) and en_proceso=1;`
 }
 
+exports.consultaFueraDeTerminoCompleto= async()=>{
+  return `select if(DATE(?)<DATE(dia.fecha_finalizacion),'true','false') as fecha_RW,
+  dia.fecha_Examen,
+  dia.fecha_finalizacion, 
+  semana.* 
+  from examen_en_dia_RW as diaexrw
+  join dia_RW as dia on dia.uuid=diaexrw.dia_RW_uuid
+  join (
+      select if(DATE(?)<DATE(sls.finaliza_inscripcion),'true','false') as fecha_ls,
+      sls.semana_Examen,
+      sls.finaliza_inscripcion 
+      from examen_en_semana_LS as exls
+      join semana_LS as sls on sls.uuid=exls.semana_LS_uuid
+      where exls.uuid=UUID_TO_BIN(?)
+  ) as semana on (month(dia.fecha_Examen) + year(dia.fecha_Examen)) = (month(semana.semana_Examen) + year(semana.semana_Examen))
+  where diaexrw.uuid= UUID_TO_BIN(?);`
+}
+
+exports.consultaFueraDeTerminoRW = async ()=>{
+  return `select if(DATE(?)<DATE(dia.fecha_finalizacion),'true','false') as fecha,
+  dia.fecha_Examen,
+  dia.fecha_finalizacion
+  from examen_en_dia_RW as diaexrw
+  join dia_RW as dia on dia.uuid=diaexrw.dia_RW_uuid
+  where diaexrw.uuid= UUID_TO_BIN(?);`
+}
+
+exports.consultaFueraDeTerminoLS = async ()=>{
+  return `select if(DATE(?)<DATE(sls.finaliza_inscripcion),'true','false') as fecha,
+      sls.semana_Examen,
+      sls.finaliza_inscripcion 
+      from examen_en_semana_LS as exls
+      join semana_LS as sls on sls.uuid=exls.semana_LS_uuid
+      where exls.uuid=UUID_TO_BIN(?)`
+}
+

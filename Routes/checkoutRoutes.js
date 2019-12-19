@@ -102,6 +102,18 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
 
 });
 
+
+router.get('/ver-fecha-fuera-de-termino/:modalidad',async(req,res)=>{
+        if(req.params.modalidad==='Completo'){
+            const verFueraTerminoCo = await controller.verFechaFueraDeTermino(req.params.modalidad, req.query.horario, req.query.idhorarioL);
+            res.json({rw:verFueraTerminoCo.fecha_RW,ls:verFueraTerminoCo.fecha_ls});
+        }else{
+            const verFueraTermino = await controller.verFechaFueraDeTermino(req.params.modalidad.replace(/_/g," "), req.query.horario);
+            res.json({rw:verFueraTermino.fecha})
+        }
+     
+})
+
 //Consultar Con Juani si se hace esto
 /*
 router.post('/horario-updated/:materia/:tipo/:nivel/:modalidad', async (req, res) => {

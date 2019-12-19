@@ -4,7 +4,7 @@ document.querySelector('.secondary-menu-logo span').addEventListener('click', cl
 
 /*step2 */
 document.getElementsByName('horario-selector').forEach(input => {
-    input.addEventListener('change', setRoute)
+    input.addEventListener('change', validarHorario)
 })
 
 let route = window.location.href;
@@ -50,26 +50,44 @@ function desHabilitarBotton() {
 
 
 /* Paso 2  */
-async function setRoute() {
+async function validarHorario() {
     try {
         desHabilitarBotton()
-        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
-        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
-        const modalidad = route.match(/(Completo|Reading_&_Writing|Listening_&_Speaking)/)[0].replace(/_/g," ");
+        const modalidad = route.match(/(Completo|Reading_&_Writing|Listening_&_Speaking)/)[0];
         const obtenerHorarios = await getHorario()
-        const verFueraDeTermino =await verFueraDeTermino(modalidad,obtenerHorarios);
-        document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-        habilitarBoton()
+        const fueraDeTermino = await verFueraDeTermino(modalidad,obtenerHorarios);
+        if(modalidad==='Completo'){
+            console.log(fueraDeTermino);
+            if(fueraDeTermino.rw==='true'&& fueraDeTermino.ls==='true'){
+                setRoute(obtenerHorarios)
+            }else if(fueraDeTermino.rw==='false'|| fueraDeTermino.ls==='false'){
+                notificar(this);
+            }
+        }
+        
     } catch (err) {
         console.log(err)
     }
 }
 
+async function setRoute(obtenerHorarios){
+    const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
+    const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+    if (document.querySelector('#notificacion')) {
+        document.querySelector('#notificacion').remove();
+    }
+    habilitarBoton()
+}
 
-async function getReserva(id){
+
+
+
+async function verFueraDeTermino(modalidad,horarioSeleccionados){
     try{
-        const verSiEstaLaReerva = await fetch(`/checkout/ver-fuera-de-termino/${id}`);
-        return verSiEstaLaReerva
+        const verSiEstaFuera = await fetch(`/checkout/ver-fecha-fuera-de-termino/${modalidad}?horario=${horarioSeleccionados.horarioSeleccionado}${(horarioSeleccionados.horarioListening ? `&idhorarioL=${horarioSeleccionados.horarioListening}` : "")}`);
+        const respuesta = await verSiEstaFuera.json();
+        return respuesta ;
     }catch(err){
         console.log(err)
     }
@@ -94,11 +112,21 @@ async function getHorario() {
 
 }
 
-async function verFueraDeTermino(modalidad,horario){
-    try {
-        
-    } catch (err) {
-        console.log(err)
+async function notificar(elemento){
+    const div= document.createElement('div');
+    div.id="notificacion";
+    const parrafo = document.createElement('p');
+    parrafo.className="texto-notificacion";
+    const texto='El horario seleccionado esta fuera de termino, comunciate con MIT para buscar un cupo';
+
+    if (document.querySelector('#notificacion')){
+        document.querySelector('#notificacion').remove();
     }
+    
+    parrafo.innerText=texto;
+    div.appendChild(parrafo)
+    elemento.parentNode.insertBefore(div,elemento);
 }
+
+
 

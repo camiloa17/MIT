@@ -277,8 +277,32 @@ exports.verReservarPaso3 = async (id) => {
 }
 
 
-exports.verFechaFueraDeTermino= async(id)=>{
+exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
+    const fecha = DateTime.utc().toISODate();
+    console.log(fecha);
+    let sql;
+    let consulta;
+    switch (modalidad) {
+        case 'Completo':
+             sql = await queries.consultaFueraDeTerminoCompleto();
+             consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
+            console.log(consulta);
+            break;
     
+        case'Reading & Writing':
+        sql=await queries.consultaFueraDeTerminoRW();
+        consulta= await utils.queryAsync(sql,[fecha,idDia])
+            
+        break
+        case'Listening & Speaking':
+            sql = await queries.consultaFueraDeTerminoLS();
+            consulta = await utils.queryAsync(sql, [fecha, idDia])
+            
+            break;
+    }
+    console.log(consulta);
+    return consulta[0];
+
 }
 
 
