@@ -73,6 +73,7 @@ async function validarHorario() {
         
     } catch (err) {
         console.log(err)
+        notificar(this,"error")
     }
 }
 
@@ -135,12 +136,16 @@ async function notificar(elemento,error){
     const parrafo = document.createElement('p');
     parrafo.className="texto-notificacion";
     const texto='El horario seleccionado esta fuera de termino, comunciate con MIT para buscar un cupo';
-
+    
     if (document.querySelector('#notificacion')){
         document.querySelector('#notificacion').remove();
     }
     
     parrafo.innerText=texto;
+    if (error) {
+        parrafo.innerText="occurrio un error en la comprobacion, comunicate con mit";
+        parrafo.style.color="red";
+    }
     div.appendChild(parrafo)
     elemento.parentNode.insertBefore(div,elemento);
 }
