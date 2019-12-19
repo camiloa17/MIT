@@ -20,7 +20,7 @@ class FechasVista {
     this.fechaAEliminar = { uuid: "", lista: "" };
     this.yaSeHizoUnCambio = false;
 
-    //se usa para chequear cupos suficientes al reservas a asignar a dia ls en la seccion de semanaLS
+    //se usa para chequear cupos suficientes de reservas al asignar a dia ls en la seccion de semanaLS
     this.cupoExamenSeleccionado = [];
 
     this.reservasEnCurso = [];
@@ -227,7 +227,6 @@ class FechasVista {
 
           // SE SELECCIONA UN DIA RW ///////////////////////////////////////
           if (tipoSelected === "RW") {
-            console.log("es rw")
             // limpio la lista de examenes del lado derecho y el area de cambios debajo de la lista
             $("#listaExamenes").empty();
             $('#areaCambios').empty();
@@ -292,7 +291,6 @@ class FechasVista {
 
             // SE SELECCIONA UN DIA LS ///////////////////////////////////////
           } else if (tipoSelected === "LS") {
-            console.log("es ls")
             // limpio la lista de examenes del lado derecho y el area de cambios debajo de la lista
             $("#listaExamenes").empty();
             $('#areaCambios').empty();
@@ -648,10 +646,8 @@ class FechasVista {
 
     // retorno TRUE si es una fecha editable (posterior a la actual) o FALSE si NO es editable (fecha anterior a la actual)
     if (examenSeleccionado.toISOString().split('T')[0] < fechaActual.toISOString().split('T')[0]) {
-      //console.log("antigua")
       return false;
     } else {
-      //console.log("puedo editar")
       return true;
     }
   }
@@ -1483,7 +1479,7 @@ class FechasVista {
                     <label>Listado de Exámenes</label>
                 
                     <a id="botonAgregarExamenesAFecha" class="azul-texto cursorPointer">
-                      <i class="material-icons-outlined left secondary-content button-opacity pointer azul-texto">arrow_upward</i>Agregar
+                      <i class="material-icons-outlined left secondary-content button-opacity pointer azul-texto">arrow_upward</i>Agregar Examen a Fecha
                     </a>
                   </div>
                 </div>
@@ -1501,8 +1497,7 @@ class FechasVista {
             <div class="collapsible-body">
               <div class="row margin0">
                 <div id="listadoReservasEnFechas" class="col s12 m12 l12 xl12 "></div>
-                <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 clear-top-3 "></div>
-                <div id="areaMailSeleccionados" class="row margin0">
+                <div id="edicionReservasEnFechas" class="col s12 m12 l12 xl12 "></div>
               </div>
             </div>
           </li>   
@@ -1601,7 +1596,6 @@ class FechasVista {
 
   renderHorarios = (listaHorarios) => {
     $("#listaHorarios").empty();
-    console.log(listaHorarios)
 
     //obtengo la fecha seleccionada y chequeo si es editable o no (true o false) segun si es una fecha anterior a la actual o posterior
     listaHorarios.forEach(horario => {
@@ -1734,8 +1728,6 @@ class FechasVista {
   async eliminarFecha() {
     let idEstado = $('#estadoCambiosFechaExamenes')
     let fechasAntiguas = ($('#fechasAntiguas').filter(":checked").val()) ? true : false;
-
-    console.log(idEstado, "elminar fecha")
 
     switch (this.fechaAEliminar.lista) {
       case "semana":
@@ -1970,66 +1962,83 @@ class FechasVista {
 
   generarListaReservaSemanaLs = async (idSelected) => {
     $('#listadoReservasEnFechas').empty();
-    let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected);
-    let diasOral = await this.fechasServicio.getListaHorariosOrales();
-
+    $('#collapsibleReservas').empty()
     this.mostrarTablaReservasEnSemanasLs();
-    this.mostrarElementosListaReservasEnSemanasLs(reservaSemanas);
-    this.mostrarBotoneraReservasEnSemanaLs(diasOral);
 
-    this.habilitarFormSelect();
-    this.asignarFuncionBotonAsignarDiaOralASemana();
+    let idEstado = $('#estadoListadoReservas');
+    this.appendProgressIndeterminate($('#estadoListadoReservas'))
+
+    let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnSemanasLs, idEstado);
+    this.reservasEnCurso = reservaSemanas;
+
+    // Muestro botones para exportar Excel + el UL para colgar la asignacion de dias a semanas y el envio masivo de emails
+    this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
-    this.asignarFuncionBotonExportarTrinity();
+    this.asignarFuncionBotonExportarTrinity();    
+
+    this.mostrarListadoDiasOralesParaSemana()
+    let diasOral = await this.fechasServicio.getListaHorariosOrales();
+    this.generarListaDeDiasOralesDropdown(diasOral)
+    this.asignarFuncionBotonAsignarDiaOralASemana();
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
-    this.mostrarEnviarMailASeleccionados();
-    this.asignarFuncionalidadBotonEnviarMails()
-    M.updateTextFields();
-    let descriptionTextArea = $('#textarea_Mail')
-    M.textareaAutoResize(descriptionTextArea);
+
+    this.mostrarEnviarMailASeleccionados()
+     
   }
 
   //cuando asigno diasLS a semanas, actualizo la lista de reservas
   updateElementosListaSemanaLs = async (idSelected) => {
-    let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected);
+    let idEstado = $('#estadoListadoReservas');
+    $('#botonAsignarDiaOralASemana').addClass('disabled');
+
+    let reservaSemanas = await this.fechasServicio.getElementosListaReservasEnSemanasLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnSemanasLs, idEstado);
+    this.reservasEnCurso = reservaSemanas;
+
     let diasOral = await this.fechasServicio.getListaHorariosOrales();
-
-    this.mostrarElementosListaReservasEnSemanasLs(reservaSemanas);
-    this.mostrarBotoneraReservasEnSemanaLs(diasOral);
-
-    this.habilitarFormSelect();
-    this.asignarFuncionBotonAsignarDiaOralASemana();
-    this.habilitarToggleCheckboxAll()
-    this.asignarFuncionBotonExportarAsistencia();
-    this.asignarFuncionBotonExportarTrinity();
+    this.generarListaDeDiasOralesDropdown(diasOral)
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
   }
 
   async generarListaReservaDiaRw(idSelected) {
     $('#listadoReservasEnFechas').empty();
-    let reservaDiaRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected);
-
+    $('#collapsibleReservas').empty()
+    
     this.mostrarTablaReservasEnDiaRw();
-    this.mostrarElementosListaReservasEnDiaRw(reservaDiaRw);
-    this.mostrarBotoneraReservasEnDiaRw();
 
+    let idEstado = $('#estadoListadoReservas');
+    this.appendProgressIndeterminate(idEstado)
+
+    let reservasRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaRw, idEstado);
+    this.reservasEnCurso = reservasRw;
+
+    this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
+    
+    this.mostrarEnviarMailASeleccionados()
   }
 
   async generarListaReservaDiaLs(idSelected) {
     $('#listadoReservasEnFechas').empty();
-    let reservaDiaLs = await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected);
+    $('#collapsibleReservas').empty();
 
     this.mostrarTablaReservasEnDiaLs();
-    this.mostrarElementosListaReservasEnDiaLs(reservaDiaLs);
-    this.mostrarBotoneraReservasEnDiaLs();
 
+    let idEstado = $('#estadoListadoReservas');
+    this.appendProgressIndeterminate(idEstado);
+
+    let reservasLs= await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaLs, idEstado);
+    this.reservasEnCurso = reservasLs;
+
+    this.mostrarBotoneraYEdicionReservas();    
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
+    
+    this.mostrarEnviarMailASeleccionados() 
+
   }
 
   habilitarToggleCheckboxAll() {
@@ -2043,7 +2052,7 @@ class FechasVista {
       `<table>
         <thead>
             <tr>
-              <th class="">
+              <th class="th-width-short">
                   <label>
                       <input type="checkbox" id="ckbCheckAll" />
                       <span></span>
@@ -2058,92 +2067,11 @@ class FechasVista {
         </thead>
 
         <tbody id="bodyListadoReservasEnFechas"></tbody>
-      </table>`
-    )
-  }
-
-  mostrarElementosListaReservasEnSemanasLs(reservasSemanaLs) {
-    $('#bodyListadoReservasEnFechas').empty();
-
-    this.reservasEnCurso = reservasSemanaLs;
-
-    reservasSemanaLs.sort(function (objA, objB) {
-      // Primero ordeno por fecha diaLS asignado
-      let ordenFechaA = objA.dia_LS_fecha_examen;
-      let ordenFechaB = objB.dia_LS_fecha_examen;
-
-      if (ordenFechaA > ordenFechaB) {
-        return 1;
-      } else if (ordenFechaA < ordenFechaB) {
-        return -1;
-      } else if (ordenFechaA === null) {
-        return -2;
-      } else {
-        // luego ordeno por apellido
-        let ordenApellidoA = objA.alumno_apellido;
-        let ordenApellidoB = objB.alumno_apellido;
-
-        if (ordenApellidoA > ordenApellidoB) {
-          return 1;
-        } else if (ordenApellidoA < ordenApellidoB) {
-          return -1;
-        }
-      }
-    })
-
-    reservasSemanaLs.forEach(reserva => {
-      $('#bodyListadoReservasEnFechas').append(
-        `<tr>
-            <td class="th-width-short">
-              <label>
-                <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
-                          <span class="margin-top-5px"></span>
-              </label>
-            </td>
-            <td>${reserva.alumno_nombre}</td>
-            <td>${reserva.alumno_apellido}</td>
-            <td>${reserva.alumno_candidate_number}</td>
-            <td>${reserva.alumno_documento_id}</td>
-            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen) : "sin asignar"}</td>
-          </tr>`)
-    });
-  }
-
-  mostrarBotoneraReservasEnSemanaLs(diasOral) {
-    $('#edicionReservasEnFechas').empty().append(
+      </table>
+      <div id="estadoListadoReservas"></div>
       `
-        <div class="col s12 m12 l12 xl12">
-          <div class="col s6 m6 l6  xl5">      
-            <div class="input-field clear-top-3">
-              <select id="listadoDiasOralesParaSemana"></select>
-              <label>Asignar Día de Oral a los seleccionados</label>
-              <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Asignar</a>
-              <span id="estadoReserva" class="padding-left2-4 rojo-texto" ></span>
-            </div>
-          </div>
-  
-          <div class="col s6 m6 l6 xl6 right clear-top-2">
-            <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
-            <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
-          </div>          
-        </div>
-     `);
-
-    $('#listadoDiasOralesParaSemana').append(
-      `<option value="" disabled selected>Seleccionar</option>`
     )
-
-    this.cupoExamenSeleccionado = [];
-
-    diasOral.forEach(diaHorario => {
-      let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas;
-      this.cupoExamenSeleccionado.push([diaHorario.uuid, cupos_libres])
-
-      $('#listadoDiasOralesParaSemana').append(
-        `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${cupos_libres}</option>`
-      )
-    });
-  };
+  }
 
   mostrarTablaReservasEnDiaRw() {
     $('#listadoReservasEnFechas').append(
@@ -2165,60 +2093,13 @@ class FechasVista {
 
           <tbody id="bodyListadoReservasEnFechas"></tbody>
     </table>
+    <div id="estadoListadoReservas"></div>
   `)
   }
 
-  mostrarElementosListaReservasEnDiaRw(reservaDiaRw) {
-    $('#bodyListadoReservasEnFechas').empty();
-
-    reservaDiaRw.sort(function (objA, objB) {
-      // ordeno por apellido
-      let ordenApellidoA = objA.alumno_apellido;
-      let ordenApellidoB = objB.alumno_apellido;
-
-      if (ordenApellidoA > ordenApellidoB) {
-        return 1;
-      } else if (ordenApellidoA < ordenApellidoB) {
-        return -1;
-      }
-    })
-
-    reservaDiaRw.forEach(reserva => {
-      $('#bodyListadoReservasEnFechas').append(
-        `<tr>
-            <td class="th-width-short">
-              <label>
-                <input id="${reserva.reserva_uuid}" class="checkBoxClass" type="checkbox"   />
-                          <span class="margin-top-5px"></span>
-              </label>
-            </td>
-            <td>${reserva.alumno_nombre}</td>
-            <td>${reserva.alumno_apellido}</td>
-            <td>${reserva.alumno_candidate_number}</td>
-            <td>${reserva.alumno_documento_id}</td>
-          </tr>`)
-    });
-
-
-  };
-
-  mostrarBotoneraReservasEnDiaRw() {
-    $('#edicionReservasEnFechas').empty().append(
-      `<div class="col s6 m6 l6 xl6 right clear-top-2">
-      
-      <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
-      <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
-    </div>
-   
-    <div class="col s6 m6 l6 xl6 right clear-top-2">
-    <span id="estadoReserva" class=" rojo-texto margin-right-1" ></span>
-    </div>
-      `)
-  };
-
-
+  
   mostrarTablaReservasEnDiaLs() {
-    $('#listadoReservasEnFechas').append(
+    $('#listadoReservasEnFechas').empty().append(
       `<table>
           <thead>
               <tr>
@@ -2237,28 +2118,125 @@ class FechasVista {
 
           <tbody id="bodyListadoReservasEnFechas"></tbody>
 
-    </table>    
+    </table> 
+    <div id="estadoListadoReservas"></div>
+    
     `)
   }
 
+
+  mostrarElementosListaReservasEnSemanasLs = (reservasSemanaLs) => {
+    $('#bodyListadoReservasEnFechas').empty();
+    $('#estadoListadoReservas').empty();    
+
+    if (reservasSemanaLs.length) {
+      reservasSemanaLs.sort(function (objA, objB) {
+        // Primero ordeno por fecha diaLS asignado
+        let ordenFechaA = objA.dia_LS_fecha_examen;
+        let ordenFechaB = objB.dia_LS_fecha_examen;
+
+        if (ordenFechaA > ordenFechaB) {
+          return 1;
+        } else if (ordenFechaA < ordenFechaB) {
+          return -1;
+        } else if (ordenFechaA === null) {
+          return -2;
+        } else {
+          // luego ordeno por apellido
+          let ordenApellidoA = objA.alumno_apellido;
+          let ordenApellidoB = objB.alumno_apellido;
+
+          if (ordenApellidoA > ordenApellidoB) {
+            return 1;
+          } else if (ordenApellidoA < ordenApellidoB) {
+            return -1;
+          }
+        }
+      })
+
+      reservasSemanaLs.forEach(reserva => {
+        $('#bodyListadoReservasEnFechas').append(
+          `<tr>
+            <td class="th-width-short">
+              <label>
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
+                <span class="margin-top-5px"></span>
+              </label>
+            </td>
+            <td>${reserva.alumno_nombre}</td>
+            <td>${reserva.alumno_apellido}</td>
+            <td>${reserva.alumno_candidate_number}</td>
+            <td>${reserva.alumno_documento_id}</td>
+            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen)   : "sin asignar"}</td>
+          </tr>`)
+      });
+    } else {
+      $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+    }
+  }
+ 
+  mostrarElementosListaReservasEnDiaRw(reservaDiaRw) {
+    $('#bodyListadoReservasEnFechas').empty();
+    $('#estadoListadoReservas').empty();
+
+    if (reservaDiaRw.length) {
+
+      reservaDiaRw.sort(function (objA, objB) {
+        // ordeno por apellido
+        let ordenApellidoA = objA.alumno_apellido;
+        let ordenApellidoB = objB.alumno_apellido;
+
+        if (ordenApellidoA > ordenApellidoB) {
+          return 1;
+        } else if (ordenApellidoA < ordenApellidoB) {
+          return -1;
+        }
+      })
+
+      reservaDiaRw.forEach(reserva => {
+        $('#bodyListadoReservasEnFechas').append(
+          `<tr>
+            <td class="th-width-short">
+              <label>
+                <input id="${reserva.reserva_uuid}" class="checkBoxClass" type="checkbox"   />
+                          <span class="margin-top-5px"></span>
+              </label>
+            </td>
+            <td>${reserva.alumno_nombre}</td>
+            <td>${reserva.alumno_apellido}</td>
+            <td>${reserva.alumno_candidate_number}</td>
+            <td>${reserva.alumno_documento_id}</td>
+          </tr>`)
+      });
+
+    } else {
+      $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+    }
+
+
+  };
+
+
   mostrarElementosListaReservasEnDiaLs(reservaDiaLs) {
     $('#bodyListadoReservasEnFechas').empty();
+    $('#estadoListadoReservas').empty();
 
-    reservaDiaLs.sort(function (objA, objB) {
-      // ordeno por apellido
-      let ordenApellidoA = objA.alumno_apellido;
-      let ordenApellidoB = objB.alumno_apellido;
+    if (reservaDiaLs.length) {
+      reservaDiaLs.sort(function (objA, objB) {
+        // ordeno por apellido
+        let ordenApellidoA = objA.alumno_apellido;
+        let ordenApellidoB = objB.alumno_apellido;
 
-      if (ordenApellidoA > ordenApellidoB) {
-        return 1;
-      } else if (ordenApellidoA < ordenApellidoB) {
-        return -1;
-      }
-    })
+        if (ordenApellidoA > ordenApellidoB) {
+          return 1;
+        } else if (ordenApellidoA < ordenApellidoB) {
+          return -1;
+        }
+      })
 
-    reservaDiaLs.forEach(reserva => {
-      $('#bodyListadoReservasEnFechas').append(
-        `<tr>
+      reservaDiaLs.forEach(reserva => {
+        $('#bodyListadoReservasEnFechas').append(
+          `<tr>
             <td class="th-width-short">
               <label>
                 <input id="${reserva.reserva_uuid}" class="checkBoxClass"  type="checkbox"   />
@@ -2270,29 +2248,62 @@ class FechasVista {
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
           </tr>`)
-    });
+      });
+
+    } else {
+      $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+    }
   };
 
-  mostrarBotoneraReservasEnDiaLs() {
+  mostrarBotoneraYEdicionReservas() {
     $('#edicionReservasEnFechas').empty().append(
       `
       <div class="col s6 m6 l6 xl6 right clear-top-2">
-    <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
-    <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
-  </div>    
+        <a id="botonExportarAsistencia" class="waves-effect waves-light btn btn-small weight400 background-azul right ">Exportar Asistencia</a>
+        <a id="botonExportarTrinity" class="waves-effect waves-light btn btn-small weight400 background-azul right margin-right-1">Exportar Trinity</a>
+      </div>    
 
-  <div class="col s6 m6 l6 xl6 right clear-top-2">
-  <span id="estadoReserva" class=" rojo-texto margin-right-1" ></span>
-  </div>
+      <div class="col s6 m6 l6 xl6 right clear-top-2">
+        <span id="estadoExcels" class=" rojo-texto margin-right-1" ></span>
+      </div>
+
+      <div class="col s10 m10 l10 xl10 clear-top-3 offset-s1 offset-m1 offset-l1 offset-xl1">
+        <ul id="collapsibleReservas" class="collapsible">
+        </ul>
+      </div>      
       `)
+
+      $('.collapsible').collapsible()
   };
 
+  mostrarListadoDiasOralesParaSemana() {
+    $('#collapsibleReservas').append(`
+    <li>
+      <div class="collapsible-header grey lighten-3 azul-texto">
+        <i class="material-icons">event</i>Asignar Día/Hora de Oral a las Semanas seleccionados
+      </div>
+      <div class="collapsible-body">
+        <div class="row">
+          <div class="col s6 m6 l6  xl5">      
+            <div class="input-field clear-top-3">
+              <select id="listadoDiasOralesParaSemana"></select>
+              <label>Asignar Día de Oral a los seleccionados</label>
+              <a id="botonAsignarDiaOralASemana" class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Asignar</a>
+              <span id="estadoReserva" class="padding-left2-4 rojo-texto" ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    `);
+
+
+  }
+
   mostrarEnviarMailASeleccionados() {
-    $('#areaMailSeleccionados').empty().append(`
-            <div class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1">
-            <ul class="collapsible">
+    $('#collapsibleReservas').append(`
                 <li>
-                    <div class="collapsible-header">
+                    <div class="collapsible-header grey lighten-3 azul-texto">
                         <i class="material-icons">mail</i>Enviar Email con Fechas a Seleccionados
                     </div>
 
@@ -2327,6 +2338,12 @@ Saludos!</textarea>
             </ul>
         </div>
     `)
+
+    this.asignarFuncionalidadBotonEnviarMails();
+    M.updateTextFields();
+    let descriptionTextArea = $('#textarea_Mail');
+    M.textareaAutoResize(descriptionTextArea);    
+
   }
 
 
@@ -2337,7 +2354,7 @@ Saludos!</textarea>
     let fechaString = $("#listaHorarios").find(".ui-selected").attr("fechaExamen");
 
     $('#botonExportarAsistencia').on('click', () => {
-      let id = $('#estadoReserva')
+      let id = $('#estadoExcels')
       this.fechasServicio.getExcelAsistencia(fecha, tipo, fechaString, this.huboUnError, id);
     });
   }
@@ -2355,11 +2372,38 @@ Saludos!</textarea>
   asignarFuncionBotonAsignarDiaOralASemana() {
     $('#botonAsignarDiaOralASemana').on('click', () => {
       this.asignarDiaASemanaExamenOral();
-      let reservasActualizadad = this.fechasServicio.getElementosListaReservasEnSemanasLs();
-      this.reservasEnCurso = reservasActualizadad;
+      // let idEstado = $('#estadoListadoReservas');
+
+      // let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
+      // let reservasActualizadad = this.fechasServicio.getElementosListaReservasEnSemanasLs(fecha, this.huboUnError, null, idEstado);
+      // this.reservasEnCurso = reservasActualizadad;
 
     })
   }
+
+  generarListaDeDiasOralesDropdown(diasOral) {
+    // reinicio los examenes seleccionados
+    this.cupoExamenSeleccionado = [];
+    $('#listadoDiasOralesParaSemana').empty();
+
+    diasOral.forEach(diaHorario => {
+      let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas;
+      this.cupoExamenSeleccionado.push([diaHorario.uuid, cupos_libres])
+
+      $('#listadoDiasOralesParaSemana').append(
+        `<option value="${diaHorario.uuid}" >${this.fechasServicio.stringDiaHoraEspanol(diaHorario.fecha_Examen)} // Cupos Libres: ${cupos_libres}</option>`
+      )
+    });
+
+    $('#listadoDiasOralesParaSemana').append(
+          `<option value="" disabled selected>Seleccionar</option>`
+    );
+
+    this.habilitarFormSelect();
+
+  }
+
+
 
   listenChequearSiHayCuposLibresParaAsignarExamen() {
     $('.checkBoxClass').on('change', () => {
@@ -2376,9 +2420,7 @@ Saludos!</textarea>
   }
 
   chequearSiHayCuposLibresParaAsignarExamen() {
-    console.log("click")
-
-    $("select").formSelect();
+     $("select").formSelect();
     let instance = M.FormSelect.getInstance($("#listadoDiasOralesParaSemana"));
     let diaOralSeleccionado = instance.getSelectedValues();
     let cuposLibres;
@@ -2705,7 +2747,6 @@ Saludos!</textarea>
 
   asignarFuncionalidadBotonEnviarMails() {
     $('#enviarMails').on('click', () => {
-      console.log("click mails")
       this.generarDatosAEnviarPorMail();
     })
   }
@@ -2753,7 +2794,6 @@ Saludos!</textarea>
 
   mostrarMensaje(id, mensaje) {
     let mensajeInline = mensaje.replace("./", ". <br />").replace("./", ". <br />")
-    console.log(mensajeInline)
     id.empty().append(`<div>${mensajeInline}</div>`)
   }
 

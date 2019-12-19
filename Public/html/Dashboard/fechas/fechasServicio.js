@@ -12,7 +12,7 @@ class FechasServicio {
       const rta = await response.json();
 
       if(rta.error) {
-        printMensaje(id, rta.error)     
+        printMensaje(id, rta.error)
         console.log(rta.error)
         console.log(rta.mensaje)
       } else {
@@ -61,7 +61,7 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
-      
+
       if(rta.error) {
         error(id)
       } else {
@@ -102,7 +102,7 @@ class FechasServicio {
 
   async elminarFechaSemana(fecha, exito, error, id) {
     let datos= { fecha: fecha }
-    
+
     try {
       const response = await fetch(`./elminarFechaSemana/`, {
         method: "POST",
@@ -116,7 +116,7 @@ class FechasServicio {
 
       if(rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(id);
       }
 
@@ -127,7 +127,7 @@ class FechasServicio {
 
   async elminarFechaDiaLs(fecha, exito, error, id) {
     let datos= { fecha: fecha }
-    
+
     try {
       const response = await fetch(`./elminarFechaDiaLs/`, {
         method: "POST",
@@ -141,7 +141,7 @@ class FechasServicio {
 
       if(rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(id);
       }
 
@@ -152,7 +152,7 @@ class FechasServicio {
 
   async elminarFechaDiaRw(fecha, exito, error, id) {
     let datos= { fecha: fecha }
-    
+
     try {
       const response = await fetch(`./elminarFechaDiaRw/`, {
         method: "POST",
@@ -166,7 +166,7 @@ class FechasServicio {
 
       if(rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(id);
       }
 
@@ -184,7 +184,7 @@ class FechasServicio {
 
       if (rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(rta);
         accionLuegoDeGuardar ? accionLuegoDeGuardar() : null;
       }
@@ -215,10 +215,10 @@ class FechasServicio {
         body: JSON.stringify(datos)
       });
       const rta = await response.json();
-      
+
       if (rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(id);
         accion(idSelected)
       }
@@ -231,34 +231,55 @@ class FechasServicio {
 
 
 
-  
-  async getElementosListaReservasEnSemanasLs(semana) {
+
+  async getElementosListaReservasEnSemanasLs(semana, error, mostrarReservas, idEstado) {
     try {
       const response = await fetch(`./listarReservaSemanasLs/${semana}`);
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+      
+      if (rta.error) {
+        error(idEstado)        
+      } else {
+        mostrarReservas ? mostrarReservas(rta) : null;
+        return rta;
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(idEstado) : null;
     }
   }
 
-  async getElementosListaReservasEnDiaRw(fecha) {
+  async getElementosListaReservasEnDiaRw(fecha, error, mostrarReservas, idEstado) {
     try {
       const response = await fetch(`./listarReservaDiaRw/${fecha}`);
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(idEstado)
+      } else {
+        mostrarReservas(rta)
+        return rta;
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(idEstado) : null;
     }
   }
 
-  async getElementosListaReservasEnDiaLs(fecha) {
+  async getElementosListaReservasEnDiaLs(fecha, error, mostrarReservas, idEstado) {
     try {
       const response = await fetch(`./listarReservaDiaLs/${fecha}`);
-      const data = await response.json();
-      return data;
+      const rta = await response.json();
+
+      if (rta.error) {
+        error(idEstado)
+      } else {
+        mostrarReservas(rta)
+        return rta;
+      }
+
     } catch (err) {
-      console.log(err);
+      err ? error(idEstado) : null;
     }
   }
 
@@ -271,7 +292,7 @@ class FechasServicio {
 
       if (rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(rta)
         accionLuegoDeGuardar ? accionLuegoDeGuardar() : null;
       }
@@ -288,7 +309,7 @@ class FechasServicio {
 
       if (rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(editable, rta, tipo)
       }
 
@@ -297,7 +318,7 @@ class FechasServicio {
     }
   }
 
-  
+
 
   async getExamenesEnSemana(semana, editable, exito, error, id) {
     try {
@@ -306,14 +327,14 @@ class FechasServicio {
 
       if (rta.error) {
         error(id)
-      } else {        
+      } else {
         exito(editable, rta)
       }
 
     } catch (err) {
       err ? error(id) : null;
     }
-    
+
   }
 
   async getListaExamenes() {
@@ -339,8 +360,8 @@ class FechasServicio {
           a.href = url;
           a.download = fileName;
           document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-          a.click();    
-          a.remove();         
+          a.click();
+          a.remove();
         }
       );
     } catch (err) {
@@ -352,13 +373,13 @@ class FechasServicio {
   async getExcelTrinity(fecha, tipo, exito, error, id){
     try {
       const response = await fetch(`./excelTrinity/${fecha}&${tipo}`);
-     
+
       console.log(response)
-      
+
 
       // if (rta.error) {
       //   error(id)
-      // } else {        
+      // } else {
       //   // exito(rta)
       // }
 
@@ -375,7 +396,7 @@ class FechasServicio {
     let hora = datetime.slice(11, 16);
 
     let fechaJs = new Date(anio, mes-1, dia);
- 
+
     let numeroDia = fechaJs.getDay();
 
 
@@ -412,7 +433,7 @@ class FechasServicio {
     let dia = datetime.slice(8, 10);
 
     let fechaJs = new Date(anio, mes-1, dia);
- 
+
     let numeroDia = fechaJs.getDay();
 
 

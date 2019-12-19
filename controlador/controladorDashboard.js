@@ -759,12 +759,17 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
-    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
-    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+    r.discapacidad as discapacidad,
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+    
+    
     BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_semana_LS_uuid,
     BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) as uuid_semana_LS,
-    dia_LS.fecha_Examen as dia_LS_fecha_examen,
     semana_LS.semana_examen as fecha_semana_examen,
+
+    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+    dia_LS.fecha_Examen as dia_LS_fecha_examen,
+    
     
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
@@ -780,8 +785,7 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
     WHERE BIN_TO_UUID(semana_LS.uuid) = ${connection.escape(semana)};`;
 
-    console.log("BUSCANDO RESERVAS")
-
+    
     const data = await queryToDb(connection, query);
     return data;
   } finally {
