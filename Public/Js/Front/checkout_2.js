@@ -63,6 +63,12 @@ async function validarHorario() {
             }else if(fueraDeTermino.rw==='false'|| fueraDeTermino.ls==='false'){
                 notificar(this);
             }
+        }else{
+             if(fueraDeTermino.rw==='true'){
+                 setRoute(obtenerHorarios)
+             } else if (fueraDeTermino.rw === 'false'){
+                 notificar(this);
+             }
         }
         
     } catch (err) {
@@ -71,13 +77,18 @@ async function validarHorario() {
 }
 
 async function setRoute(obtenerHorarios){
-    const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
-    const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
-    document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
-    if (document.querySelector('#notificacion')) {
-        document.querySelector('#notificacion').remove();
+    try {
+        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
+        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+        document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
+        if (document.querySelector('#notificacion')) {
+            document.querySelector('#notificacion').remove();
+        }
+        habilitarBoton()
+    } catch (error) {
+        
     }
-    habilitarBoton()
+    
 }
 
 
@@ -95,24 +106,30 @@ async function verFueraDeTermino(modalidad,horarioSeleccionados){
 
 
 async function getHorario() {
-    let horarioSeleccionado;
-    let horarioListening;
-    document.getElementsByName('horario-selector').forEach(horario => {
-        if (horario.checked) {
-            if (horario.classList.length == 2) {
-                horarioSeleccionado = (horario.classList[0]);
-                horarioListening = (horario.classList[1])
-            } else {
-                horarioSeleccionado = (horario.classList[0]);
-            }
+    try {
+        let horarioSeleccionado;
+        let horarioListening;
+        document.getElementsByName('horario-selector').forEach(horario => {
+            if (horario.checked) {
+                if (horario.classList.length == 2) {
+                    horarioSeleccionado = (horario.classList[0]);
+                    horarioListening = (horario.classList[1])
+                } else {
+                    horarioSeleccionado = (horario.classList[0]);
+                }
 
-        }
-    });
-    return { horarioSeleccionado: horarioSeleccionado, horarioListening: horarioListening }
+            }
+        });
+        return { horarioSeleccionado: horarioSeleccionado, horarioListening: horarioListening }
+        
+    } catch (error) {
+        
+    }
+    
 
 }
 
-async function notificar(elemento){
+async function notificar(elemento,error){
     const div= document.createElement('div');
     div.id="notificacion";
     const parrafo = document.createElement('p');
