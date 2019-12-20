@@ -7,7 +7,9 @@ document.getElementsByName('horario-selector').forEach(input => {
     input.addEventListener('change', validarHorario)
 })
 
-let route = window.location.href;
+const route = window.location.href;
+const idMod= route.match(/[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
+
 
 function openNav(item) {
     const clickItems = item.target.classList;
@@ -53,11 +55,9 @@ function desHabilitarBotton() {
 async function validarHorario() {
     try {
         desHabilitarBotton()
-        const modalidad = route.match(/(Completo|Reading_&_Writing|Listening_&_Speaking)/)[0];
-        const obtenerHorarios = await getHorario()
-        const fueraDeTermino = await verFueraDeTermino(modalidad,obtenerHorarios);
-        if(modalidad==='Completo'){
-            console.log(fueraDeTermino);
+        const obtenerHorarios = await getHorario();
+        const fueraDeTermino = await verFueraDeTermino(idMod,obtenerHorarios);
+        if(fueraDeTermino.modalidad.exrw===1 && fueraDeTermino.modalidad.exls===1){
             if(fueraDeTermino.rw==='true'&& fueraDeTermino.ls==='true'){
                 setRoute(obtenerHorarios)
             }else if(fueraDeTermino.rw==='false'|| fueraDeTermino.ls==='false'){

@@ -9,8 +9,7 @@ router.get('/step_1/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const stylesheet = '/css/Front/checkoutStyle_Step1.css';
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
-
-        res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, descripcion: datosExamenModalidad.descripcion, step: 'step_1', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo })
+        res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, descripcion: datosExamenModalidad.descripcion, step: 'step_1', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo });
     } catch (err) {
         console.error(err)
     }
@@ -20,8 +19,9 @@ router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const stylesheet = '/css/Front/checkoutStyle_Step2.css';
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
-        const horarios = await controller.consultaHorarios(req.params.modalidad, req.query.id);
-        res.render('checkoutStep2', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_2', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horario: horarios })
+        const horarios = await controller.consultaHorarios({exrw:datosExamenModalidad.exrw,exls:datosExamenModalidad.exls}, req.query.id);
+        
+        res.render('checkoutStep2', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_2', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horario: horarios });
     } catch (err) {
         console.error(err)
     }
@@ -31,7 +31,7 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
         const informacionPagina = {
-            stylesheet: (datosExamenModalidad == "Completo" ? '/css/Front/checkoutStyle_Step2.css' : '/css/Front/checkoutStyle_info.css'),
+            stylesheet:"",
             step: 'step_4',
             materia: datosExamenModalidad.materia,
             tipo: datosExamenModalidad.tipo,
@@ -43,12 +43,12 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             idReserva: req.query.idreserva,
             precio: datosExamenModalidad.precio
         }
-        if (req.params.modalidad === 'Completo') {
-            
-            res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva});
+        if (datosExamenModalidad.exrw === 1 && datosExamenModalidad.exls === 1) {
+            informacionPagina.stylesheet = '/css/Front/checkoutStyle_Step2.css';
+            res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva });
         } else {
-            
-            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio:informacionPagina.precio });
+           informacionPagina.stylesheet = '/css/Front/checkoutStyle_info.css';
+          res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
         }
 
     } catch (err) {
@@ -59,7 +59,7 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
-        if (req.params.modalidad === 'Completo') {
+        if (datosExamenModalidad.exrw===1 && datosExamenModalidad.exls===1) {
             const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
             const informacionPagina={
                 stylesheet:stylesheetInfo,
@@ -84,15 +84,6 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 })
 
 
-router.get('/ver-horario/:idreserva', async (req, res) => {
-    try {
-        const consultarReserva = await controller.verReservarPaso3(req.params.idreserva);
-        res.json(consultarReserva[0])
-    } catch (err) {
-        console.log(err)
-    }
-});
-
 
 
 router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, res, next) => {
@@ -102,10 +93,12 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
             materia: datosExamenModalidad.materia,
             tipo: datosExamenModalidad.tipo,
             nivel: datosExamenModalidad.nivel,
-            modalidad: datosExamenModalidad.modalidad
+            modalidad: datosExamenModalidad.modalidad,
+            exrw:datosExamenModalidad.exrw,
+            exls:datosExamenModalidad.exls
         }
-        if (examen.modalidad === 'Completo') {
-            const crearReservaTemporalCompleto = await controller.crearReservaEnProceso(examen.modalidad, req.query.idhorario, req.query.idhorarioL);
+        if (examen.exrw === 1 && examen.exls===1) {
+            const crearReservaTemporalCompleto = await controller.crearReservaEnProceso({exrw:examen.exrw,exls:examen.exls}, req.query.idhorario, req.query.idhorarioL);
             if (!crearReservaTemporalCompleto) {
                 res.sendStatus(404);
             } else {
@@ -113,7 +106,7 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
             }
 
         } else {
-            const crearReservaTemporalRwLs = await controller.crearReservaEnProceso(examen.modalidad, req.query.idhorario);
+            const crearReservaTemporalRwLs = await controller.crearReservaEnProceso({ exrw: examen.exrw, exls: examen.exls }, req.query.idhorario);
 
             if (!crearReservaTemporalRwLs) {
                 res.sendStatus(404)
@@ -131,18 +124,31 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
 
 
 router.get('/ver-fecha-fuera-de-termino/:modalidad',async(req,res)=>{
-        if(req.params.modalidad==='Completo'){
-            const verFueraTerminoCo = await controller.verFechaFueraDeTermino(req.params.modalidad, req.query.horario, req.query.idhorarioL);
-            res.json({rw:verFueraTerminoCo.fecha_RW,ls:verFueraTerminoCo.fecha_ls});
+        const datosExamenModalidad = await controller.consultaExamenCheckout(req.params.modalidad);
+        if(datosExamenModalidad.exrw===1 && datosExamenModalidad.exls===1){
+            const verFueraTerminoCo = await controller.verFechaFueraDeTermino({exrw:datosExamenModalidad.exrw,exls:datosExamenModalidad.exls}, req.query.horario, req.query.idhorarioL);
+            res.json({modalidad:{exrw:datosExamenModalidad.exrw,exls:datosExamenModalidad.exls},rw:verFueraTerminoCo.fecha_RW,ls:verFueraTerminoCo.fecha_ls});
         }else{
-            const verFueraTermino = await controller.verFechaFueraDeTermino(req.params.modalidad.replace(/_/g," "), req.query.horario);
-            res.json({rw:verFueraTermino.fecha})
+            const verFueraTermino = await controller.verFechaFueraDeTermino({ exrw: datosExamenModalidad.exrw, exls: datosExamenModalidad.exls }, req.query.horario);
+            res.json({ modalidad: { exrw: datosExamenModalidad.exrw, exls: datosExamenModalidad.exls }, rw:verFueraTermino.fecha})
         }
      
 })
 
 //Consultar Con Juani si se hace esto
 /*
+
+router.get('/ver-horario/:idreserva', async (req, res) => {
+    try {
+        const consultarReserva = await controller.verReservarPaso3(req.params.idreserva);
+        res.json(consultarReserva[0])
+    } catch (err) {
+        console.log(err)
+    }
+});
+
+
+
 router.post('/horario-updated/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         

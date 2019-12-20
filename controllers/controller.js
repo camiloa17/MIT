@@ -82,7 +82,9 @@ exports.consultaExamenCheckout = async (uuid) => {
             modalidad: respuesta[0].modalidad,
             descripcion: respuesta[0].descripcion,
             precio: respuesta[0].precio,
-            id: respuesta[0].id
+            id: respuesta[0].id,
+            exrw:respuesta[0].exrw,
+            exls:respuesta[0].exls
         };
     } catch (err) {
         console.error(err)
@@ -95,42 +97,32 @@ exports.consultaHorarios = async (modalidad, id) => {
     try {
         let horarios = {};
         let sql;
+        if(modalidad.exrw===1 && modalidad.exls===1){
+            sql = await queries.consultaExamenCompletoCupos()
+            const horariosCo = await utils.queryAsync(sql, [id, id]);
 
-        switch (modalidad) {
-            case "Completo":
-                sql = await queries.consultaExamenCompletoCupos()
-                const horariosCo = await utils.queryAsync(sql, [id, id]);
-                
-                horarios = {
-                    horarios: horariosCo
-                }
-                const horarioTextCo = await diasATexto(horarios,'dia');
-                horarios=horarioTextCo;
+            horarios = {
+                horarios: horariosCo
+            }
+            const horarioTextCo = await diasATexto(horarios, 'dia');
+            horarios = horarioTextCo;
+        } else if (modalidad.exrw === 1 && modalidad.exls === 0){
+            sql = await queries.consultaExamenReadingAndWriting();
+            const horariosRW = await utils.queryAsync(sql, [id]);
 
-                break
-
-            case "Reading_&_Writing":
-                sql = await queries.consultaExamenReadingAndWriting();
-                const horariosRW = await utils.queryAsync(sql, [id]);
-
-                horarios = {
-                    horarios: horariosRW,
-                }
-                const horarioTextRw = await diasATexto(horarios, 'dia');
-                horarios = horarioTextRw;
-                break;
-            case "Listening_&_Speaking":
-                sql = await queries.consultaExamenListeningAndSpeaking();
-                const horariosLS = await utils.queryAsync(sql, [id]);
-
-
-                horarios = {
-                    horarios: horariosLS,
-                }
-                const horarioTextLs = await diasATexto(horarios, 'semana');
-                horarios = horarioTextLs;
-
-                break
+            horarios = {
+                horarios: horariosRW,
+            }
+            const horarioTextRw = await diasATexto(horarios, 'dia');
+            horarios = horarioTextRw;
+        } else if (modalidad.exrw === 0 && modalidad.exls === 1){
+            sql = await queries.consultaExamenListeningAndSpeaking();
+            const horariosLS = await utils.queryAsync(sql, [id]);
+            horarios = {
+                horarios: horariosLS,
+            }
+            const horarioTextLs = await diasATexto(horarios, 'semana');
+            horarios = horarioTextLs;
         }
 
         return horarios;
@@ -145,16 +137,15 @@ async function diasATexto(horarios,tipo) {
     try {
         if(tipo==="dia"){
             horariosConTexto.horarios.forEach(horario => {
-            let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').toLocaleString({day:'numeric',month:'long',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+            let fecha = `${DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({day:'numeric',month:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})} hora España`;
                 horario.fecha_Examen = fecha;
             });
         }else if(tipo==='semana'){
             horariosConTexto.horarios.forEach(horario => {
-            let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekNumber;
-            let año = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekYear;
-            let mes = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').monthLong;
-        
-                horario.fecha_Examen = `Semana ${fecha} del año ${año} (${mes} )`;
+            let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').weekNumber;
+            let año = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').weekYear;
+            let mes = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').monthLong;
+                horario.fecha_Examen = `Semana ${fecha} del año ${año} (${mes})`;
             });
         }
         
@@ -169,35 +160,27 @@ async function diasATexto(horarios,tipo) {
 exports.crearReservaEnProceso = async (modalidad, idExamenEnDia, idExamenEnSemana) => {
     try {
 
-        switch (modalidad) {
-            case "Completo":
-                const reservaTemporalCompleto = await crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana);
-                if (reservaTemporalCompleto) {
-                    return { reserva: reservaTemporalCompleto.reserva, uuid: reservaTemporalCompleto.uuid }
-                } else if (!reservaTemporalCompleto) {
-                    return false
-                }
-                break;
-            case "Reading & Writing":
-                const reservaTemporalRW = await crearReservaTemporalRW(idExamenEnDia);
-                if (reservaTemporalRW) {
-                    return { reserva: reservaTemporalRW.reserva, uuid: reservaTemporalRW.uuid }
-                } else if (!reservaTemporalRW) {
-                    return false
-                }
-
-                break;
-
-            case "Listening & Speaking":
-                const reservaTemporalLs = await crearReservaTemporalLs(idExamenEnDia);
-                if (reservaTemporalLs) {
-                    
-                    return { reserva: reservaTemporalLs.reserva, uuid: reservaTemporalLs.uuid }
-                } else if (!reservaTemporalLs) {
-                    return false
-                }
-                break;
-
+        if(modalidad.exrw===1 && modalidad.exls===1){
+            const reservaTemporalCompleto = await crearReservaTemporalCompleto(idExamenEnDia, idExamenEnSemana);
+            if (reservaTemporalCompleto) {
+                return { reserva: reservaTemporalCompleto.reserva, uuid: reservaTemporalCompleto.uuid }
+            } else if (!reservaTemporalCompleto) {
+                return false
+            }
+        }else if(modalidad.exrw===1 && modalidad.exls===0){
+            const reservaTemporalRW = await crearReservaTemporalRW(idExamenEnDia);
+            if (reservaTemporalRW) {
+                return { reserva: reservaTemporalRW.reserva, uuid: reservaTemporalRW.uuid }
+            } else if (!reservaTemporalRW) {
+                return false
+            }
+        } else if (modalidad.exrw === 0 && modalidad.exls === 1){
+            const reservaTemporalLs = await crearReservaTemporalLs(idExamenEnDia);
+            if (reservaTemporalLs) {
+                return { reserva: reservaTemporalLs.reserva, uuid: reservaTemporalLs.uuid }
+            } else if (!reservaTemporalLs) {
+                return false
+            }
         }
     } catch (err) {
         console.error(err);
@@ -271,27 +254,19 @@ async function crearReservaTemporalLs(idExamenEnSemana) {
 
 exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
     const fecha = DateTime.utc().toISODate();
-    
     let sql;
     let consulta;
-    switch (modalidad) {
-        case 'Completo':
-             sql = await queries.consultaFueraDeTerminoCompleto();
-             consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
-            
-            break;
-    
-        case'Reading & Writing':
-        sql=await queries.consultaFueraDeTerminoRW();
-        consulta= await utils.queryAsync(sql,[fecha,idDia])
-            
-        break
-        case'Listening & Speaking':
-            sql = await queries.consultaFueraDeTerminoLS();
-            consulta = await utils.queryAsync(sql, [fecha, idDia])
-            
-            break;
+    if (modalidad.exrw === 1 && modalidad.exls === 1){
+        sql = await queries.consultaFueraDeTerminoCompleto();
+        consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
+    } else if(modalidad.exrw === 1 && modalidad.exls === 0){
+        sql = await queries.consultaFueraDeTerminoRW();
+        consulta = await utils.queryAsync(sql, [fecha, idDia])
+    } else if (modalidad.exrw === 0 && modalidad.exls === 1){
+        sql = await queries.consultaFueraDeTerminoLS();
+        consulta = await utils.queryAsync(sql, [fecha, idDia])
     }
+    
     
     return consulta[0];
 
