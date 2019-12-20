@@ -30,12 +30,25 @@ router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
+        const informacionPagina = {
+            stylesheet: (datosExamenModalidad == "Completo" ? '/css/Front/checkoutStyle_Step2.css' : '/css/Front/checkoutStyle_info.css'),
+            step: 'step_4',
+            materia: datosExamenModalidad.materia,
+            tipo: datosExamenModalidad.tipo,
+            nivel: datosExamenModalidad.nivel,
+            modo: datosExamenModalidad.modalidad,
+            id: datosExamenModalidad.id,
+            horarioId: req.query.idhorario,
+            horarioLs: req.query.idhorarioL,
+            idReserva: req.query.idreserva,
+            precio: datosExamenModalidad.precio
+        }
         if (req.params.modalidad === 'Completo') {
-            const stylesheet = '/css/Front/checkoutStyle_Step2.css';
-            res.render('checkoutStep3Co', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_3', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horarioId: req.query.idhorario, horarioLs: req.query.idhorarioL, idreserva: req.query.idreserva });
+            
+            res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva});
         } else {
-            const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
-            res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_3', materia: datosExamenModalidad.materia, tipo: datosExamenModalidad.tipo, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id,precio:datosExamenModalidad.precio, horarioId: req.query.idhorario, idreserva: req.query.idreserva });
+            
+            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio:informacionPagina.precio });
         }
 
     } catch (err) {
@@ -48,7 +61,21 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
         if (req.params.modalidad === 'Completo') {
             const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
-            res.render('checkoutInformation', { stylesheet: stylesheetInfo, step: 'step_4', materia: datosExamenModalidad.materia, tipo: datosExamenModalidad.tipo, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, id: datosExamenModalidad.id, horarioId: req.query.idhorario, horarioLs: req.query.idhorarioL, idreserva: req.query.idreserva });
+            const informacionPagina={
+                stylesheet:stylesheetInfo,
+                step:'step_4',
+                materia:datosExamenModalidad.materia,
+                tipo:datosExamenModalidad.tipo,
+                nivel:datosExamenModalidad.nivel,
+                modo:datosExamenModalidad.modalidad,
+                id:datosExamenModalidad.id,
+                horarioId:req.query.idhorario,
+                horarioLs:req.query.idhorarioL,
+                idReserva:req.query.idreserva,
+                precio:datosExamenModalidad.precio
+            }
+            
+            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia:informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva,precio:informacionPagina.precio });
         }
 
     } catch (err) {

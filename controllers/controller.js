@@ -153,7 +153,7 @@ async function diasATexto(horarios,tipo) {
             let fecha = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekNumber;
             let año = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').weekYear;
             let mes = DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('Europe/Madrid').monthLong;
-            console.log(fecha)
+        
                 horario.fecha_Examen = `Semana ${fecha} del año ${año} (${mes} )`;
             });
         }
@@ -191,10 +191,9 @@ exports.crearReservaEnProceso = async (modalidad, idExamenEnDia, idExamenEnSeman
             case "Listening & Speaking":
                 const reservaTemporalLs = await crearReservaTemporalLs(idExamenEnDia);
                 if (reservaTemporalLs) {
-                    console.log(reservaTemporalLs);
+                    
                     return { reserva: reservaTemporalLs.reserva, uuid: reservaTemporalLs.uuid }
                 } else if (!reservaTemporalLs) {
-                    console.log(reservaTemporalLs)
                     return false
                 }
                 break;
@@ -269,24 +268,17 @@ async function crearReservaTemporalLs(idExamenEnSemana) {
 }
 
 
-/*Queda en hold para luego corroborar las reservas */
-exports.verReservarPaso3 = async (id) => {
-    const consultaReserva = await queries.consultaReservaPaso3();
-    const verDB = await utils.queryAsync(consultaReserva, id)
-    return verDB
-}
-
 
 exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
     const fecha = DateTime.utc().toISODate();
-    console.log(fecha);
+    
     let sql;
     let consulta;
     switch (modalidad) {
         case 'Completo':
              sql = await queries.consultaFueraDeTerminoCompleto();
              consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
-            console.log(consulta);
+            
             break;
     
         case'Reading & Writing':
@@ -300,7 +292,7 @@ exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
             
             break;
     }
-    console.log(consulta);
+    
     return consulta[0];
 
 }
@@ -309,6 +301,12 @@ exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
 
 /* Queda on hold hasta ver si es necesario actualizar las reservas*/
 /*
+
+exports.verReservarPaso3 = async (id) => {
+    const consultaReserva = await queries.consultaReservaPaso3();
+    const verDB = await utils.queryAsync(consultaReserva, id)
+    return verDB
+}
 exports.corroborarCambioDeHorario = async (modalidad,idReserva, idHorario, idHorarioSemana) => {
     console.log(idReserva,idHorario,idHorarioSemana)
     if (modalidad==="Completo") {
