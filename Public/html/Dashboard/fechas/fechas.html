@@ -1,0 +1,59 @@
+<h4 class="weight700 azul-texto clear-top-3 col xl10 l10 m10 s10 padding0">Fechas</h4>
+
+<div class="row margin-bottom-0">
+    <div class="col s11 ">
+        <h6 class="azul-texto clear-top-2 clear-bottom-1 weight700">Agregar fecha:</h6>
+
+        <ul id="chipsSeleccionDiaSemanaAgregar" class="disableSelectOusideChip">
+            <li id="agregarChipDiaHora" class="chip enableSelectLi">Día / Hora</li>
+            <li id="agregarChipSemana" class="chip enableSelectLi">Semana</li>
+        </ul>
+
+        <div id="areaAgregarFecha">
+        </div>
+    </div>
+</div>
+
+<div class="row margin-bottom-0 clear-top-1">
+    <div class="col s4 l4 m4 xl4 ">
+        <h6 class="azul-texto clear-top-2 clear-bottom-1 weight700">Ver y editar fecha:</h6>
+
+        <ul id="chipsSeleccionDiaSemanaEditar" class="disableSelectOusideChip">
+            <li id="editarChipDiaHora" class="chip enableSelectLi">Día / Hora</li>
+            <li id="editarChipSemana" class="chip enableSelectLi">Semana</li>
+        </ul>
+        
+        <span class="margin-Left-neg08 ">
+            <label>
+                <input id="fechasAntiguas"  type="checkbox" class="filled-in"  />
+                <span class="gris-texto clear-top-05">Mostrar fechas antiguas</span>
+            </label>
+        </span>
+    </div>
+
+    <div class="col s12 l12 m12 xl12 ">
+        <div id="areaEditarFecha"></div>
+    </div>
+</div>
+
+<div id="modalEliminarFecha" class="modal">
+    <div class="modal-content">
+        <h4>¿Eliminar?</h4>
+        <p>Está por eliminar una fecha y todos sus elementos dependientes de forma definitiva.</p>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript: fechasVista.eliminarFecha();"
+            class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
+        <a class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+    </div>
+</div>
+
+<script src="./html/dashboard/fechas/fechasVista.js"></script>
+<script src="./html/dashboard/fechas/fechasServicio.js"></script>
+
+
+
+
+<script>
+    let fechasVista = new FechasVista();
+</script>

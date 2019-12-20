@@ -1,0 +1,470 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+/*---------------------Uso General---------------------*/
+.hidden {
+  display: none;
+}
+
+.notVisible {
+  visibility: hidden;
+}
+
+/*---------------------PRELOADER---------------------*/
+.progress {
+  background-color: #d4ecff;
+}
+.progress .indeterminate {
+  background-color: #085796;
+}
+
+.progress .indeterminate:before {
+  background-color: inherit;
+}
+
+/*---------------------UI/SELECTED---------------------*/
+.ui-selected {
+  background-color: #085796 !important;
+  color: white !important;
+}
+
+
+/* La seleccion de chips es solo dentro de los lis y no en espacio ul  (para que no me deseleccione un chip cuando apreto fuera del li) */
+/*Se aplica a los uls*/
+.disableSelectOusideChip {
+  pointer-events: none;
+}
+
+/*Se aplica a los lis*/
+.enableSelectLi{
+  pointer-events: auto;
+}
+
+
+
+/*---------------------COLORES TEXTO / BACK---------------------*/
+.background-azul {
+  background-color: #085796 !important;
+}
+
+.azul-texto {
+  color: #085796 !important;
+}
+
+.rojo-texto {
+  color: #961108 !important;
+}
+
+.gris-texto {
+  color: #5a5a5a !important;
+}
+
+/*---------------------COLORES CHECKBOX CHECKED---------------------*/
+[type="checkbox"].filled-in:not(:checked) + span:not(.lever):after {
+  border: 2px solid #085796 !important;
+}
+
+label {
+  color: #085796 !important;
+  opacity: 0.9;
+  font-weight: 400 !important;
+}
+
+[type="checkbox"].filled-in:checked + span:not(.lever):after {
+  border: 2px solid #085796;
+  background-color: #085796;
+}
+
+[type="checkbox"] + span:not(.lever) {
+  padding-left: 2rem !important;
+  margin-right: 1rem !important;
+  margin-left: 1rem !important;
+}
+
+
+[type="checkbox"]:checked+span:not(.lever):before {
+  border-right: 2px solid #085796;
+  border-bottom: 2px solid #085796
+}
+
+/*---------------------Tamaños Texto ---------------------*/
+.weight400 {
+  font-weight: 400 !important;
+}
+
+.weight500 {
+  font-weight: 500 !important;
+}
+
+.weight700 {
+  font-weight: 700 !important;
+}
+
+.text-1-4rem {
+  font-size: 1.4rem !important;
+}
+
+/*---------------------SIDE NAV ---------------------*/
+.width-sidenav {
+  width: 16rem;
+}
+
+/*Hamburguesa boton triger*/
+a {
+  color: #085796;
+}
+
+/*---------------------COLLAPSIBLE ---------------------*/
+.collapsible-no-shadow {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #fff;
+}
+
+.flecha-movimiento::after {
+  font-family: "Material Icons";
+  position: absolute;
+  font-size: 1.6rem;
+  content: "chevron_right";
+  transition: transform 0.3s ease-in-out, opacity 0.25s ease-in-out 0.1s,
+    -webkit-transform 0.3s ease-in-out;
+  margin-top: -0.4rem;
+}
+
+li.active div::after {
+  transform: rotate(90deg);
+}
+
+.collapsible-body {
+  border-bottom: 0px;
+}
+
+/*---------------------INPUT FORMS---------------------*/
+input {
+  background-color: transparent;
+  border: 0px solid;
+  color: #085796;
+}
+
+input:hover {
+  text-decoration: underline !important;
+}
+
+input:focus {
+  background-color: transparent !important;
+  border: 0px solid !important;
+}
+
+.inputInactivo {
+  color: grey;
+  text-decoration: line-through !important;
+}
+
+.input-field input[type="text"]:focus,
+.materialize-textarea:focus:not([readonly]) {
+  border-bottom: 1px solid #085796 !important;
+  box-shadow: 0 1px 0 0 #085796 !important;
+}
+
+
+input:not([type]):focus:not([readonly]), 
+input[type=text]:not(.browser-default):focus:not([readonly]), 
+input[type=password]:not(.browser-default):focus:not([readonly]), 
+input[type=email]:not(.browser-default):focus:not([readonly]), 
+input[type=url]:not(.browser-default):focus:not([readonly]), 
+input[type=time]:not(.browser-default):focus:not([readonly]), 
+input[type=date]:not(.browser-default):focus:not([readonly]), 
+input[type=datetime]:not(.browser-default):focus:not([readonly]), 
+input[type=datetime-local]:not(.browser-default):focus:not([readonly]), 
+input[type=tel]:not(.browser-default):focus:not([readonly]), 
+input[type=number]:not(.browser-default):focus:not([readonly]), 
+input[type=search]:not(.browser-default):focus:not([readonly]), 
+textarea.materialize-textarea:focus:not([readonly]){
+  box-shadow: 0 1px 0 0 #085796 !important;
+  border-bottom: 1px solid #085796 !important;
+  -webkit-box-shadow: 0 1px 0 0 #085796 !important;
+}
+
+/* Input Precio Modalidad Label */
+.input-field > label {
+  color: #5a5a5a !important;
+  font-weight: 400;
+}
+
+/* Remueve las flechitas al ingresar un numero*/
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/*---------------------DROPDOWN MENU ---------------------*/
+.dropdown-content li > a,
+.dropdown-content li > span {
+  color: #085796 !important;
+}
+
+/*---------------------TOSTADAS---------------------*/
+.toast {
+  background-color: #085796 !important;
+}
+
+/*---------------------MODAL---------------------*/
+.modal {
+  color: #085796 !important;
+}
+
+/*---------------------BUTTONS---------------------*/
+.button-opacity {
+  opacity: 0.3 !important;
+}
+
+.button-opacity:hover {
+  opacity: 1 !important;
+}
+
+.move-button-nivel-margin-top {
+  margin-top: 0.2rem;
+  margin-left: 0.4rem !important;
+}
+
+/*---------------------COLLECTIONS---------------------*/
+
+.collection-item, .collection-item:last-child {
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.collectionSinBorde {
+  border: 0px solid #e0e0e0 !important;
+  margin: 0 !important;
+}
+
+/*---------------------RADIOBUTTONS---------------------*/
+[type="radio"]:not(:checked) + span:before,
+[type="radio"]:not(:checked) + span:after {
+  border: 2px solid #085796;
+}
+
+[type="radio"]:checked + span:after,
+[type="radio"].with-gap:checked + span:after {
+  background-color: #085796;
+}
+
+[type="radio"]:checked + span:after,
+[type="radio"].with-gap:checked + span:before,
+[type="radio"].with-gap:checked + span:after {
+  border: 2px solid #085796;
+}
+
+/*---------------------CHIPS---------------------*/
+.chip:hover {
+  cursor: pointer !important;
+}
+
+/*---------------------WIDTHS---------------------*/
+.width4rem {
+  width: 4rem !important;
+}
+
+.cupos{
+  width: 6rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.85rem !important;
+}
+
+
+/*---------------------MARGIN/PADDING---------------------*/
+.margin0 {
+  margin: 0 !important;
+}
+
+.margin-top-0{
+  margin-top: 0 !important;
+}
+
+.margin-left-0-15{
+  margin-left: 0.15rem !important;
+}
+
+.margin-Left-neg08{
+  margin-left: -0.8rem !important;
+}
+
+.margin-right-1{
+  margin-right: 1rem !important;
+}
+
+.margin-bottom-0 {
+  margin-bottom: 0 !important;
+}
+
+.margin-bottom-0-4 {
+  margin-bottom: 0.4rem !important;
+}
+
+.clear-top-05 {
+  margin-top: 0.5rem !important;
+}
+
+.clear-top-1 {
+  margin-top: 1rem !important;
+}
+
+.clear-top-2 {
+  margin-top: 2rem !important;
+}
+
+.clear-top-3 {
+  margin-top: 3rem !important;
+}
+
+.clear-top-6 {
+  margin-top: 6rem !important;
+}
+
+.clear-bottom-1 {
+  margin-bottom: 1rem !important;
+}
+
+.clear-bottom-2 {
+  margin-bottom: 2rem;
+}
+
+.clear-bottom-3 {
+  margin-bottom: 3rem;
+}
+
+.padding0 {
+  padding: 0 !important;
+}
+
+.padding-top0-6{
+  padding-top: 0.6rem;
+}
+
+.padding-top2-5{
+  padding-top: 2.5rem;
+}
+
+.padding0-7rem {
+  padding: 0.7rem !important;
+}
+
+.padding-left0{
+  padding-left: 0 !important;
+}
+
+.padding-left2-4 {
+  padding-left: 2.4rem !important;
+}
+
+.padding-left3 {
+  padding-left: 3rem !important;
+}
+
+.margin-top-5px{
+  margin-top: 5px !important;
+}
+
+/*---------------------HEIGHT COLLECTION---------------------*/
+.height24rem {
+  height: 24rem;
+  overflow-y: auto;
+}
+
+/*---------------------TABLES---------------------*/
+td{
+  padding: 4px 2px !important;
+}
+
+/*---------------------DATEPICKER---------------------*/
+.datepicker-date-display {
+  background-color: #085796;
+}
+
+.datepicker-cancel,.datepicker-done{
+  color: #085796 !important;
+}
+
+
+.datepicker-table td.is-today{
+  color: #085796 ;
+  font-weight: 700 !important;
+}
+
+.timepicker-digital-display{
+  background-color: #085796;
+}
+
+.timepicker-close{
+  color: #085796;
+}
+
+.datepicker-table td.is-selected {
+  background-color: #86aac7
+}
+
+/* AGUJA DEL RELOJ*/
+.timepicker-canvas line, .timepicker-canvas-bg, .timepicker-canvas-bearing{
+  fill: #86aac7 !important;
+}
+.timepicker-canvas line {
+  stroke: #86aac7 !important;
+}
+
+/* COLLECTION LISTA HORARIOS */
+#listaHorarios .ui-selected{
+  color: white !important;
+}
+
+#listaHorarios .ui-selected .cupos{
+  color: white !important;
+}
+
+#listaHorarios .ui-selected i{
+  color: white !important;
+}
+
+#listaExamenes .ui-selected{
+  color: white !important;
+}
+
+#listaExamenes .ui-selected i{
+  color: white !important;
+}
+
+
+
+.cursorPointer{
+  cursor:pointer;
+}
+
+.hoverGrey:hover{
+  background-color: #e0e0e0;
+}
+
+
+.heigth78px{
+  height: 78px !important;
+  margin-top: -50px !important;
+}
+
+@media screen and (max-width: 992px) {
+  .margin-bottom22 {
+    margin-bottom: 8rem;
+  }
+}
