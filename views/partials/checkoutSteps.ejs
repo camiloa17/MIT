@@ -1,5 +1,5 @@
 <div id="steps">
-    <% if(modo == 'Reading & Writing' || modo =='Listening & Speaking'){ %>
+    <% if((modo.exrw ===1 && modo.exls===0  )|| (modo.exrw ===0 && modo.exls === 1)){ %>
     <ul>
         <%if(step =='step_1'){%>
         <li class="step-number selected-step">1</li>
@@ -23,7 +23,7 @@
         <% }%>
     </ul>
     <% }%>
-    <% if(modo == "Completo") { %>
+    <% if(modo.exrw ===1 && modo.exls === 1) { %>
     <ul>
         <%if(step=='step_1'){%>
         <li class="step-number selected-step">1</li>

@@ -35,7 +35,7 @@
     <div class="button-wrap">
         <% if(horario.horarios.length>0) {%>
             <a class="button-checkout"
-                href="/checkout/step_1/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
+                href="/checkout/step_1/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.texto.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
             <% }else if(horario.horarios.length===0){%>
                 <a class="button-checkout"
                     href="/">Regresar</a>

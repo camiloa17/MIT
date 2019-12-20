@@ -107,13 +107,14 @@ function mostrarNumeroTrinity(){
 
 function sumarEnvio(){
   let botonSeleccionado = document.querySelector('.envio-seleccion:checked').value;
+  let innerText = document.querySelector('#detalles-compra p').innerText;
   console.log(botonSeleccionado)
   if(botonSeleccionado==="si"){
     document.querySelector('#precio').innerText= parseInt(document.querySelector("#precio").innerText)+10;
-    document.querySelector('#detalles-compra p').innerText ="Examen de ingles ISE1 Reading & Writing + Envio"
+    document.querySelector('#detalles-compra p').innerText =`${innerText} + Envío`
   }else if(botonSeleccionado==="no"){
     document.querySelector("#precio").innerText=precio;
-    document.querySelector('#detalles-compra p').innerText = "Examen de ingles ISE1 Reading & Writing"
+    document.querySelector('#detalles-compra p').innerText = innerText.replace(/\s\+\sEnvío/,"");
   }
 }
 

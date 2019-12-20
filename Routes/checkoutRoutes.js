@@ -9,7 +9,7 @@ router.get('/step_1/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const stylesheet = '/css/Front/checkoutStyle_Step1.css';
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
-        res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, descripcion: datosExamenModalidad.descripcion, step: 'step_1', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo });
+        res.render('checkoutStep1', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: {texto:datosExamenModalidad.modalidad,exrw:datosExamenModalidad.exrw,exls:datosExamenModalidad.exls}, precio: datosExamenModalidad.precio, descripcion: datosExamenModalidad.descripcion, step: 'step_1', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo });
     } catch (err) {
         console.error(err)
     }
@@ -17,11 +17,21 @@ router.get('/step_1/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 
 router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
-        const stylesheet = '/css/Front/checkoutStyle_Step2.css';
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
-        const horarios = await controller.consultaHorarios({exrw:datosExamenModalidad.exrw,exls:datosExamenModalidad.exls}, req.query.id);
+        const informacionPagina = {
+            stylesheet: '/css/Front/checkoutStyle_Step2.css',
+            step: 'step_2',
+            materia: datosExamenModalidad.materia,
+            tipo: datosExamenModalidad.tipo,
+            nivel: datosExamenModalidad.nivel,
+            modo: datosExamenModalidad.modalidad,
+            exrw: datosExamenModalidad.exrw,
+            exls: datosExamenModalidad.exls,
+            id: datosExamenModalidad.id
+        }
+        const horarios = await controller.consultaHorarios({ exrw: informacionPagina.exrw, exls: informacionPagina.exls }, informacionPagina.id);
         
-        res.render('checkoutStep2', { stylesheet: stylesheet, nivel: datosExamenModalidad.nivel, modo: datosExamenModalidad.modalidad, precio: datosExamenModalidad.precio, step: 'step_2', materia: datosExamenModalidad.materia, id: datosExamenModalidad.id, tipo: datosExamenModalidad.tipo, horario: horarios });
+        res.render('checkoutStep2', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto:informacionPagina.modo , exrw: informacionPagina.exrw, exls: informacionPagina.exls }, step: informacionPagina.step, id: informacionPagina, horario: horarios });
     } catch (err) {
         console.error(err)
     }
@@ -32,11 +42,13 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
         const informacionPagina = {
             stylesheet:"",
-            step: 'step_4',
+            step: 'step_3',
             materia: datosExamenModalidad.materia,
             tipo: datosExamenModalidad.tipo,
             nivel: datosExamenModalidad.nivel,
             modo: datosExamenModalidad.modalidad,
+            exrw: datosExamenModalidad.exrw,
+            exls: datosExamenModalidad.exls,
             id: datosExamenModalidad.id,
             horarioId: req.query.idhorario,
             horarioLs: req.query.idhorarioL,
@@ -45,10 +57,10 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         }
         if (datosExamenModalidad.exrw === 1 && datosExamenModalidad.exls === 1) {
             informacionPagina.stylesheet = '/css/Front/checkoutStyle_Step2.css';
-            res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva });
+            res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva });
         } else {
            informacionPagina.stylesheet = '/css/Front/checkoutStyle_info.css';
-          res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
+            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
         }
 
     } catch (err) {
@@ -60,22 +72,28 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
         if (datosExamenModalidad.exrw===1 && datosExamenModalidad.exls===1) {
-            const stylesheetInfo = '/css/Front/checkoutStyle_info.css';
-            const informacionPagina={
-                stylesheet:stylesheetInfo,
-                step:'step_4',
-                materia:datosExamenModalidad.materia,
-                tipo:datosExamenModalidad.tipo,
-                nivel:datosExamenModalidad.nivel,
-                modo:datosExamenModalidad.modalidad,
-                id:datosExamenModalidad.id,
-                horarioId:req.query.idhorario,
-                horarioLs:req.query.idhorarioL,
-                idReserva:req.query.idreserva,
-                precio:datosExamenModalidad.precio
+            
+            const informacionPagina = {
+                stylesheet: "",
+                step: 'step_4',
+                materia: datosExamenModalidad.materia,
+                tipo: datosExamenModalidad.tipo,
+                nivel: datosExamenModalidad.nivel,
+                modo: datosExamenModalidad.modalidad,
+                exrw: datosExamenModalidad.exrw,
+                exls: datosExamenModalidad.exls,
+                id: datosExamenModalidad.id,
+                horarioId: req.query.idhorario,
+                horarioLs: req.query.idhorarioL,
+                idReserva: req.query.idreserva,
+                precio: datosExamenModalidad.precio
+            }
+            if(informacionPagina.exrw===1 && informacionPagina.exls===1){
+                informacionPagina.stylesheet ='/css/Front/checkoutStyle_info.css'
+                res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
             }
             
-            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia:informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: informacionPagina.modo, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva,precio:informacionPagina.precio });
+            
         }
 
     } catch (err) {

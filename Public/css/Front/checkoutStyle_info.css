@@ -404,7 +404,7 @@ input[id="b2"]:checked ~ #label-no{
         padding-top:0;
     }
 
-    button.button-checkout:disabled{
+button.button-checkout:disabled{
     cursor:not-allowed;
     background:#BBBBBB;
     border: 1px solid #BBBBBB;
@@ -545,7 +545,19 @@ input[id="b2"]:checked ~ #label-no{
         text-align: left;
         margin-top:10px;
         margin-bottom:30px;
+        margin-left:0px;
     }
+
+    #texto-obligatorio,
+    #aviso-numero-mit{
+        width: 500px;
+    }
+    
+    #texto-obligatorio{
+        margin-bottom: 0px;
+    }
+
+    
 
     #information-wrapper{
         margin:10px 0;

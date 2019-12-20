@@ -11,7 +11,7 @@
         <%- include("partials/checkoutSteps") -%>
         <div id="information">
             <h3>EXAMEN DE</h3>
-            <h1><%= nivel %> - <%= modo %></h1>
+            <h1><%= nivel %> - <%= modo.texto %></h1>
             <div class="exam-wrapper ongoing">
                 <div class="exam-picture">
                     <img src="/images/Front/team-section-picture.jpg" alt="">
@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="button-wrap">
-                <a class="button-checkout" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Siguiente</a>
+                <a class="button-checkout" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.texto.replace(/\s/g, '_')%>?id=<%=id%>">Siguiente</a>
             </div>
         </div>
         </section>

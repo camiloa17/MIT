@@ -15,7 +15,8 @@
 
                 <div id="person-information">
                     <h2>COMPLETAR TUS DATOS</h2>
-                    <P>Completa todos los campos obligatorios *</P>
+                    <P id="texto-obligatorio">Completa todos los campos obligatorios <b>*</b></P>
+                    <p id="aviso-numero-mit"><strong>Si tienes Número de Trinity tienes que agregarlo obligatoriamente</strong></p>
                     <div id="information-wrapper">
                         <label for="">Nombre</label>
                         <input type="text" placeholder="Nombre" name="mombre" class="input-checkout" required>
@@ -119,18 +120,11 @@
         <section id='detalles-compra'>
             <h3>Detalles de la compra</h3>
             <!--Total--> 
-            <p>Examen de ingles ISE1 Reading & Writing</p>
+            <p>Examen de <%=materia %> <%=nivel %> <%=modo.texto%></p>
             <h2>€<span id="precio"><%=precio%></span></h2>
         </section>
         <div class="button-wrap">
-            <% if(modo==="Completo") {%>
-            <a class="button-checkout backwards"
-                href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>&idhorario=<%=horarioId%>&idhorarioL=<%=horarioLs%>">Regresar</a>
-            <% }else {%>
-            <a class="button-checkout backwards"
-                href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
-            <% }%>
-
+            <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.texto.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
             <button type="submit" class="button-checkout" id="button-horario" disabled>Siguiente</button>
         </div>
     </form>
