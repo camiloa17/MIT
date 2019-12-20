@@ -376,6 +376,10 @@ input[type="number"] {
   padding: 0.7rem !important;
 }
 
+.padding03rem{
+  padding: 0.3rem !important;
+}
+
 .padding-left0{
   padding-left: 0 !important;
 }
@@ -491,3 +495,12 @@ td{
   height: 20px;
 }
 
+.relative10pxtop{
+  position: relative;
+  top: 10px;
+}
+
+.relative2pxtop{
+  position: relative;
+  top: 2px;
+}

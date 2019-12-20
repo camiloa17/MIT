@@ -116,7 +116,7 @@ async function buscarEnDbModalidad(nivel) {
   let connection;
   try {
     const query =
-      "SELECT BIN_TO_UUID(uuid) AS uuid, nombre, orden, precio, activo, mostrar_cliente, examen_RW, examen_LS FROM modalidad WHERE activo=1 AND BIN_TO_UUID(nivel_uuid)= ?";
+      "SELECT BIN_TO_UUID(uuid) AS uuid, nombre, orden, precio, activo, mostrar_cliente, examen_RW, examen_LS, txt_img FROM modalidad WHERE activo=1 AND BIN_TO_UUID(nivel_uuid)= ?";
     let values = [nivel];
     connection = await connectionToDb();
     const data = await queryToDb(connection, query, values);
@@ -298,13 +298,13 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 
       if (cambios.addModalidades.length) {
         cambios.addModalidades.forEach(element => {
-          sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS) VALUES (UUID_TO_BIN(${connection.escape(element)}), '1', '0', UUID_TO_BIN(${connection.escape(cambios.uuid)}), ' ', 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
+          sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS, txt_img) VALUES (UUID_TO_BIN(${connection.escape(element)}), '1', '0', UUID_TO_BIN(${connection.escape(cambios.uuid)}), ' ', 0, 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
         });
       }
 
       if (cambios.cambioModalidades) {
         cambios.modalidades.forEach(element => {
-          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
+          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)}, txt_img=${connection.escape(element.txt_img)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
         });
       }
     }

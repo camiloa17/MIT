@@ -279,7 +279,7 @@
     chipLista.empty();
 
     dataOrdenada.forEach(elemento => {
-      elemento.activo ? chipLista.append(chipSortableTemplate(elemento)) : null; 
+      elemento.activo ? chipLista.append(chipSortableTemplate(elemento)) : null;
     });
     habilitaSortableChip(chipLista);
   }
@@ -356,8 +356,8 @@
           idEstadoNivel.append(preloader());
 
           updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado);
-          
-             
+
+
 
           break;
       }
@@ -383,7 +383,7 @@
         case listaNivel:
           let tipoSeleccionado = chipsTipoEnNivel.find(".ui-selected").attr("id")
           let nivelSeleccionado = chipsNivelEnNivel.find(".ui-selected").attr("id");
-  
+
           if (nivelSeleccionado) {
             // Cuando ya tengo otros niveles
             seGuardaOResetea(lista);
@@ -698,6 +698,11 @@
       seGeneroUnCambioEnLista(lista);
     });
 
+    $(`#${elemento.uuid}_txt_img`).on("input", function () {
+      cambioModalidades = true;
+      seGeneroUnCambioEnLista(lista);
+    });
+
     $(`#${elemento.uuid}_precio`).on("input", function () {
       cambioModalidades = true;
       seGeneroUnCambioEnLista(lista);
@@ -801,7 +806,7 @@
         // gets the new and old index then removes the temporary attribute
         var newIndex = ui.item.index();
         var oldIndex = $(this).attr("data-previndex");
-        $(this).removeAttr("data-previndex");    
+        $(this).removeAttr("data-previndex");
 
         //Si no se movio de lugar, no se genera ningun cambio       
         !(newIndex === oldIndex)
@@ -1037,34 +1042,61 @@
   //////////////////// PRESETS HTML elemento modalidad que pertenece a cada nivel
   const liModalidadTemplate = modalidad => {
     return `
-  <li id="${modalidad.uuid}" class="collection-item grey lighten-4 margin-bottom-0-4"  RW="${modalidad.examen_RW ? 1 : 0}" LS="${modalidad.examen_LS ? 1 : 0}"   >
+  <li id="${modalidad.uuid}" class="collection-item grey lighten-4 padding03rem margin-bottom-0-4"  RW="${modalidad.examen_RW ? 1 : 0}" LS="${modalidad.examen_LS ? 1 : 0}"   >
     <div class="row margin0">
-      <div class="col padding-left3  ">
+      <div class="col s1 m1 l1 xl1">
         <a class="secondary-content left">
-          <i class="material-icons-outlined azul-texto left button-opacity cursorPointer move-button">import_export</i>
+          <i class="relative10pxtop material-icons-outlined azul-texto left button-opacity cursorPointer move-button">import_export</i>
         </a>
+      </div>
+      
+      <div class="col s5 m5 l5 xl5 ">
 
         <input id="${modalidad.uuid}_nombre" class="browser-default ${!modalidad.mostrar_cliente ? "inputInactivo" : ""}" type="text" value="${modalidad.nombre}"/>
+      </div>
+      <div class="col s4 m4 l4 xl4 ">  
         <span class="azul-texto">€</span>
         <input id="${modalidad.uuid}_precio" class="browser-default precio width4rem" type="number" value="${modalidad.precio}"/>
+        
+      </div>
 
-        <div class="secondary-content">
-          ${modalidad.examen_RW ?
-        `<span class="new badge margin-left-0-15 margin-right-1 left light-blue" data-badge-caption="">ESCR</span>` : `<span class="new badge margin-left-0-15 margin-right-1 left background-grey" data-badge-caption=""></span>`}
-            
+      <div class="col s1 m1 l1 xl1 ">
+       
           ${modalidad.examen_LS ?
-        `<span class="new badge margin-left-0-15 margin-right-1 left orange" data-badge-caption="">ORAL</span>` : `<span class="new badge margin-left-0-15 margin-right-1 left background-grey" data-badge-caption=""></span>`}
+        `<span class="new badge margin-left-0-15 margin-right-1 right orange" data-badge-caption="">ORAL</span>` : `<span class="new badge margin-left-0-15 margin-right-1 right background-grey" data-badge-caption=""></span>`}
+              
 
-          <a class="secondary-content delete">
-            <i id="${modalidad.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity">delete</i>
-          </a>
-
-          <a class="secondary-content check">
-            <i id="${modalidad.uuid}_visibility" class="material-icons-outlined azul-texto right button-opacity">${modalidad.mostrar_cliente ? "visibility" : "visibility_off"}</i>
-          </a>          
-        </div>
+      </div>
+      <div class="col s1 m1 l1 xl1 ">
+      <a class="secondary-content check">
+          <i id="${modalidad.uuid}_visibility" class="material-icons-outlined azul-texto right button-opacity cursorPointer">${modalidad.mostrar_cliente ? "visibility" : "visibility_off"}</i>
+        </a> 
       </div>
     </div>
+
+
+
+
+    <div class="row margin0">
+
+      <div class="col s9 m9 l9 xl9 offset-s1 offset-m1 offset-l1 offset-xl1">
+      <i class="material-icons-outlined azul-texto left">photo</i>
+        <input id="${modalidad.uuid}_txt_img" class="relative2pxtop browser-default ${!modalidad.mostrar_cliente ? "inputInactivo" : ""}" type="text" value="${modalidad.txt_img ? modalidad.txt_img : ""}"/>
+      </div>
+
+      <div class="col s1 m1 l1 xl1 ">
+        ${modalidad.examen_RW ?
+        `<span class="new badge margin-left-0-15 margin-right-1 right light-blue" data-badge-caption="">ESCR</span>` : `<span class="new badge margin-left-0-15 margin-right-1 right background-grey" data-badge-caption=""></span>`}
+      </div>
+
+      <div class="col s1 m1 l1 xl1 ">
+        <a class="secondary-content delete">
+          <i id="${modalidad.uuid}_delete" class="material-icons-outlined azul-texto right button-opacity cursorPointer">delete</i>
+        </a>
+      </div>
+
+    </div>
+
   </li>`;
   };
 
@@ -1185,7 +1217,8 @@
             mostrar_cliente: $(`#${modalidadId}_visibility`).text() === "visibility" ? 1 : 0,
             examen_RW: $(`#${modalidadId}`).attr("rw"),
             examen_LS: $(`#${modalidadId}`).attr("ls"),
-            edita_user_secundario: 0
+            edita_user_secundario: 0,
+            txt_img: $(`#${modalidadId}_txt_img`).val(),
           });
         });
 
@@ -1334,7 +1367,7 @@
     }
   }
 
-  
+
 
   async function updateNivelModalidad(cambios, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado) {
     try {
