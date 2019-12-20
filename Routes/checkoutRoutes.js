@@ -107,7 +107,7 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
 
         } else {
             const crearReservaTemporalRwLs = await controller.crearReservaEnProceso({ exrw: examen.exrw, exls: examen.exls }, req.query.idhorario);
-
+            
             if (!crearReservaTemporalRwLs) {
                 res.sendStatus(404)
             } else {

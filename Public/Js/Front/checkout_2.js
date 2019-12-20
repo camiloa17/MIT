@@ -93,8 +93,6 @@ async function setRoute(obtenerHorarios){
 }
 
 
-
-
 async function verFueraDeTermino(modalidad,horarioSeleccionados){
     try{
         const verSiEstaFuera = await fetch(`/checkout/ver-fecha-fuera-de-termino/${modalidad}?horario=${horarioSeleccionados.horarioSeleccionado}${(horarioSeleccionados.horarioListening ? `&idhorarioL=${horarioSeleccionados.horarioListening}` : "")}`);

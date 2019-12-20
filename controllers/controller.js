@@ -106,10 +106,11 @@ exports.consultaHorarios = async (modalidad, id) => {
             }
             const horarioTextCo = await diasATexto(horarios, 'dia');
             horarios = horarioTextCo;
+
         } else if (modalidad.exrw === 1 && modalidad.exls === 0){
             sql = await queries.consultaExamenReadingAndWriting();
             const horariosRW = await utils.queryAsync(sql, [id]);
-
+            
             horarios = {
                 horarios: horariosRW,
             }
@@ -274,27 +275,6 @@ exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
 
 
 
-/* Queda on hold hasta ver si es necesario actualizar las reservas*/
-/*
-
-exports.verReservarPaso3 = async (id) => {
-    const consultaReserva = await queries.consultaReservaPaso3();
-    const verDB = await utils.queryAsync(consultaReserva, id)
-    return verDB
-}
-exports.corroborarCambioDeHorario = async (modalidad,idReserva, idHorario, idHorarioSemana) => {
-    console.log(idReserva,idHorario,idHorarioSemana)
-    if (modalidad==="Completo") {
-        console.log('completo')
-    } else {
-        console.log('R&W')
-    }
-}
-
-exports.actualizarReservaEnProceso =async(modalidad,horario,reserva,horarioSemana)=>{
-console.log(modalidad,horario,reserva,horarioSemana);
-}
-*/
 
 
 
