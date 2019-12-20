@@ -1,4 +1,4 @@
-const con = require("../lib/conexiondb");
+const con = require("../database/conexionDB/conexionbd");
 const mysql = require("mysql");
 const process = require("process");
 

@@ -2,7 +2,7 @@ class FechasServicio {
 
   async agregarFechaDia(datos, exito, error, clean, id) {
     try {
-      const response = await fetch(`./agregarFechaDia/`, {
+      const response = await fetch(`/dashboard/agregarFechaDia/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -27,7 +27,7 @@ class FechasServicio {
 
   async agregarFechaSemana(datos, exito, error, clean, id) {
     try {
-      const response = await fetch(`./agregarFechaSemana/`, {
+      const response = await fetch(`/dashboard/agregarFechaSemana/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -53,7 +53,7 @@ class FechasServicio {
   async updateExamenesEnFecha(datos, tipoDeLista, guardadoExitoso, error, id) {
     console.log("estamos en servicio")
     try {
-      const response = await fetch(`./updateExamenesEnFecha/`, {
+      const response = await fetch(`/dashboard/updateExamenesEnFecha/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -78,7 +78,7 @@ class FechasServicio {
     let datos= { fecha: fecha }
     
     try {
-      const response = await fetch(`./elminarFechaSemana/`, {
+      const response = await fetch(`/dashboard/elminarFechaSemana/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -103,7 +103,7 @@ class FechasServicio {
     let datos= { fecha: fecha }
     
     try {
-      const response = await fetch(`./elminarFechaDiaLs/`, {
+      const response = await fetch(`/dashboard/elminarFechaDiaLs/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -128,7 +128,7 @@ class FechasServicio {
     let datos= { fecha: fecha }
     
     try {
-      const response = await fetch(`./elminarFechaDiaRw/`, {
+      const response = await fetch(`/dashboard/elminarFechaDiaRw/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -153,7 +153,7 @@ class FechasServicio {
   // Me trae horarios de Orales y Escritos
   async getListaHorarios(exito, error, id, accionLuegoDeGuardar, fechasAntiguas) {
     try {
-      const response = await fetch(`./listarHorarios/${fechasAntiguas}`);
+      const response = await fetch(`/dashboard/listarHorarios/${fechasAntiguas}`);
       const rta = await response.json();
 
       if (rta.error) {
@@ -171,7 +171,7 @@ class FechasServicio {
   // Me trae horarios de Orales
   async getListaHorariosOrales() {
     try {
-      const response = await fetch("./listarHorariosOrales/");
+      const response = await fetch("/dashboard/listarHorariosOrales/");
       const data = await response.json();
       return data;
     } catch (err) {
@@ -181,7 +181,7 @@ class FechasServicio {
 
   async asignarDiaASemanaExamenOral(datos) {
     try {
-      const response = await fetch(`./asignarDiaASemanaExamenOral/`, {
+      const response = await fetch(`/dashboard/asignarDiaASemanaExamenOral/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -200,7 +200,7 @@ class FechasServicio {
   
   async getElementosListaReservasEnSemanasLs(semana) {
     try {
-      const response = await fetch(`./listarReservaSemanasLs/${semana}`);
+      const response = await fetch(`/dashboard/listarReservaSemanasLs/${semana}`);
       const data = await response.json();
       return data;
     } catch (err) {
@@ -210,7 +210,7 @@ class FechasServicio {
 
   async getElementosListaReservasEnDiaRw(fecha) {
     try {
-      const response = await fetch(`./listarReservaDiaRw/${fecha}`);
+      const response = await fetch(`/dashboard/listarReservaDiaRw/${fecha}`);
       const data = await response.json();
       return data;
     } catch (err) {
@@ -220,7 +220,7 @@ class FechasServicio {
 
   async getElementosListaReservasEnDiaLs(fecha) {
     try {
-      const response = await fetch(`./listarReservaDiaLs/${fecha}`);
+      const response = await fetch(`/dashboard/listarReservaDiaLs/${fecha}`);
       const data = await response.json();
       return data;
     } catch (err) {
@@ -232,7 +232,7 @@ class FechasServicio {
 
   async getListaSemanas(exito, error, id, accionLuegoDeGuardar, fechasAntiguas)  {
     try {
-      const response = await fetch(`./listarSemanas/${fechasAntiguas}`);
+      const response = await fetch(`/dashboard/listarSemanas/${fechasAntiguas}`);
       const rta = await response.json();
 
       if (rta.error) {
@@ -249,7 +249,7 @@ class FechasServicio {
 
   async getExamenesEnFecha(fecha, tipo, editable, exito, error, id){
     try {
-      const response = await fetch(`./listarExamenesEnFecha/${fecha}&${tipo}`);
+      const response = await fetch(`/dashboard/listarExamenesEnFecha/${fecha}&${tipo}`);
       const rta = await response.json();
 
       if (rta.error) {
@@ -267,7 +267,7 @@ class FechasServicio {
 
   async getExamenesEnSemana(semana, editable, exito, error, id) {
     try {
-      const response = await fetch(`./listarExamenesEnSemana/${semana}`);
+      const response = await fetch(`/dashboard/listarExamenesEnSemana/${semana}`);
       const rta = await response.json();
 
       if (rta.error) {
@@ -284,7 +284,7 @@ class FechasServicio {
 
   async getListaExamenes() {
     try {
-      const response = await fetch("./listarExamenes/");
+      const response = await fetch("/dashboard/listarExamenes/");
       const data = await response.json();
       return data;
     } catch (err) {

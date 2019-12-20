@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const controller = require('../MIT/controllers/controller');
 const checkoutRoutes = require('./Routes/checkoutRoutes');
+const dashbordRoutes = require('./Routes/rutas_dashboard')
 const app = express();
 
 app.set("view engine", "ejs");
@@ -41,7 +42,9 @@ app.get('/faqs', asyncErrorWrap(async (req, res) => {
     const stylesheet = 'css/Front/faqs.css';
     const menuItems = await controller.adquirirMenu();
     res.render("faqs", { stylesheet: stylesheet, team: '/#team', contacto: '/#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
-}))
+}));
+
+app.use('/dashboard',asyncErrorWrap(dashbordRoutes));
 
 
 app.use(errorHandler);

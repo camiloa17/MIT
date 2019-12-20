@@ -1460,7 +1460,7 @@ function ingresarNuevoInputValue(uuid) {
 //////////////////// CONSULTAS GET AL SERVIDOR
 async function getMateria() {
   try {
-    const response = await fetch("./materia");
+    const response = await fetch("/dashboard/materia");
     const data = await response.json();
     return data;
   } catch (err) {
@@ -1470,7 +1470,7 @@ async function getMateria() {
 
 async function getTipo(materiaId) {
   try {
-    const response = await fetch(`./tipo/${materiaId}`);
+    const response = await fetch(`/dashboard/tipo/${materiaId}`);
     const data = await response.json();
     return data;
   } catch (err) {
@@ -1481,7 +1481,7 @@ async function getTipo(materiaId) {
 // Me trae todos los nombres de los niveles de un tipo
 async function getChipNivel(tipoId) {
   try {
-    const response = await fetch(`./nivelChip/${tipoId}`);
+    const response = await fetch(`/dashboard/nivelChip/${tipoId}`);
     const data = await response.json();
     return data;
   } catch (err) {
@@ -1492,7 +1492,7 @@ async function getChipNivel(tipoId) {
 // Me trae toda la informacion de un nivel seleccionado
 async function getNivel(nivelId) {
   try {
-    const response = await fetch(`./nivel/${nivelId}`);
+    const response = await fetch(`/dashboard/nivel/${nivelId}`);
     const data = await response.json();
     return data;
   } catch (err) {
@@ -1503,7 +1503,7 @@ async function getNivel(nivelId) {
 // Me trae toda las modalidades de un nivel seleccionado
 async function getModalidad(nivelId) {
   try {
-    const response = await fetch(`./modalidad/${nivelId}`);
+    const response = await fetch(`/dashboard/modalidad/${nivelId}`);
     const data = await response.json();
     return data;
   } catch (err) {
@@ -1514,7 +1514,7 @@ async function getModalidad(nivelId) {
 //////////////////// UPDATES POST AL SERVIDOR
 async function updateMateria(cambios) {
   try {
-    const response = await fetch(`./examenes/`, {
+    const response = await fetch(`/dashboard/examenes/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1532,7 +1532,7 @@ async function updateMateria(cambios) {
 
 async function updateTipo(cambios) {
   try {
-    const response = await fetch(`./examenes/`, {
+    const response = await fetch(`/dashboard/examenes/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1549,7 +1549,7 @@ async function updateTipo(cambios) {
 
 async function updateNivelModalidad(cambios) {
   try {
-    const response = await fetch(`./examenesUpdateNivelModalidad/`, {
+    const response = await fetch(`/dashboard/examenesUpdateNivelModalidad/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
