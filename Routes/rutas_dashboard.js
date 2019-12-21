@@ -1,5 +1,4 @@
 const express = require('express');
-
 const router = express.Router();
 const controladorDashboard = require('../controllers/controladorDashboard')
 
@@ -23,58 +22,58 @@ function errorHandler(err, req, res, next) {
 }
 
 
-router.get('/dashboard', function(req, res){
-  res.sendFile( 'index.html', route);
+router.get('/', function(req, res){
+  res.render('dashboardIndex')
 })
 
 // SOLAPA EXAMENES
-router.get('/dashboard/materia', asyncErrorWrap(controladorDashboard.getMateria))
+router.get('/materia', asyncErrorWrap(controladorDashboard.getMateria))
 
-router.get('/dashboard/tipo/:materia',  asyncErrorWrap(controladorDashboard.getTipo))
+router.get('/tipo/:materia',  asyncErrorWrap(controladorDashboard.getTipo))
 
-router.get('/dashboard/nivelChip/:tipo',  asyncErrorWrap(controladorDashboard.getNivelChips))
+router.get('/nivelChip/:tipo',  asyncErrorWrap(controladorDashboard.getNivelChips))
 
-router.get('/dashboard/nivel/:nivel',  asyncErrorWrap(controladorDashboard.getNivel))
+router.get('/nivel/:nivel',  asyncErrorWrap(controladorDashboard.getNivel))
 
-router.get('/dashboard/modalidad/:nivel',  asyncErrorWrap(controladorDashboard.getModalidad))
+router.get('/modalidad/:nivel',  asyncErrorWrap(controladorDashboard.getModalidad))
 
-router.post('/dashboard/examenes/',  asyncErrorWrap(controladorDashboard.examenesCambios))
+router.post('/examenes/',  asyncErrorWrap(controladorDashboard.examenesCambios))
 
-router.post('/dasboard/examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
+router.post('examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
 
 // SOLAPA FECHAS
-router.post('/dashboard/agregarFechaDia/',  asyncErrorWrap(controladorDashboard.agregarFechaDia))
+router.post('/agregarFechaDia/',  asyncErrorWrap(controladorDashboard.agregarFechaDia))
 
-router.get('/dashboard/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
+router.get('/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
 
-router.get('/dashboard/listarHorariosOrales/',  asyncErrorWrap(controladorDashboard.listarHorariosOrales))
-
-
-router.post('/dashboard/asignarDiaASemanaExamenOral/', asyncErrorWrap(controladorDashboard.asignarDiaASemanaExamenOral))
+router.get('/listarHorariosOrales/',  asyncErrorWrap(controladorDashboard.listarHorariosOrales))
 
 
-router.get('/dashboard/listarExamenes/',  asyncErrorWrap(controladorDashboard.listarExamenes))
-
-router.get('/dashboard/listarExamenesEnFecha/:fecha&:tipo',  asyncErrorWrap(controladorDashboard.getExamenesEnFecha))
-
-router.post('/dashboard/updateExamenesEnFecha/',  asyncErrorWrap(controladorDashboard.updateExamenesEnFecha))
-
-router.post('/dashboard/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
-
-router.get('/dashboard/listarSemanas/:fechasAntiguas', asyncErrorWrap(controladorDashboard.listarSemanas))
-
-router.get('/dashboard/listarExamenesEnSemana/:semana', asyncErrorWrap(controladorDashboard.getExamenesEnSemana))
-
-router.get('/dashboard/listarReservaSemanasLs/:semana', asyncErrorWrap(controladorDashboard.listarReservaSemanasLs))
+router.post('/asignarDiaASemanaExamenOral/', asyncErrorWrap(controladorDashboard.asignarDiaASemanaExamenOral))
 
 
-router.get('/dashboard/listarReservaDiaRw/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaRw))
+router.get('/listarExamenes/',  asyncErrorWrap(controladorDashboard.listarExamenes))
 
-router.get('/dashboard/listarReservaDiaLs/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaLs))
+router.get('/listarExamenesEnFecha/:fecha&:tipo',  asyncErrorWrap(controladorDashboard.getExamenesEnFecha))
 
-router.post('/dashboard/elminarFechaSemana/', asyncErrorWrap(controladorDashboard.elminarFechaSemana))
-router.post('/dashboard/elminarFechaDiaRw/', asyncErrorWrap(controladorDashboard.elminarFechaDiaRw))
-router.post('/dashboard/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFechaDiaLs))
+router.post('/updateExamenesEnFecha/',  asyncErrorWrap(controladorDashboard.updateExamenesEnFecha))
+
+router.post('/agregarFechaSemana/',  asyncErrorWrap(controladorDashboard.agregarFechaSemana))
+
+router.get('/listarSemanas/:fechasAntiguas', asyncErrorWrap(controladorDashboard.listarSemanas))
+
+router.get('/listarExamenesEnSemana/:semana', asyncErrorWrap(controladorDashboard.getExamenesEnSemana))
+
+router.get('/listarReservaSemanasLs/:semana', asyncErrorWrap(controladorDashboard.listarReservaSemanasLs))
+
+
+router.get('/listarReservaDiaRw/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaRw))
+
+router.get('/listarReservaDiaLs/:fecha', asyncErrorWrap(controladorDashboard.listarReservaDiaLs))
+
+router.post('/elminarFechaSemana/', asyncErrorWrap(controladorDashboard.elminarFechaSemana))
+router.post('/elminarFechaDiaRw/', asyncErrorWrap(controladorDashboard.elminarFechaDiaRw))
+router.post('/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFechaDiaLs))
 
 
 router.use(errorHandler);
