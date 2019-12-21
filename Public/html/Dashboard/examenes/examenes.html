@@ -25,15 +25,13 @@
                     <div class="row">
                         <div class="col s12 m10 offset-m1 l10 offset-l1 xl8 offset-xl1">
                             <ul id="listaMateria" class="collection collectionSinBorde">
-                                <div class="progress ">
-                                    <div class="indeterminate"></div>
-                                </div>
+                             
                             </ul>
                         </div>
                     </div>
 
-                    <div class="row clear-bottom-3">
-                        <div class="col s10 offset-s1">
+                    <div id="botonesMateria" class="row clear-bottom-3">
+                        <div class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1">
                             <a id="guardarMateria"
                                 class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
                             <a id="resetMateria"
@@ -58,9 +56,6 @@
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
 
                             <ul id="chipsMateriaEnTipo" class="disableSelectOusideChip">
-                                <div class="progress ">
-                                    <div class="indeterminate"></div>
-                                </div>
                             </ul>
 
                             <div class="input-field ">
@@ -105,9 +100,6 @@
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione una Materia:</h6>
 
                             <ul id="chipsMateriaEnNivel" class="disableSelectOusideChip">
-                                <div class="progress ">
-                                    <div class="indeterminate"></div>
-                                </div>
                             </ul>
                         </div>
                     </div>
@@ -117,9 +109,6 @@
                             <h6 class="gris-texto clear-top-2 clear-bottom-1">Seleccione un Tipo:</h6>
 
                             <ul id="chipsTipoEnNivel" class="disableSelectOusideChip">
-                                <div class="progress ">
-                                    <div class="indeterminate"></div>
-                                </div>
                             </ul>
                         </div>
                     </div>
@@ -131,9 +120,6 @@
 
 
                             <ul id="chipsNivelEnNivel" class="disableSelectOusideChip">
-                                <div class="progress">
-                                    <div class="indeterminate"></div>
-                                </div>
                             </ul>
                             <div id="lugarBotonAgregarNivel"></div>
                         </div>
@@ -142,7 +128,7 @@
 
                     <div id="areaListaNivel" class="row clear-top-1">
                         <div
-                            class="col s10 m10 l10 xl10 offset-s1 offset-m1 offset-l1 offset-xl1 white-text grey lighten-4">
+                            class="col s12 m12 l10 xl10 offset-l1 offset-xl1 white-text grey lighten-4">
                             <div id="listaNivel" class="row">
                             </div>
                         </div>
@@ -154,7 +140,7 @@
                                 class="waves-effect waves-light btn btn-medium weight400 background-azul disabled">Guardar</a>
                             <a id="resetNivel"
                                 class="waves-effect waves-red btn btn-medium white btn-flat azul-texto weight400 disabled">Reset</a>
-                            <span id="NivelError"></span>
+                            <span id="estadoNivel"></span>
                         </div>
                     </div>
 
@@ -169,14 +155,12 @@
             <p>Está por eliminar un elemento y todos sus elementos dependientes de forma definitiva.</p>
         </div>
         <div class="modal-footer">
-            <a href="javascript:eliminarElementoLista(elementoAEliminar.uuid, elementoAEliminar.lista);" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
+            <a href="javascript:eliminarExamenLista(examenAEliminar.uuid, examenAEliminar.lista);" class="modal-close waves-effect waves-red btn-flat">Aceptar</a>
             <a class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
         </div>
     </div>
 
-  
-
 </div>
 
-<script src="/Js/Dashboard/examenes/examenes_vista.js"></script>
-<script src="/Js/Dashboard/examenes/examenes_servicio.js"></script>
+<script src="./html/dashboard/examenes/examenes_vista.js"></script>
+

@@ -1,4 +1,5 @@
 node_modules
 .vscode
-conexionbd.js
 conexionDB
+conexionbd.js
+conexionMail.js

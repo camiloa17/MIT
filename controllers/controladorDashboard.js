@@ -1,7 +1,6 @@
-const con = require("../database/conexionDB/conexionbd");
+const con = require(`../database/conexionDB/conexionbd`);
 const mysql = require("mysql");
 const process = require("process");
-
 
 function connectionToDb() {
   return new Promise((resolve, reject) => {
@@ -117,7 +116,7 @@ async function buscarEnDbModalidad(nivel) {
   let connection;
   try {
     const query =
-      "SELECT BIN_TO_UUID(uuid) AS uuid, nombre, orden, precio, activo, mostrar_cliente, examen_RW, examen_LS FROM modalidad WHERE activo=1 AND BIN_TO_UUID(nivel_uuid)= ?";
+      "SELECT BIN_TO_UUID(uuid) AS uuid, nombre, orden, precio, activo, mostrar_cliente, examen_RW, examen_LS, txt_img FROM modalidad WHERE activo=1 AND BIN_TO_UUID(nivel_uuid)= ?";
     let values = [nivel];
     connection = await connectionToDb();
     const data = await queryToDb(connection, query, values);
@@ -299,13 +298,13 @@ async function updateEnDbExamenesCambiosNivelModalidad(cambios) {
 
       if (cambios.addModalidades.length) {
         cambios.addModalidades.forEach(element => {
-          sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS) VALUES (UUID_TO_BIN(${connection.escape(element)}), '1', '0', UUID_TO_BIN(${connection.escape(cambios.uuid)}), ' ', 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
+          sql += `INSERT INTO modalidad (uuid, activo, orden, nivel_uuid, nombre, precio, mostrar_cliente, edita_user_secundario, examen_RW, examen_LS, txt_img) VALUES (UUID_TO_BIN(${connection.escape(element)}), '1', '0', UUID_TO_BIN(${connection.escape(cambios.uuid)}), ' ', 0, 0, 0, 0, 0, 0);`; // Aqui solo se da de alta el elemento, se actualiza en el siguiente paso
         });
       }
 
       if (cambios.cambioModalidades) {
         cambios.modalidades.forEach(element => {
-          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
+          sql += `UPDATE modalidad SET orden=${connection.escape(element.orden)}, nombre=${connection.escape(element.nombre)}, precio=${connection.escape(element.precio)}, mostrar_cliente=${connection.escape(element.mostrar_cliente)}, examen_RW=${connection.escape(element.examen_RW)}, examen_LS=${connection.escape(element.examen_LS)}, txt_img=${connection.escape(element.txt_img)} WHERE BIN_TO_UUID(uuid)=${connection.escape(element.uuid)};`;
         });
       }
     }
@@ -440,7 +439,6 @@ async function updateExamenesEnFechaEnDb(cambios) {
 
 async function agregarFechaDia(req, res) {
   let cambios = req.body;
-  console.log(cambios);
   let data = await agregarFechaDiaEnDb(cambios);
   res.send(JSON.stringify(data));
 }
@@ -524,7 +522,17 @@ async function buscarEnDBListaSemanas(fechasAntiguas) {
       (SELECT count(*)  FROM reserva 
       LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
       LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
-      where BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas,
+      where fecha_venta IS NOT NULL and BIN_TO_UUID(semana_LS.uuid)=this_uuid)  as ventas,
+
+      ( SELECT count(*) FROM reserva       
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
+
+      ( SELECT count(*) FROM reserva       
+      LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+      LEFT JOIN semana_LS ON BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid)=BIN_TO_UUID(semana_LS.uuid)
+      where BIN_TO_UUID(semana_LS.uuid)=this_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino,
       
       
       YEARWEEK(semana_Examen,3) AS yyyyss, 
@@ -568,8 +576,19 @@ async function buscarEnDBListaHorarios(fechasAntiguas) {
       (SELECT count(*)  FROM reserva 
       LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
       LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
-      where BIN_TO_UUID(dia_RW.uuid)=this_uuid)  as ventas, 
+      where BIN_TO_UUID(dia_RW.uuid)=this_uuid and fecha_venta IS NOT NULL)  as ventas, 
 
+      ( SELECT count(*) FROM reserva 
+      LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+      LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
+      where BIN_TO_UUID(dia_RW.uuid)=this_uuid
+      and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
+
+      ( SELECT count(*) FROM reserva 
+      LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+      LEFT JOIN dia_RW ON BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)=BIN_TO_UUID(dia_RW.uuid)
+      where BIN_TO_UUID(dia_RW.uuid)=this_uuid
+      and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino,
 
 
       'RW' as source FROM dia_RW 
@@ -586,11 +605,16 @@ async function buscarEnDBListaHorarios(fechasAntiguas) {
 
       (SELECT count(*)  FROM reserva 
       LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
-      where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid and fecha_venta IS NOT NULL)  as ventas, 
 
-    
+      ( SELECT count(*) FROM reserva      
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+       where BIN_TO_UUID(dia_LS.uuid)=this_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
 
-      
+      ( SELECT count(*) FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino,
+
       'LS' as source FROM dia_LS 
       
       WHERE activo=1 ${(fechasAntiguas === 'true') ? "" : "AND fecha_Examen > CURDATE()"}
@@ -624,10 +648,19 @@ async function buscarEnDBListaHorariosOrales() {
       
       (SELECT count(*)  FROM reserva 
       LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
-      where BIN_TO_UUID(dia_LS.uuid)=this_uuid)  as ventas, 
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid and fecha_venta IS NOT NULL)  as ventas, 
+
+      ( SELECT count(*) FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
+
+      ( SELECT count(*) FROM reserva 
+      LEFT JOIN dia_LS ON BIN_TO_UUID(reserva.dia_LS_uuid)=BIN_TO_UUID(dia_LS.uuid)
+      where BIN_TO_UUID(dia_LS.uuid)=this_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino,
 
       
-      'LS' as source FROM dia_LS WHERE activo=1 
+      'LS' as source FROM dia_LS 
+      WHERE activo=1 AND fecha_Examen > NOW()
       ORDER BY fecha_Examen;`;
     connection = await connectionToDb();
 
@@ -676,8 +709,17 @@ async function buscarEnDbExamenesEnSemana(semana_uuid) {
                   BIN_TO_UUID(semana_LS_uuid) as fecha_uuid, 
                   pausado,
 
-                  (SELECT count(*) FROM reserva LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
-                  where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid) as ventas
+                  (SELECT count(*) FROM reserva 
+                  LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+                  where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid and fecha_venta IS NOT NULL) as ventas,
+
+                  ( SELECT count(*) FROM reserva 
+                  LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+                  where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
+
+                  ( SELECT count(*) FROM reserva 
+                  LEFT JOIN examen_en_semana_LS ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid)
+                  where BIN_TO_UUID(examen_en_semana_LS.uuid)=this_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino
                   
                   FROM examen_en_semana_LS WHERE activo=1 AND BIN_TO_UUID(semana_LS_uuid)= ${connection.escape(semana_uuid)} `;
 
@@ -711,11 +753,50 @@ async function buscarEnDbExamenesEnFecha(fecha, tipo) {
               BIN_TO_UUID(dia_RW_uuid) as fecha_uuid, 
               pausado,
               
-              (SELECT count(*) FROM reserva LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
-              where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid) as ventas
+              (SELECT count(*) FROM reserva 
+              LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+              where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid and fecha_venta IS NOT NULL) as ventas,
+
+              ( SELECT count(*) FROM reserva 
+              LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+              where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) as reservas_en_proceso_web,
+
+              ( SELECT count(*) FROM reserva 
+              LEFT JOIN examen_en_dia_RW ON BIN_TO_UUID(reserva.examen_en_dia_RW_uuid)=BIN_TO_UUID(examen_en_dia_RW.uuid)
+              where BIN_TO_UUID(examen_en_dia_RW.uuid)=this_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) as reservas_en_proceso_fuera_termino
 
              
               FROM examen_en_dia_RW WHERE activo=1 AND BIN_TO_UUID(dia_RW_uuid)= ? `;
+        break;
+      case "LS":
+        query= `SELECT  DISTINCT
+        BIN_TO_UUID(dia_LS.uuid) as fecha_uuid,
+        BIN_TO_UUID(dia_LS.uuid) as this_fecha_uuid,
+        BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as modalidad_uuid,
+        BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as this_modalidad_uuid,
+        
+        (SELECT count(*) FROM examen_en_semana_LS 
+        LEFT JOIN reserva ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid) 
+        LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid)=BIN_TO_UUID(reserva.dia_LS_uuid) 
+        where BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid)=this_modalidad_uuid and BIN_TO_UUID(dia_LS.uuid) = this_fecha_uuid and fecha_venta IS NOT NULL         
+        ) as ventas,
+
+        ( SELECT count(*) FROM examen_en_semana_LS  
+        LEFT JOIN reserva ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid) 
+        LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid)=BIN_TO_UUID(reserva.dia_LS_uuid) 
+        where BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid)=this_modalidad_uuid and BIN_TO_UUID(dia_LS.uuid) = this_fecha_uuid and en_proceso=1 and fecha_reserva > (NOW() - INTERVAL 10 MINUTE)) 
+        as reservas_en_proceso_web,
+
+        ( SELECT count(*) FROM examen_en_semana_LS 
+        LEFT JOIN reserva ON BIN_TO_UUID(reserva.examen_en_semana_LS_uuid)=BIN_TO_UUID(examen_en_semana_LS.uuid) 
+        LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid)=BIN_TO_UUID(reserva.dia_LS_uuid) 
+        where BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid)=this_modalidad_uuid and BIN_TO_UUID(dia_LS.uuid) = this_fecha_uuid and en_proceso=1 and fecha_fuera_termino=1 and fecha_reserva > (NOW() - INTERVAL 1440 MINUTE) ) 
+        as reservas_en_proceso_fuera_termino
+
+        FROM examen_en_semana_LS  
+        LEFT JOIN reserva on BIN_TO_UUID(reserva.examen_en_semana_LS_uuid) = BIN_TO_UUID(examen_en_semana_LS.uuid)
+        LEFT JOIN dia_LS on BIN_TO_UUID(reserva.dia_LS_uuid) = BIN_TO_UUID(dia_LS.uuid)
+        WHERE BIN_TO_UUID(dia_LS.uuid)= ?`;
         break;
     }
     const values = [fecha];
@@ -742,13 +823,16 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
-    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
-    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
-    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_semana_LS_uuid,
-    BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) as uuid_semana_LS,
-    dia_LS.fecha_Examen as dia_LS_fecha_examen,
-    semana_LS.semana_examen as fecha_semana_examen,
+    r.discapacidad as discapacidad,
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+        
+    BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) as sem_modalidad_uuid,
     
+    semana_LS.semana_examen as fecha_semana_examen,
+
+    BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+    dia_LS.fecha_Examen as dia_LS_fecha_examen,
+        
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
     a.documento as alumno_documento_id,
@@ -758,13 +842,13 @@ async function buscarEnDbReservaEnSemanaLs(semana) {
     
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
+    LEFT JOIN examen_en_dia_RW on BIN_TO_UUID(examen_en_dia_RW.uuid) = BIN_TO_UUID(r.examen_en_dia_RW_uuid)
     LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
     LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
     LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
-    WHERE BIN_TO_UUID(semana_LS.uuid) = ${connection.escape(semana)};`;
+    WHERE fecha_venta IS NOT NULL and BIN_TO_UUID(semana_LS.uuid) = ${connection.escape(semana)};`;
 
-    console.log("BUSCANDO RESERVAS")
-
+    
     const data = await queryToDb(connection, query);
     return data;
   } finally {
@@ -786,7 +870,14 @@ async function buscarEnDbReservaDiaRw(fecha) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
-    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_dia_RW_uuid,
+    r.discapacidad as discapacidad,
+
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_en_semana_LS_uuid,
+    
+    BIN_TO_UUID(modalidad.uuid) as rw_modalidad_uuid,
+    dia_RW.fecha_Examen as dia_RW_fecha_examen,
+    
 
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
@@ -797,14 +888,10 @@ async function buscarEnDbReservaDiaRw(fecha) {
     
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
-    LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) =  BIN_TO_UUID(r.examen_en_semana_LS_uuid)
-    LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
-    LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) = BIN_TO_UUID(r.dia_LS_uuid)
     LEFT JOIN examen_en_dia_RW on BIN_TO_UUID(examen_en_dia_RW.uuid) = BIN_TO_UUID(r.examen_en_dia_RW_uuid)
-    LEFT JOIN dia_RW on BIN_TO_UUID(dia_RW.uuid) = BIN_TO_UUID(examen_en_dia_RW.uuid)
-    WHERE BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid) = ${connection.escape(fecha)};`;
-
-    console.log("BUSCANDO RESERVAS DIA RW")
+    LEFT JOIN modalidad on BIN_TO_UUID(examen_en_dia_RW.modalidad_uuid) = BIN_TO_UUID(modalidad.uuid)
+    LEFT JOIN dia_RW on BIN_TO_UUID(dia_RW.uuid) = BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid)
+    WHERE fecha_venta IS NOT NULL and BIN_TO_UUID(examen_en_dia_RW.dia_RW_uuid) = ${connection.escape(fecha)};`;
 
     const data = await queryToDb(connection, query);
     return data;
@@ -812,8 +899,6 @@ async function buscarEnDbReservaDiaRw(fecha) {
     if (connection) connection.release();
   }
 }
-
-
 
 async function listarReservaDiaLs(req, res) {
   let fecha = req.params.fecha;
@@ -829,7 +914,15 @@ async function buscarEnDbReservaDiaLs(fecha) {
     let query = `SELECT
     BIN_TO_UUID(r.uuid) as reserva_uuid,
     BIN_TO_UUID(r.alumno_uuid) as alumno_uuid,
+    r.discapacidad as discapacidad,
+
+    BIN_TO_UUID(r.examen_en_dia_RW_uuid) as examen_en_dia_RW_uuid,
+    BIN_TO_UUID(r.examen_en_semana_LS_uuid) as examen_en_semana_LS_uuid,
     BIN_TO_UUID(r.dia_LS_uuid) as dia_LS_uuid,
+    YEARWEEK(semana_LS.semana_Examen,3) as semana_LS_fecha_examen,
+
+    BIN_TO_UUID(modalidad.uuid) as ls_modalidad_uuid,
+    dia_LS.fecha_Examen as dia_LS_fecha_examen,
 
     a.nombre as alumno_nombre,
     a.apellido as alumno_apellido,
@@ -841,9 +934,12 @@ async function buscarEnDbReservaDiaLs(fecha) {
     from reserva r
     LEFT JOIN alumno a on r.alumno_uuid = a.uuid
     LEFT JOIN dia_LS on BIN_TO_UUID(dia_LS.uuid) =  BIN_TO_UUID(r.dia_LS_uuid)
-    WHERE BIN_TO_UUID(dia_LS.uuid) = ${connection.escape(fecha)};`;
+    LEFT JOIN examen_en_semana_LS on BIN_TO_UUID(examen_en_semana_LS.uuid) = BIN_TO_UUID(r.examen_en_semana_LS_uuid)
+    LEFT JOIN semana_LS on BIN_TO_UUID(examen_en_semana_LS.semana_LS_uuid) = BIN_TO_UUID(semana_LS.uuid)
+    LEFT JOIN modalidad on BIN_TO_UUID(examen_en_semana_LS.modalidad_uuid) = BIN_TO_UUID(modalidad.uuid)
+    WHERE fecha_venta IS NOT NULL and BIN_TO_UUID(dia_LS.uuid) = ${connection.escape(fecha)};`;
 
-    console.log("BUSCANDO RESERVAS DIA RW")
+    console.log("BUSCANDO RESERVAS DIA LS")
 
     const data = await queryToDb(connection, query);
     return data;
@@ -851,13 +947,6 @@ async function buscarEnDbReservaDiaLs(fecha) {
     if (connection) connection.release();
   }
 }
-
-
-
-
-
-
-
 
 
 
@@ -998,5 +1087,10 @@ module.exports = {
   elminarFechaSemana: elminarFechaSemana,
   elminarFechaDiaLs: elminarFechaDiaLs,
   elminarFechaDiaRw: elminarFechaDiaRw,
+
+  buscarEnDbReservaDiaRw: buscarEnDbReservaDiaRw,
+  buscarEnDbReservaDiaLs: buscarEnDbReservaDiaLs,
+  buscarEnDbReservaEnSemanaLs: buscarEnDbReservaEnSemanaLs,
+
 
 };

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const controladorDashboard = require('../controllers/controladorDashboard')
+const controladorDashboard = require('../controllers/controladorDashboard');
+const controladorExcel = require('../controllers/exceljs/controlador_excel');
+const controladorMailSender = require('../controllers/mailSender/controladorMailSender');
 
 
 //const mailSenderFile = require('./mailSender/mailSender')
@@ -23,7 +25,7 @@ function errorHandler(err, req, res, next) {
 
 
 router.get('/', function(req, res){
-  res.render('dashboardIndex')
+  res.redirect('/dashboard/fechas');
 })
 
 // SOLAPA EXAMENES
@@ -37,11 +39,19 @@ router.get('/nivel/:nivel',  asyncErrorWrap(controladorDashboard.getNivel))
 
 router.get('/modalidad/:nivel',  asyncErrorWrap(controladorDashboard.getModalidad))
 
+router.get('/examenes', (req,res)=>{
+  res.render('examenesDashboard')
+})
+
 router.post('/examenes/',  asyncErrorWrap(controladorDashboard.examenesCambios))
 
 router.post('/examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
 
 // SOLAPA FECHAS
+
+router.get('/fechas',(req,res)=>{
+  res.render('fechasDashboard')
+})
 router.post('/agregarFechaDia/',asyncErrorWrap(controladorDashboard.agregarFechaDia))
 
 router.get('/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
@@ -75,6 +85,11 @@ router.post('/elminarFechaSemana/', asyncErrorWrap(controladorDashboard.elminarF
 router.post('/elminarFechaDiaRw/', asyncErrorWrap(controladorDashboard.elminarFechaDiaRw))
 router.post('/elminarFechaDiaLs/', asyncErrorWrap(controladorDashboard.elminarFechaDiaLs))
 
+//
+router.get('/excelAsistencia/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelAsistencia))
+router.get('/excelTrinity/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelTrinity))
+
+router.post('/enviarMails/', asyncErrorWrap(controladorMailSender.enviarMails))
 
 router.use(errorHandler);
 
