@@ -287,7 +287,7 @@ class FechasVista {
             }
 
             // genero la lista de reservas a esa fecha seleccionada
-            this.generarListaReservaDiaRw(idSelected)
+            this.generarListaReservaDiaRw(idSelected, fechaEditable)
 
             // SE SELECCIONA UN DIA LS ///////////////////////////////////////
           } else if (tipoSelected === "LS") {
@@ -350,7 +350,7 @@ class FechasVista {
             }
 
             // genero la lista de reservas a esa fecha seleccionada
-            this.generarListaReservaDiaLs(idSelected)
+            this.generarListaReservaDiaLs(idSelected, fechaEditable)
 
 
             // SE SELECCIONA UNA SEMANA LS ///////////////////////////////////////
@@ -410,7 +410,7 @@ class FechasVista {
               this.habilitarBotonGuardarExamenesEnFecha();
               this.habilitarBotonResetExamenesEnFecha();
 
-              this.generarListaReservaSemanaLs(idSelected);
+              
 
             } else {
               // escondo el dropdown de examenes disponibles a agregar
@@ -419,6 +419,7 @@ class FechasVista {
               // muestro un mensajes diciendo que la fecha fue rendida
               this.areaCambiosFechaRendida()
             }
+            this.generarListaReservaSemanaLs(idSelected, fechaEditable);
 
           }
         }
@@ -1599,7 +1600,9 @@ class FechasVista {
 
     //obtengo la fecha seleccionada y chequeo si es editable o no (true o false) segun si es una fecha anterior a la actual o posterior
     listaHorarios.forEach(horario => {
-      let cupos_libres = horario.cupo_maximo - horario.ventas;
+      console.log(horario)
+      let pendientes = horario.reservas_en_proceso_web + horario.reservas_en_proceso_fuera_termino;
+      let cupos_libres = horario.cupo_maximo - horario.ventas - pendientes;
       $("#listaHorarios").append(`
             <li id="${horario.uuid}" tipo="${horario.source}" pausado="${horario.pausado}" cupo="${horario.cupo_maximo}" fechaExamen="${horario.fecha_Examen}" fechaFinalizacion="${horario.fecha_finalizacion}" 
             class="collection-item azul-texto weight700 cursorPointer hoverGrey ${horario.pausado ? "inputInactivo" : ""}">
@@ -1615,7 +1618,7 @@ class FechasVista {
                   <div class="secondary-content right">  
                     <i id="${horario.uuid}_pausa" class="noClickable material-icons-outlined secondary-content right white-text button-opacity ">${horario.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${horario.ventas}</span>
-                    <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
+                    <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">${pendientes}</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${cupos_libres}</span>
                     <i id="${horario.uuid}_remover" href="#modalEliminarFecha" class="noClickable material-icons-outlined secondary-content right azul-texto button-opacity margin0 ">${!horario.ventas ? "delete" : ""}</i>
                   </div>
@@ -1689,7 +1692,10 @@ class FechasVista {
 
 
     listaSemanas.forEach(semana => {
-      let cupos_libres = semana.cupo_maximo - semana.ventas;
+      let pendientes = semana.reservas_en_proceso_web + semana.reservas_en_proceso_fuera_termino;
+      let cupos_libres = semana.cupo_maximo - semana.ventas - pendientes;
+
+      console.log(semana)
 
       $("#listaHorarios").append(`
             <li id="${semana.uuid}" tipo="${semana.yyyyss}" pausado="${semana.pausado}" cupo="${semana.cupo_maximo}" fechaFinalizacion="${semana.finaliza_inscripcion}" class="collection-item azul-texto weight700 cursorPointer hoverGrey ${semana.pausado ? "inputInactivo" : ""}">
@@ -1703,7 +1709,7 @@ class FechasVista {
                   <div class="secondary-content right">  
                     <i id="${semana.uuid}_pausa" class="noClickable material-icons-outlined secondary-content right white-text button-opacity">${semana.pausado ? "visibility_off" : "visibility"}</i>
                     <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${semana.ventas}</span>
-                    <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
+                    <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">${pendientes}</span>
                     <span class="new badge green margin-left-0-15" data-badge-caption="libres">${cupos_libres}</span>
                     <i href="#modalEliminarFecha" id="${semana.uuid}_remover" class="noClickable material-icons-outlined secondary-content right azul-texto button-opacity margin0 noSelectable">${!semana.ventas ? "delete" : ""}</i>
                   </div>
@@ -1833,7 +1839,7 @@ class FechasVista {
   }
 
 
-  templateLiExamen(id, uuidExamen, uuidFecha, nombre, pausado, ventas, activo, mostrarCliente, fechaEditable) {
+  templateLiExamen(id, uuidExamen, uuidFecha, nombre, pausado, ventas, pendientes, activo, mostrarCliente, fechaEditable) {
 
     return `
     <li id="${id}" uuidExamen="${uuidExamen}" uuidFecha="${uuidFecha}" pausado="${pausado}" dirty="0" class="collection-item azul-texto cursorPointer hoverGrey">
@@ -1845,7 +1851,7 @@ class FechasVista {
           <div class="secondary-content right ">  
             <i id="${id}_pausa" class="material-icons-outlined secondary-content azul-texto right button-opacity ">${fechaEditable ? (pausado ? "visibility_off" : "visibility") : ""}</i>
             <span class="new badge background-azul margin-left-0-15" data-badge-caption="vtas">${ventas}</span>
-            <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">0</span>
+            <span class="new badge yellow black-text margin-left-0-15" data-badge-caption="pend">${pendientes}</span>
             <i id="${id}_remove" class="material-icons-outlined secondary-content azul-texto right button-opacity margin0 ">${fechaEditable ? (ventas ? "" : "delete") : ""}</i>
             ${activo ? '<a class="tooltipped" data-position="bottom" data-tooltip="Este examen no está siendo mostrado en la web del cliente debido a que fue eliminado desde la sección Exámenes."><span class="new badge red black-text margin-left-0-15" data-badge-caption="eliminado"></span></a>' : ""} 
             ${mostrarCliente ? '<a class="tooltipped" data-position="bottom" data-tooltip="Este examen no está siendo mostrado en la web del cliente. Dirígase a la sección Exámenes y active su visibilidad."><span class="new badge pink black-text margin-left-0-15" data-badge-caption="inactivo"></span></a>' : ""} 
@@ -1960,7 +1966,7 @@ class FechasVista {
   }
 
 
-  generarListaReservaSemanaLs = async (idSelected) => {
+  generarListaReservaSemanaLs = async (idSelected, fechaEditable) => {
     $('#listadoReservasEnFechas').empty();
     $('#collapsibleReservas').empty()
     this.mostrarTablaReservasEnSemanasLs();
@@ -1977,18 +1983,26 @@ class FechasVista {
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
 
-    this.mostrarListadoDiasOralesParaSemana()
-    let diasOral = await this.fechasServicio.getListaHorariosOrales();
-    this.generarListaDeDiasOralesDropdown(diasOral)
-    this.asignarFuncionBotonAsignarDiaOralASemana();
-    this.listenChequearSiHayCuposLibresParaAsignarExamen();
+    console.log("editable fecha", fechaEditable)
+  
+    if(fechaEditable){    
+      this.mostrarListadoDiasOralesParaSemana();    
+      this.mostrarEnviarMailASeleccionados();
 
-    this.mostrarEnviarMailASeleccionados()
+      let diasOral = await this.fechasServicio.getListaHorariosOrales();
+      this.generarListaDeDiasOralesDropdown(diasOral);
+      this.asignarFuncionBotonAsignarDiaOralASemana();
+      this.listenChequearSiHayCuposLibresParaAsignarExamen();   
+    } else {
+      $('#collapsibleReservas').remove()
+    }
+   
 
   }
 
   //cuando asigno diasLS a semanas, actualizo la lista de reservas
   updateElementosListaSemanaLs = async (idSelected) => {
+    console.log("update editable fecha", fechaEditable)
     let idEstado = $('#estadoListadoReservas');
     $('#botonAsignarDiaOralASemana').addClass('disabled');
 
@@ -2000,7 +2014,7 @@ class FechasVista {
     this.listenChequearSiHayCuposLibresParaAsignarExamen();
   }
 
-  async generarListaReservaDiaRw(idSelected) {
+  async generarListaReservaDiaRw(idSelected, fechaEditable) {
     $('#listadoReservasEnFechas').empty();
     $('#collapsibleReservas').empty()
 
@@ -2017,10 +2031,10 @@ class FechasVista {
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
 
-    this.mostrarEnviarMailASeleccionados()
+    fechaEditable ? this.mostrarEnviarMailASeleccionados() : $('#collapsibleReservas').remove();
   }
 
-  async generarListaReservaDiaLs(idSelected) {
+  async generarListaReservaDiaLs(idSelected, fechaEditable) {
     $('#listadoReservasEnFechas').empty();
     $('#collapsibleReservas').empty();
 
@@ -2037,7 +2051,7 @@ class FechasVista {
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
 
-    this.mostrarEnviarMailASeleccionados()
+    fechaEditable ? this.mostrarEnviarMailASeleccionados() : $('#collapsibleReservas').remove();
 
   }
 
@@ -2062,7 +2076,11 @@ class FechasVista {
               <th>APELLIDO</th>
               <th>CANDIDATE NUMBER</th>
               <th>DOCUMENTO</th>
-              <th>DIA ASIGNADO</th>
+              <th>GENERO</th>
+              <th>MAIL</th>
+              <th class="padding-left1-5">DIA ASIGNADO</th>
+              <th>COMPLETO</th>
+              <th>DISC</th>
             </tr>
         </thead>
 
@@ -2083,11 +2101,16 @@ class FechasVista {
                           <input type="checkbox" id="ckbCheckAll" />
                           <span></span>
                       </label>
-                  </th>
+                  </th>                  
                   <th>NOMBRE</th>
                   <th>APELLIDO</th>
                   <th>CANDIDATE NUMBER</th>
                   <th>DOCUMENTO</th>
+                  <th>GENERO</th>
+                  <th>MAIL</th>
+                  <th>COMPLETO</th>
+                  <th>DISC</th>
+
               </tr>
           </thead>
 
@@ -2113,6 +2136,11 @@ class FechasVista {
                   <th>APELLIDO</th>
                   <th>CANDIDATE NUMBER</th>
                   <th>DOCUMENTO</th>
+                  <th>GENERO</th>
+                  <th>MAIL</th>
+                  <th>SEMANA</th>
+                  <th>COMPLETO</th>
+                  <th>DISC</th>
               </tr>
           </thead>
 
@@ -2167,9 +2195,14 @@ class FechasVista {
             <td>${reserva.alumno_apellido}</td>
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
-            <td>${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen) : "sin asignar"}</td>
+            <td>${reserva.alumno_genero}</td>
+            <td>${reserva.alumno_email}</td>
+            <td  class="padding-left1-5">${reserva.dia_LS_uuid ? this.fechasServicio.stringDiaHoraEspanol(reserva.dia_LS_fecha_examen) : "SIN ASIGNAR"}</td>
+            <td>${(reserva.examen_en_dia_RW_uuid && reserva.examen_en_semana_LS_uuid) ? "SI" : ""}</td>
+            <td>${reserva.discapacidad ? "X" : ""}</td>
           </tr>`)
       });
+     
     } else {
       $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
     }
@@ -2194,6 +2227,7 @@ class FechasVista {
       })
 
       reservaDiaRw.forEach(reserva => {
+        console.log(reserva)
         $('#bodyListadoReservasEnFechas').append(
           `<tr>
             <td class="th-width-short">
@@ -2201,11 +2235,15 @@ class FechasVista {
                 <input id="${reserva.reserva_uuid}" class="checkBoxClass" type="checkbox"   />
                           <span class="margin-top-5px"></span>
               </label>
-            </td>
+            </td>            
             <td>${reserva.alumno_nombre}</td>
             <td>${reserva.alumno_apellido}</td>
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
+            <td>${reserva.alumno_genero}</td>
+            <td>${reserva.alumno_email}</td>
+            <td>${(reserva.examen_en_dia_RW_uuid && reserva.examen_en_semana_LS_uuid) ? "SI" : ""}</td>
+            <td>${reserva.discapacidad ? "X" : ""}</td>
           </tr>`)
       });
 
@@ -2217,7 +2255,7 @@ class FechasVista {
   };
 
 
-  mostrarElementosListaReservasEnDiaLs(reservaDiaLs) {
+  mostrarElementosListaReservasEnDiaLs = (reservaDiaLs) => {
     $('#bodyListadoReservasEnFechas').empty();
     $('#estadoListadoReservas').empty();
 
@@ -2235,6 +2273,8 @@ class FechasVista {
       })
 
       reservaDiaLs.forEach(reserva => {
+        console.log(reserva)
+        console.log("dd", )
         $('#bodyListadoReservasEnFechas').append(
           `<tr>
             <td class="th-width-short">
@@ -2247,6 +2287,12 @@ class FechasVista {
             <td>${reserva.alumno_apellido}</td>
             <td>${reserva.alumno_candidate_number}</td>
             <td>${reserva.alumno_documento_id}</td>
+
+            <td>${reserva.alumno_genero}</td>
+            <td>${reserva.alumno_email}</td>
+            <td>${ `${reserva.semana_LS_fecha_examen.toString().substring(0,4)}-${reserva.semana_LS_fecha_examen.toString().substring(4,7)}` }</td>
+            <td>${(reserva.examen_en_dia_RW_uuid && reserva.examen_en_semana_LS_uuid) ? "SI" : ""}</td>
+            <td>${reserva.discapacidad ? "X" : ""}</td>
           </tr>`)
       });
 
@@ -2363,8 +2409,7 @@ Saludos!</textarea>
                       
                     </div>
                 </li>
-            </ul>
-        </div>
+
     `)
 
     this.asignarFuncionalidadBotonEnviarMails();
@@ -2403,12 +2448,6 @@ Saludos!</textarea>
   asignarFuncionBotonAsignarDiaOralASemana() {
     $('#botonAsignarDiaOralASemana').on('click', () => {
       this.asignarDiaASemanaExamenOral();
-      // let idEstado = $('#estadoListadoReservas');
-
-      // let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
-      // let reservasActualizadad = this.fechasServicio.getElementosListaReservasEnSemanasLs(fecha, this.huboUnError, null, idEstado);
-      // this.reservasEnCurso = reservasActualizadad;
-
     })
   }
 
@@ -2418,7 +2457,9 @@ Saludos!</textarea>
     $('#listadoDiasOralesParaSemana').empty();
 
     diasOral.forEach(diaHorario => {
-      let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas;
+      let pendientes = diaHorario.reservas_en_proceso_web + diaHorario.reservas_en_proceso_fuera_termino;
+      let cupos_libres = diaHorario.cupo_maximo - diaHorario.ventas - pendientes;
+
       this.cupoExamenSeleccionado.push([diaHorario.uuid, cupos_libres])
 
       $('#listadoDiasOralesParaSemana').append(
@@ -2615,6 +2656,7 @@ Saludos!</textarea>
 
 
   renderExamenesEnLista = (fechaEditable, examenes, tipoSelected) => {
+    console.log(examenes)
     $("#listaExamenes").empty();
     if (examenes.length === 0) {
       $("#listaExamenes").append('<div id="listaVacia" class="azul-texto padding0-7rem weight700">No se ha asignado ningún examen a esta fecha todavía.</div>')
@@ -2628,6 +2670,8 @@ Saludos!</textarea>
       let nombre = this.convertirUuidExamenEnTexto(examen.modalidad_uuid)[0];
       let activo;
       let mostrarCliente;
+      console.log(examen)
+      let pendientes = examen.reservas_en_proceso_web + examen.reservas_en_proceso_fuera_termino;
 
       // de cada examen que voy a mostrar en la tabla, chequeo su estado de activo desde el listado que traje de la DB
       this.examenesFromDB.map(exam => {
@@ -2659,6 +2703,7 @@ Saludos!</textarea>
           nombre,
           examen.pausado,
           examen.ventas,
+          pendientes,
           activo,
           mostrarCliente,
           fechaEditable

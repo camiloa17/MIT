@@ -714,6 +714,7 @@
 
       // Si esta la visibilidad en false, el input se ve inactivo
       $(`#${elemento.uuid}_nombre`).toggleClass("inputInactivo");
+      $(`#${elemento.uuid}_txt_img`).toggleClass("inputInactivo");
 
       // Cuando presiono boton visibilidad, cambia su icono
       $(`#${elemento.uuid}_visibility`).text(

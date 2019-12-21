@@ -255,6 +255,7 @@ class FechasServicio {
       const rta = await response.json();
 
       if (rta.error) {
+        console.log(rta.error)
         error(idEstado)
       } else {
         mostrarReservas(rta)
@@ -262,6 +263,7 @@ class FechasServicio {
       }
 
     } catch (err) {
+      console.log(err)
       err ? error(idEstado) : null;
     }
   }
@@ -272,6 +274,7 @@ class FechasServicio {
       const rta = await response.json();
 
       if (rta.error) {
+        console.log(rta.error)
         error(idEstado)
       } else {
         mostrarReservas(rta)
@@ -279,6 +282,7 @@ class FechasServicio {
       }
 
     } catch (err) {
+      console.log(err)
       err ? error(idEstado) : null;
     }
   }
