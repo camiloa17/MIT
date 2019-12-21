@@ -47,7 +47,7 @@ router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         }
         const horarios = await controller.consultaHorarios({ exrw: informacionPagina.exrw, exls: informacionPagina.exls }, informacionPagina.id);
         
-        res.render('checkoutStep2', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto:informacionPagina.modo , exrw: informacionPagina.exrw, exls: informacionPagina.exls }, step: informacionPagina.step, id: informacionPagina, horario: horarios });
+        res.render('checkoutStep2', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto:informacionPagina.modo , exrw: informacionPagina.exrw, exls: informacionPagina.exls }, step: informacionPagina.step, id: informacionPagina.id, horario: horarios });
     } catch (err) {
         console.error(err,informacionPagina)
     }
