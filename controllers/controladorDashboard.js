@@ -2,6 +2,7 @@ const con = require("../database/conexionDB/conexionbd");
 const mysql = require("mysql");
 const process = require("process");
 
+
 function connectionToDb() {
   return new Promise((resolve, reject) => {
     con.getConnection(function (error, connection) {
@@ -439,6 +440,7 @@ async function updateExamenesEnFechaEnDb(cambios) {
 
 async function agregarFechaDia(req, res) {
   let cambios = req.body;
+  console.log(cambios);
   let data = await agregarFechaDiaEnDb(cambios);
   res.send(JSON.stringify(data));
 }

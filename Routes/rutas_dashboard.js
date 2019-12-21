@@ -39,10 +39,10 @@ router.get('/modalidad/:nivel',  asyncErrorWrap(controladorDashboard.getModalida
 
 router.post('/examenes/',  asyncErrorWrap(controladorDashboard.examenesCambios))
 
-router.post('examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
+router.post('/examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
 
 // SOLAPA FECHAS
-router.post('/agregarFechaDia/',  asyncErrorWrap(controladorDashboard.agregarFechaDia))
+router.post('/agregarFechaDia/',asyncErrorWrap(controladorDashboard.agregarFechaDia))
 
 router.get('/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
 
