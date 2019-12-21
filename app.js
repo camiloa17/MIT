@@ -50,7 +50,7 @@ app.use('/dashboard',asyncErrorWrap(dashbordRoutes));
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT || 80, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log(`listening on port ${process.env.PORT}`)
 })
 
