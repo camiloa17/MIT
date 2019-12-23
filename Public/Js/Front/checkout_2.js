@@ -79,8 +79,7 @@ async function validarHorario() {
 
 async function setRoute(obtenerHorarios){
     try {
-        const linkConId = route.match(/^\w*:\/\/[\w|\d]*:[\w]*\/[\w]*\/[\w]*\/[(\w|%)]*\/[\w]*\/[\w]*\/[\w|&]*\?[\w]*=[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
-        const submitRoute = linkConId.replace(/step_2/g, "horario-selected");
+        const submitRoute = route.replace(/step_2/g, "horario-selected");
         document.querySelector('form').setAttribute('action', `${submitRoute}&idhorario=${obtenerHorarios.horarioSeleccionado}${(obtenerHorarios.horarioListening ? `&idhorarioL=${obtenerHorarios.horarioListening}` : "")}`);
         if (document.querySelector('#notificacion')) {
             document.querySelector('#notificacion').remove();
