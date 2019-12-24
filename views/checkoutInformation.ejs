@@ -15,8 +15,8 @@
 
                 <div id="person-information">
                     <h2>COMPLETAR TUS DATOS</h2>
-                    <P id="texto-obligatorio">Completa todos los campos obligatorios <b>*</b></P>
-                    <p id="aviso-numero-mit"><strong>Si tienes Número de Trinity tienes que agregarlo obligatoriamente</strong></p>
+                    <P id="texto-obligatorio">Completa todos los campos obligatorios <b>*</b>. <strong> Si tienes Número de Trinity tienes que agregarlo obligatoriamente</strong></P>
+                    
                     <div id="information-wrapper">
                         <label for="">Nombre</label>
                         <input type="text" placeholder="Nombre" name="mombre" class="input-checkout" required>
@@ -28,7 +28,6 @@
                         <input type="text" name="documento" placeholder="Documento(DNI o Pasaporte)"
                             class="input-checkout" min="0">
                         <div class="genero-section">
-                            <span>Genero</span>
                             <input type="radio" name="genero" class="genero-inp" required>
                             <label for="" class="genero-inp">Masculino</label>
                             <input type="radio" name="genero" class="genero-inp">
@@ -53,10 +52,10 @@
                         <label for="">Direccion</label>
                         <input type="text" name="direccion" class="input-checkout" placeholder="Direccion">
 
-                        </br>
+                        <div class="discapacidad-wrapper">
                         <input type="checkbox" name="discapacidad" id="selector-discapacidad">
-                        <label for="discapacidad" id='discapacidad-label'>Sufro alguna condicion fisica o mental
-                            especial?</label>
+                        <label for="discapacidad" id='discapacidad-label'>Sufro alguna condicion fisica o mental especial?</label>
+                        </div>
 
                         <div class='seccion-numero-trinity'>
                             <input type="checkbox" name="numeroTrinity" id="idTrinity">
@@ -70,11 +69,11 @@
 
                 </div>
                 <div id="pago-stripe">
-                    <h2>PAGO CON STRIPE</h2>
-                    <p>Paga tranquilo con la seguridad de stripe, no guardamos informacion de la tarjeta</p>
+                    <h2>PAGAR</h2>
+                    <p>Contamos con la seguridad de Stripe</p>
                     <div class="form-row">
                         <label for="card-element">
-                            Credit or debit card
+                            Tarjeta de Crédito y Débito
                         </label>
                         <div id="card-element">
                             <!-- A Stripe Element will be inserted here. -->
@@ -84,7 +83,7 @@
                     </div>
 
                     <div class="envio-domicilio">
-                        <p>¿Quieres adicionar al envío del certificado a tu domicilio? Tiene un costo de 10 Euros adicionales</p>
+                        <p>¿Quieres adicionar al envío del certificado a tu domicilio por €10?</p>
                         <div class="wrapper-decision-domicilio">
                             <input type="radio" name="other-address" class="envio-seleccion" id="b1" value="si">
                             <input type="radio" name="other-address" class="envio-seleccion" id="b2" value="no" checked>
@@ -95,8 +94,8 @@
                             <input type="checkbox" name="nuevo-domicilio" id="adicion-nuevo-domicilio">
                             <label for="nuevo-domicilio">Cargar nuevo domicilio de envío</label>
                             <div id="seccion-nuevo-domicilio">
-                                <label for="">Provincia</label>
-                                <select name="" id="">
+                                <label for="direccion-nueva">Provincia</label>
+                                <select name="selector-direccion" id="direccion-nueva">
                                     <option value="">Provincia</option>
                                     <option value="albacete">albacete</option>
                                     <option value="alicante/alacant">alicante/alacant</option>
@@ -108,11 +107,12 @@
                             </div>
                         </div>
                     </div>
-
-                    <input type="checkbox" name="aceptar-uso-datos" id="uso-datos">
-                    <label for="aceptar-uso-datos">Acepta los términos y condiciones</label>
-                    <p>*<i> No vamos a almacenar ningún tipo de información en nuestra base de datos de las tarjetas de
-                            crédito.</i></p>
+                    <div class="terminos-wrapper">
+                        <input type="checkbox" name="aceptar-uso-datos" id="uso-datos">
+                        <label for="aceptar-uso-datos">Aceptar los términos y condiciones</label>
+                        <p>*<i>No guardamos información de tus tarjetas</i></p>
+                    </div>
+                    
                 </div>
             </div>
         </section>

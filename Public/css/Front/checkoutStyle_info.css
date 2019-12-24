@@ -207,8 +207,8 @@ h3{
 .pago h2{
     color: #000000;
     font-weight: bold;
-    font-size: 20px;
-    width: 300px;
+    font-size: 30px;
+    
     text-align: center;
 }
 .pago p{
@@ -237,9 +237,10 @@ h3{
 #seccion-nuevo-domicilio select{
     margin-bottom: 15px;
 }
-#information-wrapper input,
-.input-checkout{
-    margin:0 10px;
+ 
+input, 
+select {
+    margin:0 auto;
     margin-bottom: 20px;
     padding-left: 5px;
     border:none;
@@ -249,7 +250,8 @@ h3{
 }
 
 #information-wrapper input:focus,
-.input-checkout:focus{
+.input-checkout:focus,
+select:focus{
     border:none;
     border-bottom: 2px solid #085796;
     outline: none;
@@ -259,22 +261,30 @@ h3{
     font-size: 20px;
 }
 
-#information-wrapper select{
+select{
+    display: block;
     width: 250px;
-    
 }
 
 #information-wrapper .genero-inp{
     display :inline-block;
-    width:80px;
+    width:99px;
+    font-size: 20px;
+}
+
+div.genero-section{
+     margin: 0 auto;
+        width: 250px;
 }
 
 #information-wrapper #discapacidad-label,
 #information-wrapper #selector-discapacidad,
 #information-wrapper label[class="trinity"],
-#information-wrapper input[name='numeroTrinity']{
+#information-wrapper input[name='numeroTrinity'],
+.wrapper-nuevo-domicilio label,
+.terminos-wrapper label{
     display: inline-block;
-    margin-top:10px;
+    
     color:black;
 }
 #discapacidad-label{
@@ -297,11 +307,21 @@ h3{
     font-size: 16px;
 }
 
+.seccion-numero-trinity,
+.discapacidad-wrapper{
+    margin: 0 auto;
+    width: 300px;
+}
+
 .seccion-input-trinity{
     height: 0;
     overflow:hidden;
     transition: 0.2s;
+}
 
+.terminos-wrapper,
+.wrapper-nuevo-domicilio{
+    margin-top:10px;
 }
 
 /*Seccion pago con stripe*/
@@ -341,6 +361,10 @@ h3{
   
   .StripeElement--webkit-autofill {
     background-color: #fefde5 !important;
+  }
+
+  .form-row{
+      text-align: center;
   }
 
 /*fin de estilos tarjeta stripe*/
@@ -586,9 +610,10 @@ button.button-checkout:disabled{
         margin-right: 10px;
     }
 
-    .genero-section{
+    div.genero-section{
         display:flex;
         justify-content: flex-start;
+        margin:0;
     }
     #information-wrapper span{
         width:150px;
@@ -601,7 +626,11 @@ button.button-checkout:disabled{
     width: 300px;
 }
 
-   
+   .seccion-numero-trinity, 
+   .discapacidad-wrapper{
+       width:400px;
+       margin:0;
+   }
 
     #information-wrapper label{
         margin-bottom:5px;
@@ -625,6 +654,9 @@ button.button-checkout:disabled{
         margin-top:10px;
         margin-bottom:30px; 
     }
+    .form-row{
+      text-align: left;
+  }
 .button-wrap{
     width: 900px;
     margin: 10px auto;

@@ -205,18 +205,20 @@ h3{
 }
 
 .horario h2{
+    text-align: center;
     font-weight: bold;
     font-size: 30px;
     color:#000000;
-    width: 200px;
 }
 
 .horario h3{
-    margin-top:10px;
+    margin: 20px auto;
     font-size: 20px;
-    padding: 0 10px;
+    padding: 10px;
     color: #4F4F4F;
     text-align: center;
+    border: 2px solid #085796;
+    width: 250px;
 }
 
 
@@ -233,7 +235,6 @@ h3{
     color:#4F4F4F;
     margin:10px auto;
 }
-
 
 
 
@@ -384,6 +385,21 @@ button.button-checkout:disabled{
     #steps ul .step-number{
         margin-left:48px;
     }
+
+    .horario h2{
+        width:500px;
+        
+    }
+    .horario h3{
+    margin-top: 100px;
+    font-size: 20px;
+    padding: 30px;
+    color: #4F4F4F;
+    text-align: center;
+    border: 2px solid #085796;
+    }
+
+    
 
     .button-wrap{
     width: 900px;
