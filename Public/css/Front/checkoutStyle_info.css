@@ -220,7 +220,8 @@ h3{
 }
 
 #information-wrapper{
-    margin-left: 20px;
+    margin: 0 auto;
+    margin-top:15px;
 }
 
 #information-wrapper label,
@@ -238,11 +239,13 @@ h3{
 }
 #information-wrapper input,
 .input-checkout{
-    margin-bottom:15px;
+    margin:0 10px;
+    margin-bottom: 20px;
     padding-left: 5px;
     border:none;
     border-bottom: 2px solid #085796;
     height:25px;
+    font-size: 20px;
 }
 
 #information-wrapper input:focus,
@@ -252,6 +255,14 @@ h3{
     outline: none;
 }
 
+#information-wrapper input::placeholder{
+    font-size: 20px;
+}
+
+#information-wrapper select{
+    width: 250px;
+    
+}
 
 #information-wrapper .genero-inp{
     display :inline-block;
@@ -265,6 +276,9 @@ h3{
     display: inline-block;
     margin-top:10px;
     color:black;
+}
+#discapacidad-label{
+    width: 250px;
 }
 
 
@@ -583,6 +597,9 @@ button.button-checkout:disabled{
         width:120px;
         margin-left: 10px;
     }
+    #discapacidad-label{
+    width: 300px;
+}
 
    
 

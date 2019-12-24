@@ -72,7 +72,7 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             precio: datosExamenModalidad.precio
         }
         if (datosExamenModalidad.exrw === 1 && datosExamenModalidad.exls === 1) {
-            informacionPagina.stylesheet = '/css/Front/checkoutStyle_Step2.css';
+            informacionPagina.stylesheet = '/css/Front/checkoutStyle_Step3Co.css';
             res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva });
         } else {
            informacionPagina.stylesheet = '/css/Front/checkoutStyle_info.css';
