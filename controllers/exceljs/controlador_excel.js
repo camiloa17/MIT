@@ -10,40 +10,39 @@ async function excelAsistencia(req, res, next) {
     let fecha = req.params.fecha;
     let tipo = req.params.tipo;
     let fechaString = req.params.fechaString;
-    let fechaText= fechaString.substring(0,16)
+    let fechaText = fechaString.substring(0, 16)
 
     if (tipo === "RW") {
-        let fileName= `MIT_Asistencia_DiaEscrito_${fechaText}.xlsx`
-        let datos = await controladorDashboard.buscarEnDbReservaDiaRw(fecha);
-        let workbook = await armarFile(datos, res);
+        let fileName = `MIT_Asistencia_DiaEscrito_${fechaText}.xlsx`
+        let datos = await controladorDashboard.buscarEnDbReservaDiaRw(fecha); 
+        let workbook = await armarFile(datos, res, datos[0].dia_RW_fecha_examen, 'DIA ESCRITO');
         await sendWorkbook(workbook, res, fileName)
 
     } else if (tipo === "LS") {
-        let fileName= `MIT_Asistencia_DiaOral_${fechaText}.xlsx`
+        let fileName = `MIT_Asistencia_DiaOral_${fechaText}.xlsx`
         let datos = await controladorDashboard.buscarEnDbReservaDiaLs(fecha);
-        let workbook = await armarFile(datos, res);
+        let workbook = await armarFile(datos, res, datos[0].dia_LS_fecha_examen, 'DIA ORAL');
         await sendWorkbook(workbook, res, fileName)
 
     } else if (tipo.length === 6) {
-        let fileName= `MIT_Asistencia_SemanaOral_${tipo}.xlsx`
+        let fileName = `MIT_Asistencia_SemanaOral_${tipo}.xlsx`
         let datos = await controladorDashboard.buscarEnDbReservaEnSemanaLs(fecha);
-        let workbook = await armarFile(datos, res);
+        let workbook = await armarFile(datos, res, datos[0].semana_LS_fecha_examen, 'SEMANA ORAL');
         await sendWorkbook(workbook, res, fileName)
     }
 }
 
-async function sendWorkbook(workbook, response, fileName) {    
+async function sendWorkbook(workbook, response, fileName) {
     response.set({
         'Content-Disposition': `${fileName}`,
-        'Content-Type': "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",       
+        'Content-Type': "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
     await workbook.xlsx.write(response);
     response.end();
 }
 
-
-async function armarFile(datos, res) {
+async function armarFile(datos, res, diaExamen, tipoTexto) {
     var workbook1 = new excel.Workbook();
 
     workbook1.creator = 'Mit';
@@ -51,8 +50,7 @@ async function armarFile(datos, res) {
     workbook1.modified = new Date();
 
     var sheet1 = workbook1.addWorksheet('Planilla Asistencia', {
-        pageSetup: { paperSize: 9, orientation: 'portrait' }
-        // 9 es tamaño A4
+        pageSetup: { paperSize: 9, orientation: 'portrait' }      // 9 es tamaño A4
     });
 
     sheet1.pageSetup.margins = {
@@ -61,34 +59,106 @@ async function armarFile(datos, res) {
         header: 0.3, footer: 0.3
     };
 
-    var reColumns = [
-        { header: 'NOMBRE', key: 'nombre', width: 11 },
-        { header: 'APELLIDO', key: 'apellido', width: 8.71 },
-        { header: 'F. NAC', key: 'fnac', width: 7.71 },
-        { header: 'GENERO', key: 'genero', width: 7.57 },
-        { header: 'CANDIDATE NUMBER', key: 'cd', width: 12.86 },
-        { header: 'DNI o PASAPORTE', key: 'dni', width: 16.14 },
-        { header: 'MOVIL', key: 'movil', width: 11.71 },
-        { header: 'EXAMEN', key: 'examen', width: 12.57 },
-        { header: 'DISC', key: 'disc', width: 4.29 },
-    ];
+    sheet1.addTable({
+        name: 'Titulo',
+        ref: 'A1',
+        headerRow: true,
 
-    sheet1.columns = reColumns;
+        columns: [
+            { name: 'FECHA EXAMEN' },
+            { name: 'TIPO EXAMEN' },
+            { name: 'CUPO MAXIMO' },
+            { name: 'VENTAS' },
+            { name: 'CUPOS LIBRES' },
+        ],
+        rows: [
+            [diaExamen, tipoTexto, datos[0].totales_cupo_maximo, datos[0].totales_ventas, datos[0].totales_cupo_maximo - datos[0].totales_ventas],
+        ],
+    });
+
+    let rowss = [];
 
     datos.forEach(venta => {
-        sheet1.addRow({
-            nombre: venta.alumno_nombre,
-            apellido: venta.alumno_apellido,
-            fnac: venta.nacimiento,
-            genero: venta.alumno_genero,
-            cd: venta.alumno_candidate_number,
-            dni: venta.alumno_documento_id,
-            movil: "completar movil",
-            examen: "completar examen",
-            disc: "completar",
-        })
+        rowss.push(
+            [venta.alumno_nombre,
+            venta.alumno_apellido,
+            venta.fecha_nac,
+            venta.alumno_genero,
+            venta.alumno_candidate_number,
+            venta.alumno_documento_id,
+            venta.alumno_movil,
+            venta.alumno_telefono_fijo,
+            venta.alumno_email,
+            venta.alumno_domicilio,
+            venta.alumno_provincia,
+            venta.alumno_localidada,
+            venta.alumno_observaciones,
+            venta.discapacidad,
+            venta.requiere_envio_domicilio_diploma,
+            venta.direccion_envio_domicilio_diploma,
+            venta.localidad_envio_domicilio_diploma,
+            venta.provincia_envio_domicilio_diploma,
+            venta.fecha_venta,
+            venta.nro_ref_pago,
+            venta.monto_abonado,
+            venta.fecha_fuera_termino,
+            venta.academia_amiga,
+            venta.estado_examen,
+            venta.reserva_observaciones,
+            venta.materia_nombre,
+            venta.tipo_nombre,
+            venta.nivel_nombre,
+            venta.modalidad_nombre,
+            venta.dia_RW_fecha_examen ? venta.dia_RW_fecha_examen : '-',
+            venta.examen_en_semana_LS_uuid ? venta.semana_LS_fecha_examen : '-',                  
+            venta.dia_LS_fecha_examen ? venta.dia_LS_fecha_examen : '-'
+            ]) 
     })
 
+    sheet1.addTable({
+        name: 'Datos',
+        ref: 'A4',
+        headerRow: true,
+
+        columns: [
+            { name: 'NOMBRE' },
+            { name: 'APELLIDO' },
+            { name: 'F. NAC' },
+            { name: 'GENERO' },
+            { name: 'CANDIDATE NUMBER' },
+            { name: 'DNI o PASAPORTE' },
+            { name: 'TELEFONO MOVIL' },
+            { name: 'TELEFONO FIJO' },
+            { name: 'EMAIL' },
+            { name: 'DOMICILIO' },
+            { name: 'PROVINCIA' },
+            { name: 'LOCALIDAD' },
+            { name: 'ALUMNO OBS' },
+            { name: 'DISCAPACIDAD' },
+            { name: 'REQ ENVIO DOMICILIO' },
+            { name: 'DIRECCION ENV DOM' },
+            { name: 'LOCALIDAD ENV DOM' },
+            { name: 'PROVINCIA ENV DOM' },
+            { name: 'FECHA VENTA' },
+            { name: 'NRO REF PAGO' },
+            { name: 'MONTO ABONADO' },
+            { name: 'FECHA FUERA DE TERMINO' },
+            { name: 'ACADEMIA AMIGA' },
+            { name: 'ESTADO EXAMEN' },
+            { name: 'OBS RESERVA' },
+            { name: 'MATERIA' },
+            { name: 'TIPO' },
+            { name: 'NIVEL' },
+            { name: 'MODALIDAD' },
+            { name: 'DIA ESCRITO' },
+            { name: 'SEMANA ORAL' },
+            { name: 'DIA ORAL ASIGNADO' },
+
+        ],
+        rows: rowss,
+
+    });
+    
     // Se pone BOLD a la primer fila
     sheet1.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
@@ -99,10 +169,12 @@ async function armarFile(datos, res) {
     //     console.log("xlsx file is written.");
     // });
 
-    return workbook1   
+    return workbook1
 }
+
 
 module.exports = {
     excelAsistencia: excelAsistencia,
     excelTrinity: excelTrinity,
 }
+
