@@ -400,6 +400,10 @@ input[type="number"] {
   margin-top: 5px !important;
 }
 
+.paddingBottom700{
+  padding-bottom: 700px;
+}
+
 /*---------------------HEIGHT COLLECTION---------------------*/
 .height24rem {
   height: 24rem;
@@ -496,15 +500,21 @@ td{
 }
 
 .relative10pxtop{
-  position: relative;
-  top: 10px;
+  position: relative !important;
+  top: 10px !important;
 }
 
 .relative2pxtop{
-  position: relative;
-  top: 2px;
+  position: relative !important;
+  top: 2px !important;
 }
 
 .th-width-short{
-  width: 2rem;
+  width: 2rem !important;
+}
+
+.relative36top5left{
+  position: relative !important;
+  top: 36px !important;
+  left: -5px !important;
 }

@@ -5,6 +5,7 @@
 
   const inputAgregarMateria = $("#agregarMateria");
   const botonesMateria = $("#botonesMateria");
+  const botonAgregarMateria = $('#botonAgregarMateria')
   const botonGuardarMateria = $("#guardarMateria");
   const botonResetMateria = $("#resetMateria");
   const estadoMateria = $("#estadoMateria");
@@ -138,9 +139,14 @@
   }
 
   function renderNivel(data, lista) {
+    // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
+    
     let nivel = data[0];
     let newTemplate = liNivelTemplate(nivel);
     lista.empty().append(newTemplate);
+
+    $('#chipsNivelEnNivel li').removeClass('ui-selected');
+    $(`#${nivel.uuid}`).addClass("ui-selected");
 
     areaListaNivel.removeClass("hidden");
 
@@ -155,8 +161,8 @@
     asignarFuncionalidadBotoneAgregarModalidad(nivel.uuid);
 
     aceptarSoloNumerosEnInput(nivel.uuid);
-    // Si previamente habia un chip nivel seleccionado, se vuelve a seleccionar
-    $(`#${nivel.uuid}`).addClass("ui-selected");
+
+
 
     let descriptionTextArea = $(`#${nivel.uuid}_descripcion`);
 
@@ -176,8 +182,8 @@
     return [
       {
         uuid: uuidv4(),
-        nombre: "Nuevo Nivel",
-        descripcion: "Descripcion del Nivel",
+        nombre: "Titulo",
+        descripcion: "",
         activo: 1,
         mostrar_cliente: 0,
         edita_user_secundario: 0,
@@ -353,7 +359,7 @@
           let cambiosAGuardarNivel = generarEstadoNivel(nivelSeleccionado);
 
           let idEstadoNivel = $('#estadoNivel');
-          idEstadoNivel.append(preloader());
+
 
           updateNivelModalidad(cambiosAGuardarNivel, accionExitosa, huboUnError, idEstadoNivel, mostrarNivel, seGuardaOResetea, lista, tipoSeleccionado, nivelSeleccionado);
 
@@ -877,6 +883,7 @@
         } else if (idSelected && ulChips === chipsNivelEnNivel) {
           //Selecciono un Nivel en la solapa nivel
           appendProgressIndeterminate(listaNivel);
+          $('#areaListaNivel').removeClass("hidden");
           mostrarNivel(idSelected, huboUnError, listaNivel, renderNivel);
         }
 
@@ -1082,7 +1089,7 @@
 
       <div class="col s9 m9 l9 xl9 offset-s1 offset-m1 offset-l1 offset-xl1">
       <i class="material-icons-outlined azul-texto left">photo</i>
-        <input id="${modalidad.uuid}_txt_img" class="relative2pxtop browser-default ${!modalidad.mostrar_cliente ? "inputInactivo" : ""}" type="text" value="${modalidad.txt_img ? modalidad.txt_img : ""}"/>
+        <input id="${modalidad.uuid}_txt_img" placeholder="Texto sobre imagen" class="relative2pxtop browser-default ${!modalidad.mostrar_cliente ? "inputInactivo" : ""}" type="text" value="${modalidad.txt_img ? modalidad.txt_img : ""}"/>
       </div>
 
       <div class="col s1 m1 l1 xl1 ">

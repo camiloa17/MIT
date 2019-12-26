@@ -374,19 +374,23 @@ class FechasServicio {
     }
   }
 
-  async getExcelTrinity(fecha, tipo, exito, error, id){
+  async getExcelTrinity(fecha, tipo, fechaString, error, id){
+    let fileName
     try {
-      const response = await fetch(`/dashboard/excelTrinity/${fecha}&${tipo}`);
-
-      console.log(response)
-
-
-      // if (rta.error) {
-      //   error(id)
-      // } else {
-      //   // exito(rta)
-      // }
-
+      await fetch(`./excelTrinity/${fecha}&${tipo}&${fechaString}`).then(
+        function(response) {
+          fileName= response.headers.get('content-disposition')
+          return response.blob();
+        }).then(function(blob) {
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+          a.click();
+          a.remove();
+        }
+      );
     } catch (err) {
       err ? error(id) : null;
       console.log("error serviciio", err)
