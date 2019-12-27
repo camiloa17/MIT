@@ -1,2 +1,4 @@
 /*       MATERIALIZE  INICIALIZACION    */
-$(".sidenav").sidenav(); 
+$( document ).ready(function() {
+    $(".sidenav").sidenav(); 
+});

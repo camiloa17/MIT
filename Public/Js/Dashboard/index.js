@@ -4,7 +4,6 @@ function appendNav() {
     $("#sidenav").append(data);
   });
 }
-
 appendNav();
 
 function appendExamenes() {

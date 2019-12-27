@@ -336,6 +336,7 @@
             elementosMateria,
             lista
           );
+          console.log(cambiosAGuardarMateria)
           let idEstadoMateria = $('#estadoMateria');
           idEstadoMateria.append(preloader());
           updateMateria(cambiosAGuardarMateria, accionExitosa, huboUnError, idEstadoMateria, mostrarListaMateria, seGuardaOResetea, lista);
@@ -347,6 +348,8 @@
             elementosTipo,
             lista
           );
+
+          console.log(cambiosAGuardarTipo)
 
           let idEstadoTipo = $('#estadoTipo');
           idEstadoTipo.append(preloader());
