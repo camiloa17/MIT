@@ -4,8 +4,103 @@ const controladorDashboard = require('../controllers/controladorDashboard');
 const controladorExcel = require('../controllers/exceljs/controlador_excel');
 const controladorMailSender = require('../controllers/mailSender/controladorMailSender');
 
+///////////////////
+const passport = require('passport')
+const flash = require('express-flash')
+const session = require('express-session')
+const methodOverride = require('method-override')
+const initializePassport = require('../passport/passport-config')
 
-//const mailSenderFile = require('./mailSender/mailSender')
+const users = [ {id:'abcdef', username: "admin", password: "admin"} ]
+
+initializePassport(
+  passport,
+  username => users.find(user => user.username === username),
+  id => users.find(user => user.id === id)
+)
+
+router.use(express.urlencoded({ extended: false }))
+router.use(flash())
+
+router.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}))
+router.use(passport.initialize())
+router.use(passport.session())
+router.use(methodOverride('_method'))
+
+
+router.get('/', checkAuthenticated, (req, res) => {
+  res.render('examenesDashboard.ejs')
+  //res.render('examenesDashboard')
+})
+
+router.get('/login', checkNotAuthenticated, (req, res) => {
+  res.render('login_dashboard.ejs')
+})
+
+
+
+
+// router.get('/examenes', (req,res)=>{
+//   res.render('examenesDashboard')
+// })
+
+
+router.post('/login', checkNotAuthenticated, passport.authenticate('local', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/dashboard/login',
+  failureFlash: true
+}))
+
+function checkAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log("A")
+    return next()
+  }
+
+  console.log("B")
+  res.redirect('/dashboard/login')
+}
+
+function checkNotAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log("C")
+    return res.redirect('/dashboard')
+  }
+  console.log("D")
+  next()
+}
+
+// app.get('/register', checkNotAuthenticated, (req, res) => {
+//   res.render('register.ejs')
+// })
+
+// app.post('/register', checkNotAuthenticated, async (req, res) => {
+//   try {
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10)
+//     users.push({
+//       id: Date.now().toString(),
+//       name: req.body.name,
+//       username: req.body.username,
+//       password: req.body.username,
+//     })
+//     res.redirect('/login')
+//   } catch {
+//     res.redirect('/register')
+//   }
+// })
+
+router.delete('/logout', (req, res) => {
+  req.logOut()
+  res.redirect('/dashboard/login')
+})
+
+
+
+///////////////////
 
 
 function asyncErrorWrap(f) {
@@ -24,9 +119,7 @@ function errorHandler(err, req, res, next) {
 }
 
 
-router.get('/', function(req, res){
-  res.redirect('/dashboard/fechas');
-})
+
 
 // SOLAPA EXAMENES
 router.get('/materia', asyncErrorWrap(controladorDashboard.getMateria))
@@ -39,19 +132,22 @@ router.get('/nivel/:nivel',  asyncErrorWrap(controladorDashboard.getNivel))
 
 router.get('/modalidad/:nivel',  asyncErrorWrap(controladorDashboard.getModalidad))
 
+/*
 router.get('/examenes', (req,res)=>{
   res.render('examenesDashboard')
 })
+*/
 
 router.post('/examenes/',  asyncErrorWrap(controladorDashboard.examenesCambios))
 
 router.post('/examenesUpdateNivelModalidad/',  asyncErrorWrap(controladorDashboard.examenesUpdateNivelModalidad))
 
 // SOLAPA FECHAS
-
+/*
 router.get('/fechas',(req,res)=>{
   res.render('fechasDashboard')
 })
+*/
 router.post('/agregarFechaDia/',asyncErrorWrap(controladorDashboard.agregarFechaDia))
 
 router.get('/listarHorarios/:fechasAntiguas',  asyncErrorWrap(controladorDashboard.listarHorarios))
