@@ -1279,6 +1279,8 @@
   ////////////////////  Se genera un objeto al presionar el boton guardar con los cambios realizados por el usuario desde el ultimo fetch de la DB
   ////////////////////  Este objeto se envia al servidor con los cambios realizados para que impacten en la DB.
   function generarObjetoConCambiosMateriaTipo(elementos, lista) {
+    let materia = retornarPertenenciaTablaDb(lista) ? chipsMateriaEnTipo.find(".ui-selected").attr("id"): null;
+
     return {
       agregar: colaAgregar,
       remover: colaRemover,
@@ -1287,9 +1289,7 @@
       inputValue_cambiar: colaInputValue,
       listaEstado: elementos,
       tabla: retornarPertenenciaTablaDb(lista),
-      materia: retornarPertenenciaTablaDb(lista)
-        ? chipsMateriaEnTipo.find(".ui-selected").attr("id")
-        : null
+      materia: materia , 
     };
   }
 
@@ -1489,7 +1489,7 @@
   //Update Materia
   async function updateMateria(cambios, exito, error, idEstado, accionExitosa, seGuardaOResetea, lista) {
     try {
-      const response = await fetch(`/dashboard/examenes/`, {
+      const response = await fetch(`/dashboard/examenesCambios/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

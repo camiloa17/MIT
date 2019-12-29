@@ -354,7 +354,7 @@ class FechasServicio {
   async getExcelAsistencia(fecha, tipo, fechaString, error, id){
     try {
       let fileName
-      await fetch(`./excelAsistencia/${fecha}&${tipo}&${fechaString}`).then(
+      await fetch(`/dashboard/excelAsistencia/${fecha}&${tipo}&${fechaString}`).then(
         function(response) {
           fileName= response.headers.get('content-disposition')
           return response.blob();
@@ -377,7 +377,7 @@ class FechasServicio {
   async getExcelTrinity(fecha, tipo, fechaString, error, id){
     let fileName
     try {
-      await fetch(`./excelTrinity/${fecha}&${tipo}&${fechaString}`).then(
+      await fetch(`/dashboard/excelTrinity/${fecha}&${tipo}&${fechaString}`).then(
         function(response) {
           fileName= response.headers.get('content-disposition')
           return response.blob();

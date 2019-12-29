@@ -2672,12 +2672,13 @@ Saludos!</textarea>
         .find(".ui-selected")
         .attr("id");
       let ventas = 0;
+      let pendientes = 0;
       let activo = 0;
       let mostrarCliente = this.chequearSiElExamenEstaVisible(examen);
       let fechaEditable = 1;
 
       $("#listaExamenes").append(
-        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, activo, mostrarCliente, fechaEditable)
+        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, pendientes, activo, mostrarCliente, fechaEditable)
       );
 
       this.habilitarToolTips();

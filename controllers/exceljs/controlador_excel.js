@@ -240,7 +240,7 @@ async function armarFileAsistencia(datos, res, diaExamen, tipoTexto) {
             venta.provincia_envio_domicilio_diploma,
             venta.fecha_venta,
             venta.nro_ref_pago,
-            venta.monto_abonado,
+            venta.monto,
             venta.fecha_fuera_termino,
             venta.academia_amiga,
             venta.estado_examen,

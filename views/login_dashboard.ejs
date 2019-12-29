@@ -18,30 +18,24 @@
 
     <div class="container">
         <div class="row">
-            <div class="section"></div>
-
             <main>
                 <center>
-                    <div class="container">
-                        <div class="z-depth-3 y-depth-3 x-depth-3 login row">
+                    <div class="container ">
+                        <div class="z-depth-3 y-depth-3 x-depth-3 login width386">
                             <h4 class="section azul-texto weight700">MIT</h4>
-                            <h6 class="section azul-texto weight700">DASHBOARD</h6>
+                            <h6 class="section azul-texto weight700 padding0">DASHBOARD</h6>
 
-                            <div class="section">
-                                <i class="mdi-alert-error red-text">
-
-                                </i>
-                            </div>
+                          
 
                             <form action="/dashboard/login" method="POST">
-                                <div class='row'>
-                                    <div class='input-field col s12'>
+                                <div class='row clear-top-1'>
+                                    <div class='input-field col s12 m12 l12 xl12'>
                                         <input type="text" name='username' id='username' autocomplete="off" required />
                                         <label for='username'>Usuario</label>
                                     </div>
                                 </div>
                                 <div class='row'>
-                                    <div class='input-field col m12'>
+                                    <div class='input-field col s12 m12 l12 xl12'>
                                         <input class='validate' type='password' name='password' id='password'
                                             autocomplete="off" required />
                                         <label for='password'>Clave</label>
@@ -50,16 +44,24 @@
 
                                 <br />
                                 <center>
-                                    <div class='row'>
-                                        <button style="margin-left:65px;" type='submit' name='btn_login'
-                                            class='col s6 btn btn-small white black-text  waves-effect z-depth-1 y-depth-1'>Login</button>
+                                    <div class='row '>
+                                        <div class='center-align'>
+                                            <button type='submit' name='btn_login'
+                                                class='btn btn-small background-azul white-text  waves-effect z-depth-1 y-depth-1'>Login</button>
+                                        </div>
                                     </div>
+
+                                    <div class='padding0 height2rem width18rem rojo-texto'>
+                                        <% if (messages.error) { %>
+                                        <%= messages.error %>
+                                        <% } %>
+                                    </div>
+        
                                 </center>
 
-                                <% if (messages.error) { %>
-                                <%= messages.error %>
-                                <% } %>
+                                <center></center>
 
+                               
                             </form>
 
                         </div>
@@ -67,12 +69,16 @@
                 </center>
             </main>
 
-            <script type="text/javascript"
-                src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
-            <script type="text/javascript"
-                src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
-
+         
         </div>
     </div>
 
 </body>
+
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+
+

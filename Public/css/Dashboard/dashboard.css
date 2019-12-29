@@ -410,6 +410,12 @@ input[type="number"] {
   overflow-y: auto;
 }
 
+.height2rem {
+  height: 2rem;
+  overflow-y: auto;
+}
+
+
 /*---------------------TABLES---------------------*/
 td{
   padding: 4px 2px !important;
@@ -487,6 +493,14 @@ td{
   margin-top: -50px !important;
 }
 
+.width18rem{
+width: 18rem;
+}
+
+.width386{
+  width: 386px;
+}
+
 @media screen and (max-width: 992px) {
   .margin-bottom22 {
     margin-bottom: 8rem;
@@ -521,8 +535,9 @@ td{
 
 .login{
   display: inline-block; 
-  padding: 32px 48px 0px 48px; 
+  padding: 32px 58px 20px 58px; 
   border: 1px; 
   margin-top: 100px; 
   background-color: #EEE;
 }
+
