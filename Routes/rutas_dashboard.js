@@ -3,7 +3,7 @@ const router = express.Router();
 const controladorDashboard = require('../controllers/controladorDashboard');
 const controladorExcel = require('../controllers/exceljs/controlador_excel');
 const controladorMailSender = require('../controllers/mailSender/controladorMailSender');
-//const bodyParser = require('body-parser');
+const users = require('../passport/usuarios')
 
 ///////////////////
 const passport = require('passport')
@@ -12,7 +12,6 @@ const session = require('express-session')
 const methodOverride = require('method-override')
 const initializePassport = require('../passport/passport-config')
 
-const users = [{ id: 'abcdef', username: "admin", password: "admin" }]
 
 initializePassport(
   passport,
@@ -50,6 +49,9 @@ router.post('/fechas', checkAuthenticated, (req,res)=>{
   res.render('fechasDashboard.ejs')
 })
 
+router.post('/alumnos', checkAuthenticated, (req,res)=>{
+  res.render('alumnosDashboard.ejs')
+})
 
 
 
@@ -62,6 +64,7 @@ router.post('/login', checkNotAuthenticated, passport.authenticate('local', {
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next()
+    
   }
   res.redirect('/dashboard/login')
 }
@@ -157,6 +160,13 @@ router.get('/excelAsistencia/:fecha&:tipo&:fechaString', asyncErrorWrap(controla
 router.get('/excelTrinity/:fecha&:tipo&:fechaString', asyncErrorWrap(controladorExcel.excelTrinity))
 
 router.post('/enviarMails/', asyncErrorWrap(controladorMailSender.enviarMails))
+
+
+// SOLAPA ALUMNOS
+
+router.get('/listarAlumnos/:filtro&:valor&:todos', asyncErrorWrap(controladorDashboard.listarAlumnos))
+
+
 
 router.use(errorHandler);
 

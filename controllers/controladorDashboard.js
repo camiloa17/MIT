@@ -1141,6 +1141,50 @@ async function elminarFechaDiaLsEnDB(fecha) {
   }
 }
 
+async function listarAlumnos(req, res) {
+  let filtro = req.params.filtro;
+  let valor = req.params.valor;
+  let todos= req.params.todos;
+  let data = await buscarEnDbAlumnos(filtro, valor, todos);
+  res.send(JSON.stringify(data));
+}
+
+async function buscarEnDbAlumnos(filtro, valor, todos) {
+  console.log(filtro, valor, todos)
+  let connection;
+  try {
+    connection = await connectionToDb();
+    let query= '';
+    console.log(filtro, valor, todos)
+
+    if(todos != 'null') {
+      query= `SELECT * from alumno WHERE activo=1 ;`
+      console.log("a")
+    
+    } else if (filtro === "nombre") {
+      query= `SELECT * from alumno WHERE nombre LIKE "%$${valor}%" ESCAPE '$' AND activo=1 ;`
+      console.log("b")
+
+    } else if( filtro === "apellido") {
+      query= `SELECT * from alumno WHERE apellido LIKE "%$${valor}%" ESCAPE '$' AND activo=1 ;`
+      console.log("c")
+
+    }else if (filtro === "documento") {
+      query= `SELECT * FROM alumno WHERE REPLACE(documento,'.','') LIKE "%$${valor}%" ESCAPE '$' AND activo=1 ;`
+      console.log("d")
+
+    }else if (filtro === "candidate_number" ){
+      query= `SELECT * from alumno WHERE candidate_number LIKE "%$${valor}%" ESCAPE '$' AND activo=1 ;`
+      console.log("e")
+    }
+
+    const data = await queryToDb(connection, query);
+    return data;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 
 
 
@@ -1182,6 +1226,8 @@ module.exports = {
   buscarEnDbReservaDiaRw: buscarEnDbReservaDiaRw,
   buscarEnDbReservaDiaLs: buscarEnDbReservaDiaLs,
   buscarEnDbReservaEnSemanaLs: buscarEnDbReservaEnSemanaLs,
+
+  listarAlumnos: listarAlumnos,
 
 
 };

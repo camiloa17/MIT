@@ -1,11 +1,10 @@
 <ul class="sidenav sidenav-fixed background-azul width-sidenav" id="slide-out">
+
         <li class="clear-bottom-3 clear-top-2">
                 <div class="user-view">
                         <span class="name white-text text-1-4rem">Administrador</span>
                 </div>
         </li>
-
-
 
 
         <li>
@@ -18,20 +17,28 @@
                         Fechas</a>
         </li>
 
+
         <li>
-                        <form action="/dashboard/examenes" method="POST">
+                <form action="/dashboard/examenes" method="POST">
                         <button id="examenesButton" type="submit" class="hidden"></button>
 
-                        </form>
+                </form>
 
-                        <a class="white-text weight400" id="examenesIcon"><i
-                                        class="material-icons white-text cursorPointer">description</i>
-                                Exámenes</a>
+                <a class="white-text weight400 cursorPointer" id="examenesIcon"><i class="material-icons white-text ">description</i>
+                        Exámenes</a>
         </li>
 
-        <li><a class="white-text weight400 cursorPointer" href="#"><i class="material-icons white-text ">person</i>
+
+        <li>
+                <form action="/dashboard/alumnos" method="POST">
+                        <button id="alumnosButton" type="submit" class="hidden"></button>
+
+                </form>
+
+                <a class="white-text weight400 cursorPointer" id="alumnosIcon"><i class="material-icons white-text ">person</i>
                         Alumnos</a>
         </li>
+
 
         <li><a class="white-text weight400 cursorPointer" href="#"><i
                                 class="material-icons  white-text ">credit_card</i>
@@ -65,17 +72,22 @@
         $(document).ready(function () {
                 $(".sidenav").sidenav();
 
-                $('#logoutIcon').click(function () {
-                        $('#logoutButton').click();
+                $('#fechasIcon').click(function () {
+                        $('#fechasButton').click();
                 });
-
+               
                 $('#examenesIcon').click(function () {
                         $('#examenesButton').click();
                 });
 
-                $('#fechasIcon').click(function () {
-                        $('#fechasButton').click();
+                // $('#alumnosIcon').click(function () {
+                //         $('#alumnosButton').click();
+                // });
+
+                $('#logoutIcon').click(function () {
+                        $('#logoutButton').click();
                 });
+
         });
 
 
