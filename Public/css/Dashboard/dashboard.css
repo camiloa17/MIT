@@ -54,9 +54,19 @@ body {
   background-color: #085796 !important;
 }
 
+.background-rosa{
+  background-color: #DA4167 !important;
+}
+
+.background-gris {
+  background-color: #3e3e3e !important;
+}
+
 .background-grey {
   background-color: #f5f5f5 !important;
 }
+
+
 
 .background-darkGrey {
   background-color: #0e62a7 !important;
@@ -344,6 +354,11 @@ input[type="number"] {
   margin-top: 3rem !important;
 }
 
+.clear-top-45 {
+  margin-top: 4.5rem !important;
+}
+
+
 .clear-top-6 {
   margin-top: 6rem !important;
 }
@@ -400,11 +415,25 @@ input[type="number"] {
   margin-top: 5px !important;
 }
 
+.paddingBottom700{
+  padding-bottom: 700px;
+}
+
 /*---------------------HEIGHT COLLECTION---------------------*/
 .height24rem {
   height: 24rem;
   overflow-y: auto;
 }
+
+.height2rem {
+  height: 2rem;
+  overflow-y: auto;
+}
+
+.height30rem {
+  height: 30rem;
+}
+
 
 /*---------------------TABLES---------------------*/
 td{
@@ -483,6 +512,14 @@ td{
   margin-top: -50px !important;
 }
 
+.width18rem{
+width: 18rem;
+}
+
+.width386{
+  width: 386px;
+}
+
 @media screen and (max-width: 992px) {
   .margin-bottom22 {
     margin-bottom: 8rem;
@@ -496,15 +533,30 @@ td{
 }
 
 .relative10pxtop{
-  position: relative;
-  top: 10px;
+  position: relative !important;
+  top: 10px !important;
 }
 
 .relative2pxtop{
-  position: relative;
-  top: 2px;
+  position: relative !important;
+  top: 2px !important;
 }
 
 .th-width-short{
-  width: 2rem;
+  width: 2rem !important;
 }
+
+.relative36top5left{
+  position: relative !important;
+  top: 36px !important;
+  left: -5px !important;
+}
+
+.login{
+  display: inline-block; 
+  padding: 32px 58px 20px 58px; 
+  border: 1px; 
+  margin-top: 100px; 
+  background-color: #EEE;
+}
+

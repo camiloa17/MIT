@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard Mit</title>
 
-
+    <link rel="preconnect" href="//fonts.googleapis.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="/css/Dashboard/dashboard.css">
 
@@ -19,20 +19,27 @@
 <body>
     <div class="row">
         <div id="sidenav" class="col xl2 l2"></div>
+        <%-include("partials/dashboardSideNav") -%>
         <div id="contenido" class="col xl9 l9 offset-l1 m12 s12 padding-left3">
-            
+            <%-include("partials/dashboardAlumnos") -%>
         </div>
     </div>
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"
         type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    <script type="text/javascript" src="/Js/Dashboard/index.js"></script>
 
-    <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
+    
+    <script src="/Js/Dashboard/alumnos/alumnosVista.js"></script>
+    <script src="/Js/Dashboard/alumnos/alumnosServicio.js"></script>
+    <script>
+        let alumnosVista = new AlumnosVista();
+    </script>
+
+    
+    <script src="/Js/Dashboard/uuidv4.js"></script>
 
 </body>
-
-</html>

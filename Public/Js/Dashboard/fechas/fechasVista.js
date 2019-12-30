@@ -105,6 +105,19 @@ class FechasVista {
     $('.noSelectable, .collapsible-header').off('click');
   }
 
+   // Tostadas que avisan que debe seleccionar una fecha
+   habilitarTostadaSeleccioneUnaFecha() {
+    $(".collapsible-header").on("click",    
+      function () {
+        M.toast({ html: "Debe seleccionar una fecha" });
+      }
+    );
+  }
+
+  deshabilitarTostadaSeleccioneUnaFecha() {
+    $(".collapsible-header").off("click");
+  }
+
   aplicarClaseNoSelectableChips(ulChips) {
     ulChips.find("li").each(function () {
       $(this).addClass("noSelectable");
@@ -159,6 +172,8 @@ class FechasVista {
         //   .not(":first")
         //   .removeClass("ui-selected");
 
+        
+
         // Obtengo chip seleccionado
         let idSelected = $(event.target)
           .children(".ui-selected")
@@ -179,6 +194,8 @@ class FechasVista {
         idSelected === "editarChipDiaHora" ? this.mostrarListaDeHorarios(null, fechasAntiguas) : null;
 
         idSelected === "editarChipSemana" ? this.mostrarListaDeSemanas(null, fechasAntiguas) : null;
+
+        this.habilitarTostadaSeleccioneUnaFecha();
       }
     });
   }
@@ -214,6 +231,9 @@ class FechasVista {
         }
 
         if (idSelected) {
+          // Deshabilito las tostadas que indican que debe seleccionar una fecha
+          this.deshabilitarTostadaSeleccioneUnaFecha();
+
           // Obtengo el tipo de dia si es una fecha (RW o LS) o un numero de 6 cifras si es una semana YYYYSS
           let tipoSelected = $(event.target)
             .children(".ui-selected")
@@ -1983,6 +2003,14 @@ class FechasVista {
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
 
+    if( reservaSemanas.length === 0) {      
+      $('#botonExportarTrinity').addClass('disabled');
+      $('#botonExportarAsistencia').addClass('disabled');
+    } else {
+      $('#botonExportarTrinity').removeClass('disabled');
+      $('#botonExportarAsistencia').removeClass('disabled');
+    }
+
     console.log("editable fecha", fechaEditable)
   
     if(fechaEditable){    
@@ -2025,11 +2053,22 @@ class FechasVista {
 
     let reservasRw = await this.fechasServicio.getElementosListaReservasEnDiaRw(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaRw, idEstado);
     this.reservasEnCurso = reservasRw;
+    
+  
+
 
     this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
+
+    if( reservasRw.length === 0 ) {      
+      $('#botonExportarTrinity').addClass('disabled');
+      $('#botonExportarAsistencia').addClass('disabled');
+    } else {
+      $('#botonExportarTrinity').removeClass('disabled');
+      $('#botonExportarAsistencia').removeClass('disabled');
+    }
 
     fechaEditable ? this.mostrarEnviarMailASeleccionados() : $('#collapsibleReservas').remove();
   }
@@ -2046,10 +2085,20 @@ class FechasVista {
     let reservasLs = await this.fechasServicio.getElementosListaReservasEnDiaLs(idSelected, this.huboUnError, this.mostrarElementosListaReservasEnDiaLs, idEstado);
     this.reservasEnCurso = reservasLs;
 
+    
+
     this.mostrarBotoneraYEdicionReservas();
     this.habilitarToggleCheckboxAll()
     this.asignarFuncionBotonExportarAsistencia();
     this.asignarFuncionBotonExportarTrinity();
+
+    if( reservasLs.length === 0 ) {      
+      $('#botonExportarTrinity').addClass('disabled');
+      $('#botonExportarAsistencia').addClass('disabled');
+    } else {
+      $('#botonExportarTrinity').removeClass('disabled');
+      $('#botonExportarAsistencia').removeClass('disabled');
+    }
 
     fechaEditable ? this.mostrarEnviarMailASeleccionados() : $('#collapsibleReservas').remove();
 
@@ -2205,6 +2254,7 @@ class FechasVista {
      
     } else {
       $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+
     }
   }
 
@@ -2249,6 +2299,7 @@ class FechasVista {
 
     } else {
       $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+
     }
 
 
@@ -2298,6 +2349,7 @@ class FechasVista {
 
     } else {
       $('#estadoListadoReservas').empty().append('<div class="azul-texto weight700">No hay reservas efectuadas en esta fecha.</div>');
+
     }
   };
 
@@ -2438,9 +2490,11 @@ Saludos!</textarea>
   asignarFuncionBotonExportarTrinity() {
     let fecha = $("#listaHorarios").find(".ui-selected").attr("id");
     let tipo = $("#listaHorarios").find(".ui-selected").attr("tipo");
+    let fechaString = $("#listaHorarios").find(".ui-selected").attr("fechaExamen");
 
     $('#botonExportarTrinity').on('click', () => {
-      this.fechasServicio.getExcelTrinity(fecha, tipo);
+      let id = $('#estadoExcels')
+      this.fechasServicio.getExcelTrinity(fecha, tipo, fechaString, this.huboUnError, id);
     });
   }
 
@@ -2618,12 +2672,13 @@ Saludos!</textarea>
         .find(".ui-selected")
         .attr("id");
       let ventas = 0;
+      let pendientes = 0;
       let activo = 0;
       let mostrarCliente = this.chequearSiElExamenEstaVisible(examen);
       let fechaEditable = 1;
 
       $("#listaExamenes").append(
-        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, activo, mostrarCliente, fechaEditable)
+        this.templateLiExamen(uuid, examen, fecha, nombreCompleto, pausado, ventas, pendientes, activo, mostrarCliente, fechaEditable)
       );
 
       this.habilitarToolTips();

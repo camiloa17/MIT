@@ -1,36 +1,95 @@
 <ul class="sidenav sidenav-fixed background-azul width-sidenav" id="slide-out">
-    <li class="clear-bottom-3 clear-top-2">
-        <div class="user-view">
-            <a href="#">
-                <span class="name white-text text-1-4rem">Administrador</span>
-            </a>
-        </div>
-    </li>
+
+        <li class="clear-bottom-3 clear-top-2">
+                <div class="user-view">
+                        <span class="name white-text text-1-4rem">Administrador</span>
+                </div>
+        </li>
 
 
-    <li><a class="white-text weight400" href="/dashboard/examenes"><i class="material-icons white-text ">description</i>
-            Exámenes</a>
-    </li>
+        <li>
+                <form action="/dashboard/fechas" method="POST">
+                        <button id="fechasButton" type="submit" class="hidden"></button>
 
-    <li><a class="white-text weight400" href="/dashboard/fechas"><i class="material-icons white-text ">event</i>
-            Fechas</a></li>
+                </form>
 
-    <li><a class="white-text weight400" href="#"><i class="material-icons white-text ">person</i>
-            Alumnos</a>
-    </li>
-
-    <li><a class="white-text weight400" href="#"><i class="material-icons  white-text ">credit_card</i>
-            Reservas</a>
-    </li>
-    <li><a class="white-text weight400" href="#"><i class="material-icons  white-text ">euro</i>
-            Facturación</a>
-    </li>
+                <a class="white-text weight400 cursorPointer" id="fechasIcon""><i class=" material-icons white-text ">event</i>
+                        Fechas</a>
+        </li>
 
 
-    <li>
-        <a class="white-text clear-top-3 weight400" href="#" class="waves-effect"><i
-                class="material-icons-outlined white-text">exit_to_app</i>Salir</a>
-    </li>
+        <li>
+                <form action="/dashboard/examenes" method="POST">
+                        <button id="examenesButton" type="submit" class="hidden"></button>
+
+                </form>
+
+                <a class="white-text weight400 cursorPointer" id="examenesIcon"><i class="material-icons white-text ">description</i>
+                        Exámenes</a>
+        </li>
+
+
+        <li>
+                <form action="/dashboard/alumnos" method="POST">
+                        <button id="alumnosButton" type="submit" class="hidden"></button>
+
+                </form>
+
+                <a class="white-text weight400 cursorPointer" id="alumnosIcon"><i class="material-icons white-text ">person</i>
+                        Alumnos</a>
+        </li>
+
+
+        <li><a class="white-text weight400 cursorPointer" href="#"><i
+                                class="material-icons  white-text ">credit_card</i>
+                        Reservas</a>
+        </li>
+        <li><a class="white-text weight400 cursorPointer" href="#"><i class="material-icons  white-text ">euro</i>
+                        Facturación</a>
+        </li>
+
+
+        <li>
+                <form action="/dashboard/logout?_method=DELETE" method="POST">
+                        <button id="logoutButton" type="submit" class="hidden"></button>
+
+                </form>
+
+
+                <a id="logoutIcon" class="white-text clear-top-3 weight400 cursorPointer" class="waves-effect"><i
+                                class="material-icons-outlined white-text">exit_to_app</i>Salir</a>
+        </li>
 </ul>
 
 <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script>
+
+
+        $(document).ready(function () {
+                $(".sidenav").sidenav();
+
+                $('#fechasIcon').click(function () {
+                        $('#fechasButton').click();
+                });
+               
+                $('#examenesIcon').click(function () {
+                        $('#examenesButton').click();
+                });
+
+                // $('#alumnosIcon').click(function () {
+                //         $('#alumnosButton').click();
+                // });
+
+                $('#logoutIcon').click(function () {
+                        $('#logoutButton').click();
+                });
+
+        });
+
+
+
+</script>

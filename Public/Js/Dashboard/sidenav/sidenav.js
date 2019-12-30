@@ -1,2 +1,0 @@
-/*       MATERIALIZE  INICIALIZACION    */
-$(".sidenav").sidenav(); 

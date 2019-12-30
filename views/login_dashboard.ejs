@@ -1,0 +1,84 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login Dashboard Mit</title>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/Dashboard/dashboard.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+</head>
+
+
+<body class="background-azul">
+
+    <div class="container">
+        <div class="row">
+            <main>
+                <center>
+                    <div class="container ">
+                        <div class="z-depth-3 y-depth-3 x-depth-3 login width386">
+                            <h4 class="section azul-texto weight700">MIT</h4>
+                            <h6 class="section azul-texto weight700 padding0">DASHBOARD</h6>
+
+                          
+
+                            <form action="/dashboard/login" method="POST">
+                                <div class='row clear-top-1'>
+                                    <div class='input-field col s12 m12 l12 xl12'>
+                                        <input type="text" name='username' id='username' autocomplete="off" required />
+                                        <label for='username'>Usuario</label>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='input-field col s12 m12 l12 xl12'>
+                                        <input class='validate' type='password' name='password' id='password'
+                                            autocomplete="off" required />
+                                        <label for='password'>Clave</label>
+                                    </div>
+                                </div>
+
+                                <br />
+                                <center>
+                                    <div class='row '>
+                                        <div class='center-align'>
+                                            <button type='submit' name='btn_login'
+                                                class='btn btn-small background-azul white-text  waves-effect z-depth-1 y-depth-1'>Login</button>
+                                        </div>
+                                    </div>
+
+                                    <div class='padding0 height2rem width18rem rojo-texto'>
+                                        <% if (messages.error) { %>
+                                        <%= messages.error %>
+                                        <% } %>
+                                    </div>
+        
+                                </center>
+
+                                <center></center>
+
+                               
+                            </form>
+
+                        </div>
+                    </div>
+                </center>
+            </main>
+
+         
+        </div>
+    </div>
+
+</body>
+
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+
+
