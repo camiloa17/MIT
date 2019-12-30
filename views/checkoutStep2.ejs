@@ -16,21 +16,24 @@
             <div class="horario-wrapper">
         
                 <% horario.horarios.forEach((opcion,index)=> {%>
+                  <div class="horario-inner-wrapper"> 
                  <% if(opcion.id_semanaEx){%>
                 <input type="radio" name="horario-selector" id="h<%= index+1 %>" class="<%=opcion.id_diaEx%> <%=opcion.id_semanaEx%>">
-
                  <% }else {%>
                     <input type="radio" name="horario-selector" id="h<%= index+1 %>" class="<%=opcion.id_diaEx%>">
                     <%} %>
 
                 <label for="h<%= index+1 %>" class="horario-label" id="l<%= index+1 %>"><%=opcion.fecha_Examen%></label>
+                </div>
                 <%})%>
+                
 
                 <% if(horario.horarios.length==0){ %>
                     <h3>No existen horarios para este examen</h3>
 
                     <% }%>
-            </div>
+            
+        </div>
     </section>
     <div class="button-wrap">
         <% if(horario.horarios.length>0) {%>

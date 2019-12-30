@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/controller');
+const stripe = require('stripe')('sk_test_xc62rmtrPT5E8slPpF5UznB700b7VSJv8Z');
 
 
 
@@ -27,7 +28,7 @@ router.get('/step_1/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 
         res.render('checkoutStep1', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: {texto:informacionPagina.modo,exrw:informacionPagina.exrw,exls:informacionPagina.exls}, precio: informacionPagina.precio, descripcion: informacionPagina.descripcion, step: informacionPagina.step, id: informacionPagina.id });
     } catch (err) {
-        console.error(err,informacionPagina)
+        console.error(err)
     }
 });
 
@@ -49,7 +50,8 @@ router.get('/step_2/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
         
         res.render('checkoutStep2', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto:informacionPagina.modo , exrw: informacionPagina.exrw, exls: informacionPagina.exls }, step: informacionPagina.step, id: informacionPagina.id, horario: horarios });
     } catch (err) {
-        console.error(err,informacionPagina)
+        console.error(err)
+        res.sendStatus(500).json({estado:"algo sucedio en el server"})
     }
 });
 
@@ -71,16 +73,23 @@ router.get('/step_3/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             idReserva: req.query.idreserva,
             precio: datosExamenModalidad.precio
         }
+        
         if (datosExamenModalidad.exrw === 1 && datosExamenModalidad.exls === 1) {
             informacionPagina.stylesheet = '/css/Front/checkoutStyle_Step3Co.css';
             res.render('checkoutStep3Co', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva });
         } else {
            informacionPagina.stylesheet = '/css/Front/checkoutStyle_info.css';
-            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
+            const fechaFinalizacion = await controller.consultarFecha(informacionPagina.idReserva);
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: informacionPagina.precio * 100,
+                currency: 'eur',
+                description: `reserva ${informacionPagina.idReserva}`
+            });
+            res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio, fechaFinalizacion: fechaFinalizacion[0].fecha, idPayment: paymentIntent.client_secret});
         }
 
     } catch (err) {
-        console.error(err,informacionPagina);
+        console.error(err);
     }
 });
 
@@ -106,14 +115,22 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             }
             if(informacionPagina.exrw===1 && informacionPagina.exls===1){
                 informacionPagina.stylesheet ='/css/Front/checkoutStyle_info.css'
-                res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
+                const fechaFinalizacion = await controller.consultarFecha(informacionPagina.idReserva);
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: informacionPagina.precio * 100,
+                    currency: 'eur',
+                    description: `reserva ${informacionPagina.idReserva}`
+                });
+
+                res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio, fechaFinalizacion: fechaFinalizacion[0].fecha, idPayment:paymentIntent.client_secret});
             }
             
             
         }
 
     } catch (err) {
-        console.error(err,informacionPagina)
+        console.error(err)
+        res.sendStatus(500).json({ estado: "algo sucedio en el server" })
     }
 })
 
@@ -128,29 +145,31 @@ router.post('/horario-selected/:materia/:tipo/:nivel/:modalidad', async (req, re
             tipo: datosExamenModalidad.tipo,
             nivel: datosExamenModalidad.nivel,
             modalidad: datosExamenModalidad.modalidad,
+            precio:datosExamenModalidad.precio,
             exrw:datosExamenModalidad.exrw,
             exls:datosExamenModalidad.exls
         }
         if (examen.exrw === 1 && examen.exls===1) {
-            const crearReservaTemporalCompleto = await controller.crearReservaEnProceso({exrw:examen.exrw,exls:examen.exls}, req.query.idhorario, req.query.idhorarioL);
+            const crearReservaTemporalCompleto = await controller.crearReservaEnProcesoCompleto({exrw:examen.exrw,exls:examen.exls}, req.query.idhorario, req.query.idhorarioL, examen.precio);
             if (!crearReservaTemporalCompleto) {
                 res.sendStatus(404);
             } else {
+                
                 res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}&idhorarioL=${req.query.idhorarioL}&idreserva=${crearReservaTemporalCompleto.uuid}`)
             }
 
         } else {
-            const crearReservaTemporalRwLs = await controller.crearReservaEnProceso({ exrw: examen.exrw, exls: examen.exls }, req.query.idhorario);
-            
+            const crearReservaTemporalRwLs = await controller.crearReservaEnProcesoRwLs({ exrw: examen.exrw, exls: examen.exls }, req.query.idhorario,examen.precio);
             if (!crearReservaTemporalRwLs) {
                 res.sendStatus(404)
             } else {
+                
                 res.redirect(`/checkout/step_3/${req.params.materia}/${req.params.tipo}/${req.params.nivel}/${req.params.modalidad}?id=${req.query.id}&idhorario=${req.query.idhorario}&idreserva=${crearReservaTemporalRwLs.uuid}`)
             }
 
         }
     } catch (err) {
-        console.log(err,informacionPagina)
+        console.log(err)
 
     }
 
@@ -170,9 +189,9 @@ router.get('/ver-fecha-fuera-de-termino/:modalidad',async(req,res)=>{
     }catch(err){
         console.error(err)
     }
-        
-     
 })
+
+
 
 
 

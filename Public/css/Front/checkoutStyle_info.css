@@ -35,9 +35,7 @@ h3{
     color:#085796;
     text-decoration: none;
 }
-.brand-logo.logo-lower-part{
-        display: none;
-}
+
 
 .upper-part-header{
     justify-content: space-between;
@@ -225,7 +223,9 @@ h3{
 }
 
 #information-wrapper label,
-#seccion-nuevo-domicilio label{
+#seccion-nuevo-domicilio label,
+input[name="other-address"],
+.brand-logo.logo-lower-part{
     display: none;
 }
 #information-wrapper input,
@@ -278,13 +278,12 @@ div.genero-section{
 }
 
 #information-wrapper #discapacidad-label,
-#information-wrapper #selector-discapacidad,
+#information-wrapper #discapacidad,
 #information-wrapper label[class="trinity"],
-#information-wrapper input[name='numeroTrinity'],
+#information-wrapper #idTrinity,
 .wrapper-nuevo-domicilio label,
 .terminos-wrapper label{
     display: inline-block;
-    
     color:black;
 }
 #discapacidad-label{
@@ -294,9 +293,9 @@ div.genero-section{
 
 #information-wrapper input[name='genero'].genero-inp,
 #information-wrapper input[name='discapacidad'],
-#pago-stripe input[name='aceptar-uso-datos'],
+#pago-stripe input#uso-datos,
 #pago-stripe input[name='nuevo-domicilio'],
-#information-wrapper input[name='numeroTrinity']{
+#information-wrapper #idTrinity{
     width:20px;
     height:20px;
 }
@@ -323,6 +322,12 @@ div.genero-section{
 .wrapper-nuevo-domicilio{
     margin-top:10px;
 }
+.wrapper-nuevo-domicilio{
+    height: 0;
+    overflow: hidden;
+    transition: 0.2s;
+    
+}
 
 /*Seccion pago con stripe*/
 
@@ -340,6 +345,7 @@ div.genero-section{
 
 /*inicio de estilos tarjeta stripe*/
 .StripeElement {
+    margin-top:10px;
     box-sizing: border-box;
     height: 40px;
     padding: 10px 12px;
@@ -381,9 +387,7 @@ div.genero-section{
     width:100%;
 }
 
-input[name="other-address"]{
-    display:none;
-}
+
 
 label.button-address{
     display:inline-flex;
@@ -410,7 +414,6 @@ input[id="b2"]:checked ~ #label-no{
     overflow: hidden;
     transition: 0.2s;
 }
-
 
 
 
@@ -500,7 +503,7 @@ button.button-checkout:disabled{
     .mobile-logo-ham,
     .secondary-menu-logo,
     .brand-logo{
-        display:none;
+        display: none;
     }
     /*Se quita el overflow en caso que se quede el side menu abierto y se agrande la pantalla*/
     .overflow-menu{
@@ -563,9 +566,9 @@ button.button-checkout:disabled{
     /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
     /*Checkout*/
 
-#progress-bar-outer{
-    margin-top:0;
-}
+    #progress-bar-outer{
+        margin-top:0;
+    }
     #steps ul .step-number{
         margin-left:48px;
     }
@@ -573,6 +576,7 @@ button.button-checkout:disabled{
      .pago{
         flex-direction: row;
         align-items: flex-start;
+        margin-top:20px;
     }
 
     .pago h2{
@@ -601,7 +605,6 @@ button.button-checkout:disabled{
         margin:10px 0;
         padding-left:0;
         width:500px;
-        height: 350px;
     }
 
     #information-wrapper .input-checkout{
@@ -609,6 +612,18 @@ button.button-checkout:disabled{
         display:inline-block;
         margin-right: 10px;
     }
+
+    #seccion-nuevo-domicilio .input-checkout,
+    #input-trinity{
+        margin:10px;
+    }
+
+    #information-wrapper input::placeholder,
+    select,
+    input,
+   #information-wrapper label.genero-inp{
+        font-size: 15px;
+   }
 
     div.genero-section{
         display:flex;
@@ -622,9 +637,10 @@ button.button-checkout:disabled{
         width:120px;
         margin-left: 10px;
     }
+
     #discapacidad-label{
-    width: 300px;
-}
+        width: 300px;
+    }
 
    .seccion-numero-trinity, 
    .discapacidad-wrapper{
@@ -635,6 +651,7 @@ button.button-checkout:disabled{
     #information-wrapper label{
         margin-bottom:5px;
     }
+    
 
     /*button checkout*/
     #button-wrap{
@@ -654,18 +671,20 @@ button.button-checkout:disabled{
         margin-top:10px;
         margin-bottom:30px; 
     }
+
     .form-row{
       text-align: left;
-  }
-.button-wrap{
-    width: 900px;
-    margin: 10px auto;
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
     }
+    .button-wrap{
+        width: 900px;
+        margin: 10px auto;
+        text-align: center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
     .button-checkout{
         display: inline-block;
         margin:10px;

@@ -127,15 +127,15 @@ exports.consultaExistenciaDeExamenEnHorario = async (modalidad)=>{
 
 
 exports.ingresarReservaEnProcesoExamenCompleto=async()=>{
-  return `insert into reserva (examen_en_dia_RW_uuid,examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid)values(UUID_TO_BIN(?),UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+  return `insert into reserva (examen_en_dia_RW_uuid,examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,monto,uuid)values(UUID_TO_BIN(?),UUID_TO_BIN(?),?,?,?,?,UUID_TO_BIN(?));`
 }
 
 exports.ingresarReservaEnProcesoExamenRW= async()=>{
-  return `insert into reserva (examen_en_dia_RW_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid) values (UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+  return `insert into reserva (examen_en_dia_RW_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,monto,uuid) values (UUID_TO_BIN(?),?,?,?,?,UUID_TO_BIN(?));`
 }
 
 exports.ingresarReservaEnProcesoExamenLS= async()=>{
-  return `insert into reserva (examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,uuid) values (UUID_TO_BIN(?),?,?,?,UUID_TO_BIN(?));`
+  return `insert into reserva (examen_en_semana_LS_uuid, fecha_reserva,en_proceso,fecha_fuera_termino,monto,uuid) values (UUID_TO_BIN(?),?,?,?,?,UUID_TO_BIN(?));`
 }
 
 exports.consultaReservaPaso3 = async()=>{
@@ -176,5 +176,13 @@ exports.consultaFueraDeTerminoLS = async ()=>{
       from examen_en_semana_LS as exls
       join semana_LS as sls on sls.uuid=exls.semana_LS_uuid
       where exls.uuid=UUID_TO_BIN(?)`
+}
+
+exports.consultaPrecioReservaTemporal = async()=>{
+  return `select monto as precio from reserva where uuid=UUID_TO_BIN(?)`
+}
+
+exports.consultaFechaReservaTemporal = async()=>{
+  return `select fecha_reserva as fecha from reserva where uuid=UUID_TO_BIN(?)`
 }
 

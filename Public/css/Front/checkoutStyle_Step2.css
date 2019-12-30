@@ -218,16 +218,13 @@ h3{
     text-align: center;
 }
 
-input[name="horario-selector"]{
-    display: none;
-}
+
 
 .horario-wrapper{
     margin-top:40px;
     margin-bottom: 40px;
 }
 .horario-wrapper label{
-    display: block;
     height: auto;
     width: 300px;
     text-align: center;
@@ -246,9 +243,18 @@ input[id="h6"]:checked ~ #l6,
 input[id="h7"]:checked ~ #l7,
 input[id="h8"]:checked ~ #l8{
     font-weight: bold;
-    border: 1px solid #085796;
+    
 }
 
+.horario-inner-wrapper{
+    padding:10px;
+    width: 300px;
+    margin:10px auto;
+}
+
+.horario-activo{
+    border:1px solid #085796;
+}
 
 
 .button-checkout{
@@ -427,6 +433,12 @@ button.button-checkout:disabled{
 
     /*Lower footer- privacidad*/
     
+    footer{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
      #lower-footer{
         flex-direction: row;
         justify-content: space-between;

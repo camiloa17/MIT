@@ -55,6 +55,7 @@ function desHabilitarBotton() {
 async function validarHorario() {
     try {
         desHabilitarBotton()
+        agregarClaseHorarioActivo(this)
         const obtenerHorarios = await getHorario();
         const fueraDeTermino = await verFueraDeTermino(idMod,obtenerHorarios);
         if(fueraDeTermino.modalidad.exrw===1 && fueraDeTermino.modalidad.exls===1){
@@ -137,14 +138,26 @@ async function notificar(elemento,error){
     if (document.querySelector('#notificacion')){
         document.querySelector('#notificacion').remove();
     }
-    
     parrafo.innerText=texto;
     if (error) {
         parrafo.innerText="occurrio un error en la comprobacion, comunicate con mit";
         parrafo.style.color="red";
     }
     div.appendChild(parrafo)
-    elemento.parentNode.insertBefore(div,elemento);
+    
+    elemento.parentNode.parentNode.insertBefore(div,elemento.parentNode);
+}
+
+
+function agregarClaseHorarioActivo(element){
+    let parent= element.parentNode;
+    let allElements = document.querySelectorAll(".horario-inner-wrapper");
+    allElements.forEach(element=>{
+        if(element.classList.contains("horario-activo")){
+            element.classList.remove("horario-activo")
+        }
+    })
+    parent.classList.add("horario-activo");
 }
 
 

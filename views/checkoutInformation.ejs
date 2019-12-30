@@ -7,61 +7,113 @@
     </div>
 </div>
 <main>
-    <form action="/pay" method="POST">
+    
         <section id="checkout_information">
             <%- include("partials/checkoutSteps") -%>
-
+<form action="/checkout/pay" method="POST" id="payment-form">
             <div class="pago">
-
+            
                 <div id="person-information">
+                    <div class="timer-wrapper" id="<%=fechaFinalizacion%>">
+                        <h2 id="timer"></h2>
+                        <p>Cuando el timer llegue a 0 pierdes el cupo</p>
+                    </div>
                     <h2>COMPLETAR TUS DATOS</h2>
                     <P id="texto-obligatorio">Completa todos los campos obligatorios <b>*</b>. <strong> Si tienes Número de Trinity tienes que agregarlo obligatoriamente</strong></P>
                     
                     <div id="information-wrapper">
-                        <label for="">Nombre</label>
-                        <input type="text" placeholder="Nombre" name="mombre" class="input-checkout" required>
-                        <label for="">Apellido/s</label>
-                        <input type="text" placeholder="Apellido/s" name="apellido" class="input-checkout" required>
-                        <label>Fecha Nacimiento</label>
-                        <input type="date" name="fecha-nacimiento" value="1987-06-21" class="input-checkout" required>
-                        <label for="">DNI</label>
-                        <input type="text" name="documento" placeholder="Documento(DNI o Pasaporte)"
-                            class="input-checkout" min="0">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" placeholder="Nombre" name="nombre" class="input-checkout" required>
+                        <label for="apellido">Apellido/s</label>
+                        <input type="text" id="apellido" placeholder="Apellido/s" name="apellido" class="input-checkout" required>
+                        <label for="fnacimiento">Fecha Nacimiento</label>
+                        <input type="date" name="fnacimiento" id="fnacimiento" value="yyyy-MM-dd" class="input-checkout"  max="2019-12-31" required>
+                        <label for="doc">DNI</label>
+                        <input type="text" name="doc" id="doc" placeholder="Documento o Pasaporte"class="input-checkout" min="0" required>
                         <div class="genero-section">
-                            <input type="radio" name="genero" class="genero-inp" required>
-                            <label for="" class="genero-inp">Masculino</label>
-                            <input type="radio" name="genero" class="genero-inp">
-                            <label for="" class="genero-inp">Femenino</label required>
+                            <input type="radio" name="genero" id="masculino"class="genero-inp" value="M" required>
+                            <label for="masculino" class="genero-inp">Masculino</label>
+                            <input type="radio" name="genero" id="femenino" value="F" class="genero-inp">
+                            <label for="femenino" class="genero-inp">Femenino</label>
                         </div>
-
-                        <label for="">Email</label>
-                        <input type="email" name="email" class="input-checkout" placeholder="Mail">
-                        <label for="">Telefono fijo</label>
-                        <input type="tel" name="tfijo" class="input-checkout" placeholder="Numero de Telefono">
-                        <label for="">Telefono movile</label>
-                        <input type="tel" name="tmovile" class="input-checkout" placeholder="Numero de Celular">
-                        <label for="">Provincia</label>
-                        <select name="provincia" id="prov" class="input-checkout">
-                            <option value="">provincia</option>
-                            <option value="albacete">albacete</option>
-                            <option value="alicante/alacant">alicante/alacant</option>
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" class="input-checkout" placeholder="Mail" required>
+                        <label for="tfijo">Telefono fijo</label>
+                        <input type="tel" name="tfijo" class="input-checkout" id="tfijo" placeholder="Numero de Telefono">
+                        <label for="telm">Telefono movile</label>
+                        <input type="tel" name="tmovile" class="input-checkout" id="telm" placeholder="Numero de Celular">
+                        <label for="prov">Provincia</label>
+                        <select name="prov" id="prov" class="input-checkout" required>
+                            <option selected="" class="first-select-option" value="" disabled="">Provincia</option>
+                            <option class="select-option" value="ESC">A CORUÑA</option>
+                            <option class="select-option" value="ESVI">ALAVA</option>
+                            <option class="select-option" value="ESAB">ALBACETE</option>
+                            <option class="select-option" value="ESA">ALICANTE</option>
+                            <option class="select-option" value="ESAL">ALMERIA</option>
+                            <option class="select-option" value="ESO">ASTURIAS</option>
+                            <option class="select-option" value="ESAV">AVILA</option>
+                            <option class="select-option" value="ESBA">BADAJOZ</option>
+                            <option class="select-option" value="ESPM">BALEARES</option>
+                            <option class="select-option" value="ESB">BARCELONA</option>
+                            <option class="select-option" value="ESBU">BURGOS</option>
+                            <option class="select-option" value="ESCC">CACERES</option>
+                            <option class="select-option" value="ESCA">CADIZ</option>
+                            <option class="select-option" value="ESS">CANTABRIA</option>
+                            <option class="select-option" value="ESCS">CASTELLON</option>
+                            <option class="select-option" value="ESCE">CEUTA</option>
+                            <option class="select-option" value="ESCR">CIUDAD REAL</option>
+                            <option class="select-option" value="ESCO">CORDOBA</option>
+                            <option class="select-option" value="ESCU">CUENCA</option>
+                            <option class="select-option" value="ESGI">GERONA</option>
+                            <option class="select-option" value="ESGR">GRANADA</option>
+                            <option class="select-option" value="ESGU">GUADALAJARA</option>
+                            <option class="select-option" value="ESSS">GUIPUZCOA</option>
+                            <option class="select-option" value="ESH">HUELVA</option>
+                            <option class="select-option" value="ESHU">HUESCA</option>
+                            <option class="select-option" value="ESJ">JAEN</option>
+                            <option class="select-option" value="ESLO">LA RIOJA</option>
+                            <option class="select-option" value="ESLE">LEON</option>
+                            <option class="select-option" value="ESL">LLEIDA / LERIDA</option>
+                            <option class="select-option" value="ESLU">LUGO</option>
+                            <option class="select-option" value="ESM">MADRID</option>
+                            <option class="select-option" value="ESMA">MALAGA</option>
+                            <option class="select-option" value="ESML">MELILLA</option>
+                            <option class="select-option" value="ESMU">MURCIA</option>
+                            <option class="select-option" value="ESNA">NAVARRA</option>
+                            <option class="select-option" value="ESOR">ORENSE / OURENSE</option>
+                            <option class="select-option" value="ESP">PALENCIA</option>
+                            <option class="select-option" value="ESPO">PONTEVEDRA</option>
+                            <option class="select-option" value="ESSA">SALAMANCA</option>
+                            <option class="select-option" value="ESSG">SEGOVIA</option>
+                            <option class="select-option" value="ESSE">SEVILLA</option>
+                            <option class="select-option" value="ESSO">SORIA</option>
+                            <option class="select-option" value="EST">TARRAGONA</option>
+                            <option class="select-option" value="ESTE">TERUEL</option>
+                            <option class="select-option" value="ESTO">TOLEDO</option>
+                            <option class="select-option" value="ESV">VALENCIA</option>
+                            <option class="select-option" value="ESVA">VALLADOLID</option>
+                            <option class="select-option" value="ESBI">VIZCAYA</option>
+                            <option class="select-option" value="ESZA">ZAMORA</option>
+                            <option class="select-option" value="ESZ">ZARAGOZA</option>
                         </select>
-                        <label for="">Localidad de Residencia</label>
-                        <input type="text" name="localidad" class="input-checkout"
-                            placeholder="Localidad de Residencia">
-                        <label for="">Direccion</label>
-                        <input type="text" name="direccion" class="input-checkout" placeholder="Direccion">
-
+                        <label for="localidad">Localidad de Residencia</label>
+                        <input type="text" name="localidad" class="input-checkout" placeholder="Localidad de Residencia" id="localidad" required>
+                        <label for="direccion">Direccion</label>
+                        <input type="text" name="direccion" class="input-checkout" id="direccion" placeholder="Direccion" required>
+                        <label for="direccion2">Direccion</label>
+                        <input type="text" name="direccion2" class="input-checkout" id="direccion2" placeholder="Info. Adicional Direccion">
+                        <label for="zip">zip</label>
+                        <input type="text" name="zip" class="input-checkout" id="zip" placeholder="zip" required>
                         <div class="discapacidad-wrapper">
-                        <input type="checkbox" name="discapacidad" id="selector-discapacidad">
-                        <label for="discapacidad" id='discapacidad-label'>Sufro alguna condicion fisica o mental especial?</label>
+                        <input type="checkbox" name="discapacidad" id="discapacidad">
+                        <label for="discapacidad" id='discapacidad-label'>Tengo una discapacidad física.</label>
                         </div>
 
                         <div class='seccion-numero-trinity'>
-                            <input type="checkbox" name="numeroTrinity" id="idTrinity">
+                            <input type="checkbox" name="idTrinity" id="idTrinity">
                             <label for="idTrinity" class='trinity'>Cuento con un Número de Trinity?</label>
                             <div class="seccion-input-trinity">
-                                <input type="text" placeholder="Número Trinity" id="input-trinity">
+                                <input type="text" placeholder="Número Trinity" id="input-trinity" name="input-trinity">
                             </div>
 
                         </div>
@@ -85,38 +137,91 @@
                     <div class="envio-domicilio">
                         <p>¿Quieres adicionar al envío del certificado a tu domicilio por €10?</p>
                         <div class="wrapper-decision-domicilio">
-                            <input type="radio" name="other-address" class="envio-seleccion" id="b1" value="si">
-                            <input type="radio" name="other-address" class="envio-seleccion" id="b2" value="no" checked>
+                            <input type="radio" name="other-address" class="envio-seleccion input-checkout" id="b1" value="si">
+                            <input type="radio" name="other-address" class="envio-seleccion input-checkout" id="b2" value="no" checked>
                             <label for="b1" class="button-address" id="label-si">Si</label>
                             <label for="b2" class="button-address" id="label-no">No</label>
                         </div>
                         <div class="wrapper-nuevo-domicilio">
-                            <input type="checkbox" name="nuevo-domicilio" id="adicion-nuevo-domicilio">
-                            <label for="nuevo-domicilio">Cargar nuevo domicilio de envío</label>
-                            <div id="seccion-nuevo-domicilio">
+                            <input type="checkbox" name="nuevo-domicilio" class="input-checkout" id="adicion-nuevo-domicilio">
+                            <label for="adicion-nuevo-domicilio">Cargar nuevo domicilio de envío</label>
+                            <div id="seccion-nuevo-domicilio">                                
                                 <label for="direccion-nueva">Provincia</label>
-                                <select name="selector-direccion" id="direccion-nueva">
-                                    <option value="">Provincia</option>
-                                    <option value="albacete">albacete</option>
-                                    <option value="alicante/alacant">alicante/alacant</option>
+                                <select name="selector-provincia-adicional" class="input-checkout" id="direccion-nueva">
+                                    <option selected="" class="first-select-option" value="" disabled="">Provincia</option>
+                                    <option class="select-option" value="ESC">A CORUÑA</option>
+                                    <option class="select-option" value="ESVI">ALAVA</option>
+                                    <option class="select-option" value="ESAB">ALBACETE</option>
+                                    <option class="select-option" value="ESA">ALICANTE</option>
+                                    <option class="select-option" value="ESAL">ALMERIA</option>
+                                    <option class="select-option" value="ESO">ASTURIAS</option>
+                                    <option class="select-option" value="ESAV">AVILA</option>
+                                    <option class="select-option" value="ESBA">BADAJOZ</option>
+                                    <option class="select-option" value="ESPM">BALEARES</option>
+                                    <option class="select-option" value="ESB">BARCELONA</option>
+                                    <option class="select-option" value="ESBU">BURGOS</option>
+                                    <option class="select-option" value="ESCC">CACERES</option>
+                                    <option class="select-option" value="ESCA">CADIZ</option>
+                                    <option class="select-option" value="ESS">CANTABRIA</option>
+                                    <option class="select-option" value="ESCS">CASTELLON</option>
+                                    <option class="select-option" value="ESCE">CEUTA</option>
+                                    <option class="select-option" value="ESCR">CIUDAD REAL</option>
+                                    <option class="select-option" value="ESCO">CORDOBA</option>
+                                    <option class="select-option" value="ESCU">CUENCA</option>
+                                    <option class="select-option" value="ESGI">GERONA</option>
+                                    <option class="select-option" value="ESGR">GRANADA</option>
+                                    <option class="select-option" value="ESGU">GUADALAJARA</option>
+                                    <option class="select-option" value="ESSS">GUIPUZCOA</option>
+                                    <option class="select-option" value="ESH">HUELVA</option>
+                                    <option class="select-option" value="ESHU">HUESCA</option>
+                                    <option class="select-option" value="ESJ">JAEN</option>
+                                    <option class="select-option" value="ESLO">LA RIOJA</option>
+                                    <option class="select-option" value="ESLE">LEON</option>
+                                    <option class="select-option" value="ESL">LLEIDA / LERIDA</option>
+                                    <option class="select-option" value="ESLU">LUGO</option>
+                                    <option class="select-option" value="ESM">MADRID</option>
+                                    <option class="select-option" value="ESMA">MALAGA</option>
+                                    <option class="select-option" value="ESML">MELILLA</option>
+                                    <option class="select-option" value="ESMU">MURCIA</option>
+                                    <option class="select-option" value="ESNA">NAVARRA</option>
+                                    <option class="select-option" value="ESOR">ORENSE / OURENSE</option>
+                                    <option class="select-option" value="ESP">PALENCIA</option>
+                                    <option class="select-option" value="ESPO">PONTEVEDRA</option>
+                                    <option class="select-option" value="ESSA">SALAMANCA</option>
+                                    <option class="select-option" value="ESSG">SEGOVIA</option>
+                                    <option class="select-option" value="ESSE">SEVILLA</option>
+                                    <option class="select-option" value="ESSO">SORIA</option>
+                                    <option class="select-option" value="EST">TARRAGONA</option>
+                                    <option class="select-option" value="ESTE">TERUEL</option>
+                                    <option class="select-option" value="ESTO">TOLEDO</option>
+                                    <option class="select-option" value="ESV">VALENCIA</option>
+                                    <option class="select-option" value="ESVA">VALLADOLID</option>
+                                    <option class="select-option" value="ESBI">VIZCAYA</option>
+                                    <option class="select-option" value="ESZA">ZAMORA</option>
+                                    <option class="select-option" value="ESZ">ZARAGOZA</option>
                                 </select>
                                 <label for="">Localidad de Residencia</label>
-                                <input type="text" name="localidad-adicional" class="input-checkout"placeholder="Localidad">
+                                <input type="text" name="localidad-adicional" class="input-checkout"placeholder="Localidad" id="localidad-adicional">
                                 <label for="">Direccion</label>
-                                <input type="text" name="direccion-adicional" class="input-checkout" placeholder="Direccion-adicional">
-                            </div>
+                                <input type="text" name="direccion-adicional" id="direccion-adicional" class="input-checkout" placeholder="Direccion">
+                                <label for="direccion2-adicional">Direccion</label>
+                                <input type="text" name="direccion2-adicional" id="direccion2-adicional" class="input-checkout" id="direccion2-adicional" placeholder="Info. Adicional Direccion">
+                                <label for="zip-adicional">zip</label>
+                                <input type="text" name="zip-adicional" class="input-checkout" id="zip-adicional" placeholder="zip">
+                                
                         </div>
                     </div>
                     <div class="terminos-wrapper">
-                        <input type="checkbox" name="aceptar-uso-datos" id="uso-datos">
-                        <label for="aceptar-uso-datos">Aceptar los términos y condiciones</label>
+                        <input type="checkbox" name="uso-datos" id="uso-datos">
+                        <label for="uso-datos">Aceptar los términos y condiciones</label>
                         <p>*<i>No guardamos información de tus tarjetas</i></p>
                     </div>
                     
                 </div>
             </div>
+            </form>
         </section>
-
+        
         <section id='detalles-compra'>
             <h3>Detalles de la compra</h3>
             <!--Total--> 
@@ -125,10 +230,12 @@
         </section>
         <div class="button-wrap">
             <a class="button-checkout backwards" href="/checkout/step_2/<%=materia%>/<%= tipo %>/<%=nivel.replace(/\s/g, '_')%>/<%=modo.texto.replace(/\s/g, '_')%>?id=<%=id%>">Regresar</a>
-            <button type="submit" class="button-checkout" id="button-horario" disabled>Pagar</button>
+            <button type="submit" class="button-checkout" id="boton-pago" form="payment-form" disabled>Pagar</button>
         </div>
-    </form>
+        
 </main>
+
+<div id="hidden-payment" data-payment="<%=idPayment %>"></div>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/Js/Front/checkout.js"></script>

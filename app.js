@@ -45,7 +45,10 @@ app.get('/faqs', asyncErrorWrap(async (req, res) => {
     res.render("faqs", { stylesheet: stylesheet, team: '/#team', contacto: '/#contacto', materia: menuItems.materias, tipos: menuItems.tipo, nivel: menuItems.nivel, modo: menuItems.modo })
 }));
 
+
+
 app.use('/dashboard',asyncErrorWrap(dashbordRoutes));
+
 
 
 app.use(errorHandler);
