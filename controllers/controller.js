@@ -280,7 +280,7 @@ exports.crearReserva = async(informacion,infoExamen)=>{
             informacion.email,
             informacion.tfijo,
             informacion.tmovil,
-            informacion.provincia,
+            informacion.prov,
             informacion.localidad,
             `${informacion.direccion} ${(informacion.direccion2?informacion.direccion2:"")}`,
             informacion.zip,
@@ -292,14 +292,18 @@ exports.crearReserva = async(informacion,infoExamen)=>{
             infoExamen.idReserva,
             uuidAlumno,
             `${(informacion.envioSi===true?(informacion.adicionDom===true?informacion.zipEnvioAd:informacion.zip):"")}`,
-            `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.domicilioEnvioAd + (informacion.direccion2EnvioAd ? informacion.direccion2EnvioAd:""):informacion.domicilio+(informacion.domicilio2?informacion.domicilio2:"")):"")}`,
+            `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.direccionEnvioAd +" "+ (informacion.direccion2EnvioAd ? informacion.direccion2EnvioAd:""):informacion.direccion+" "+(informacion.direccion2?informacion.direccion2:"")):"")}`,
             `${informacion.discapacidad?1:0}`,
              0,
              `${informacion.envioSi?1:0}`,
              new Date().toISOString(),
             `${(informacion.inputTrinity ? informacion.inputTrinity : "")}`,
             `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.localidadEnvioAd : informacion.localidad): "")}`,
-             (informacion.resultado.paymentIntent.amount/100)
+             (informacion.resultado.paymentIntent.amount/100),
+            `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.provinciaEnvioAd : informacion.prov) : "")}`,
+             `${(informacion.resultado.paymentIntent.status==="success"?1:0)}`,
+             `${informacion.resultado.paymentIntent.id}`,
+             `${informacion.resultado.paymentIntent.status}`
         ]
         console.log(infoAlumno)
         console.log(infoReserva)
