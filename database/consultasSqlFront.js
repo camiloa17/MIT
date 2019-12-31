@@ -186,3 +186,12 @@ exports.consultaFechaReservaTemporal = async()=>{
   return `select fecha_reserva as fecha from reserva where uuid=UUID_TO_BIN(?)`
 }
 
+exports.consultaSiEstaFueraDeDiezMinutos = async()=>{
+  return `select
+  count(fecha_reserva) as fecha
+from reserva
+where
+  uuid = UUID_TO_BIN(?)
+  and (fecha_reserva + INTERVAL 10 MINUTE > now());`
+}
+

@@ -6,10 +6,9 @@ document.querySelector('.secondary-menu-logo span').addEventListener('click', cl
 document.querySelector('#adicion-nuevo-domicilio').addEventListener('change', mostrarNuevoDomicilio);
 document.querySelector('#idTrinity').addEventListener('change', mostrarNumeroTrinity);
 
-/*
-se desactiva mientras el evento para activar el boton de pago
+
 document.querySelector('#uso-datos').addEventListener('change', activarPago);
-*/
+
 document.querySelectorAll('.envio-seleccion').forEach(element => {
   element.addEventListener('change', sumarEnvio)
 })
@@ -35,14 +34,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }, 1000)
   
-})
+});
 
 
+const information = {};
+const url = window.location.href;
 const precio = document.querySelector("#precio").innerText;
 const idreserva = window.location.href.match(/idreserva=([\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12})/)[1];
 const idModalidad = window.location.href.match(/id=([\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12})/)[1];
-
-
 
 function openNav(item) {
   const clickItems = item.target.classList;
@@ -148,7 +147,7 @@ function sumarEnvio() {
   if (botonSeleccionado === "si") {
     document.querySelector('#precio').innerText = parseInt(document.querySelector("#precio").innerText) + 10;
     document.querySelector('#detalles-compra p').innerText = `${innerText} + Envío`;
-    console.log(domicilioWrapper.scrollHeight + "px");
+    
     domicilioWrapper.style.height = "auto";
   } else if (botonSeleccionado === "no") {
     document.querySelector("#precio").innerText = precio;
@@ -157,8 +156,7 @@ function sumarEnvio() {
   }
 }
 
-/*
-se desactiva mientras la funcion de activar el boton de pago.
+
 function activarPago() {
   if (this.checked === false) {
     document.querySelector('#boton-pago').disabled = true
@@ -167,26 +165,50 @@ function activarPago() {
     document.querySelector('#boton-pago').disabled = false
   }
 }
-*/
+
 
 document.querySelector("#payment-form").addEventListener("submit", async (form) => {
   form.preventDefault()
   const formElements = form.target.elements;
-  for (element of formElements) {
-    element.readOnly = true;
-    createObject(element)
-    if (element.id == "prov" || element.id == "direccion-nueva") {
-      element.disabled = true
+  const mensjaeRechazo = (document.querySelector('.resultado-pago') ? document.querySelector('.resultado-pago').remove():"");
+  habilitaroDesFormulario(formElements,true);
+  if(information.envioSi===true){
+    const paymentId = document.querySelector('#hidden-payment').dataset.payment.match(/^(\S{27})/)[0];
+    const sumarEnvio = fetch('/checkout/adicionar-envio/'+paymentId+"/"+idreserva,{
+      method:'post',
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    });
+    const respuesta = await sumarEnvio;
+    
+    if(respuesta.status===200){
+       submitPayment(formElements);
+    }
+  
+  }else{
+    submitPayment(formElements)
+    
+  }
+});
+
+async function habilitaroDesFormulario(formElements,estado){
+  if(estado===true){
+    for (element of formElements) {
+      element.disabled = true;
+      createObject(element)
+    }
+  }else if(estado===false){
+    for (element of formElements) {
+      element.disabled = false;
+      
     }
   }
-  if(information.adicionDom===true){
-    
-  }else{
-    const pago = await submitPayment()
-  }
-})
+}
 
-async function submitPayment(){
+
+
+async function submitPayment(formElements){
   const clientSecret = document.querySelector('#hidden-payment').dataset.payment;
   stripe.confirmCardPayment(clientSecret, {
     payment_method: {
@@ -199,20 +221,28 @@ async function submitPayment(){
     }
   }).then(function (result) {
     if (result.error) {
-      console.log(result.error.message)
+      habilitaroDesFormulario(formElements,false);
+      const elemento = document.querySelector(".form-row");
+      const elementoP = document.createElement("p");
+      elementoP.classList.add("resultado-pago")
+      elementoP.style.color="red";
+      elementoP.innerHTML="<span id='x-pago'>X </span>"+" "+result.error.message;
+      elemento.appendChild(elementoP);
     } else {
       if (result.paymentIntent.status === 'succeeded') {
-        console.log(result);
+        information.resultado=result;
+
+        fetch(url.replace(/step_\d/,"reserva"),{
+          method:"post",
+          headers:{
+            'Content-Type': 'application/json'
+          },
+          body:JSON.stringify(information)
+        })
       }
     }
   })
 }
-
-
-
-
-const information = {};
-
 
 
 function createObject(element) {

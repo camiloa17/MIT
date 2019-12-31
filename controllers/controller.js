@@ -139,7 +139,7 @@ async function diasATexto(horarios,tipo) {
         if(tipo==="dia"){
             horariosConTexto.horarios.forEach(horario => {
             let dia = `${DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({day:'numeric'})}`;
-            let mes = `${ DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({ month: 'numeric'})}`;
+            let mes = `${DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({ month: 'numeric'})}`;
             let año = `${DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({year: 'numeric'})}`;;
             let hora = `${DateTime.fromISO(new Date(horario.fecha_Examen).toISOString()).setZone('UTC').toLocaleString({hour: 'numeric', minute: '2-digit' })}`;
                 horario.fecha_Examen = `${dia}/${mes}/${año} ${hora} hora españa`;
@@ -248,7 +248,6 @@ async function crearReservaTemporalRW(idExamenEnDia,precio) {
 
 
 async function crearReservaTemporalLs(idExamenEnSemana,precio) {
-   
     try {
         const consultaLs = await queries.consultaExistenciaDeExamenEnHorario('Listening & Speaking');
         const corroborarExistenciaExamenLs = await utils.queryAsync(consultaLs, [idExamenEnSemana]);
@@ -266,36 +265,94 @@ async function crearReservaTemporalLs(idExamenEnSemana,precio) {
     }
 }
 
+exports.crearReserva = async(informacion,infoExamen)=>{
+    try {
+        const uuidAlumno=uuidv4()
+        /* activo,nombre,apellido,fecha_nac,fecha_inscripcion,document,genero,email,telefono_fijo,movil,provincia,localidad,direccion,zip,idtrinity,uuid*/ 
+        const infoAlumno=[
+            1,
+            informacion.nombre,
+            informacion.apellido, 
+            new Date(informacion.fnacimiento).toISOString(),
+            new Date().toISOString(),
+            informacion.doc,
+            informacion.genero,
+            informacion.email,
+            informacion.tfijo,
+            informacion.tmovil,
+            informacion.provincia,
+            informacion.localidad,
+            `${informacion.direccion} ${(informacion.direccion2?informacion.direccion2:"")}`,
+            informacion.zip,
+            `${(informacion.inputTrinity?informacion.inputTrinity:"")}`,
+            uuidAlumno
+        ]
+        /*UUID,alumno_uuid,codigo_postal_envio_domicilio,direccion_envio_domicilio,discapacidad,en_proceso,envio_domicilio_diploma,fecha_venta,id_trinity,localidad_envio_domicilio,monto,pronvincia_envio_domicilio,rechazada,transaccion_id,transaccion_status*/
+        const infoReserva=[
+            infoExamen.idReserva,
+            uuidAlumno,
+            `${(informacion.envioSi===true?(informacion.adicionDom===true?informacion.zipEnvioAd:informacion.zip):"")}`,
+            `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.domicilioEnvioAd + (informacion.direccion2EnvioAd ? informacion.direccion2EnvioAd:""):informacion.domicilio+(informacion.domicilio2?informacion.domicilio2:"")):"")}`,
+            `${informacion.discapacidad?1:0}`,
+             0,
+             `${informacion.envioSi?1:0}`,
+             new Date().toISOString(),
+            `${(informacion.inputTrinity ? informacion.inputTrinity : "")}`,
+            `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.localidadEnvioAd : informacion.localidad): "")}`,
+             (informacion.resultado.paymentIntent.amount/100)
+        ]
+        console.log(infoAlumno)
+        console.log(infoReserva)
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 
+/* Ver si la fecha esta fuera de termino*/
 exports.verFechaFueraDeTermino= async(modalidad,idDia,idSemana)=>{
-    const fecha = DateTime.utc().toISODate();
-    let sql;
-    let consulta;
-    if (modalidad.exrw === 1 && modalidad.exls === 1){
-        sql = await queries.consultaFueraDeTerminoCompleto();
-        consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
-    } else if(modalidad.exrw === 1 && modalidad.exls === 0){
-        sql = await queries.consultaFueraDeTerminoRW();
-        consulta = await utils.queryAsync(sql, [fecha, idDia])
-    } else if (modalidad.exrw === 0 && modalidad.exls === 1){
-        sql = await queries.consultaFueraDeTerminoLS();
-        consulta = await utils.queryAsync(sql, [fecha, idDia])
+    try {
+
+        const fecha = DateTime.utc().toISODate();
+        let sql;
+        let consulta;
+        if (modalidad.exrw === 1 && modalidad.exls === 1) {
+            sql = await queries.consultaFueraDeTerminoCompleto();
+            consulta = await utils.queryAsync(sql, [fecha, fecha, idSemana, idDia]);
+        } else if (modalidad.exrw === 1 && modalidad.exls === 0) {
+            sql = await queries.consultaFueraDeTerminoRW();
+            consulta = await utils.queryAsync(sql, [fecha, idDia])
+        } else if (modalidad.exrw === 0 && modalidad.exls === 1) {
+            sql = await queries.consultaFueraDeTerminoLS();
+            consulta = await utils.queryAsync(sql, [fecha, idDia])
+        }
+
+
+        return consulta[0];
+        
+    } catch (error) {
+     console.error(error);   
     }
     
-    
-    return consulta[0];
 
 }
 
+/*Consulta la fecha tempral*/ 
 exports.consultarFecha = async(id)=>{
     try {
         const consultaSql = await queries.consultaFechaReservaTemporal();
-        
         const fecha = await utils.queryAsync(consultaSql,id);
-        
         return fecha;
     } catch (error) {
+        console.error(error)
+    }
+}
+
+exports.consultarFueraDeDiezMinutos = async(id)=>{
+    try{
+
+    }catch(err){
         
     }
 }
@@ -307,6 +364,7 @@ exports.consultaPrecio= async (id)=>{
         const precio = await utils.queryAsync(consultSql,id);
         
         if(precio.length >0){
+            
             return  precio[0]
         }
     } catch (error) {
