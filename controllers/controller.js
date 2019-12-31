@@ -265,7 +265,7 @@ async function crearReservaTemporalLs(idExamenEnSemana,precio) {
     }
 }
 
-exports.crearReserva = async(informacion,infoExamen)=>{
+exports.crearReservaYAlumno = async(informacion,infoExamen)=>{
     try {
         const uuidAlumno=uuidv4()
         /* activo,nombre,apellido,fecha_nac,fecha_inscripcion,document,genero,email,telefono_fijo,movil,provincia,localidad,direccion,zip,idtrinity,uuid*/ 
@@ -287,9 +287,8 @@ exports.crearReserva = async(informacion,infoExamen)=>{
             `${(informacion.inputTrinity?informacion.inputTrinity:"")}`,
             uuidAlumno
         ]
-        /*UUID,alumno_uuid,codigo_postal_envio_domicilio,direccion_envio_domicilio,discapacidad,en_proceso,envio_domicilio_diploma,fecha_venta,id_trinity,localidad_envio_domicilio,monto,pronvincia_envio_domicilio,rechazada,transaccion_id,transaccion_status*/
+        /*alumno_uuid,codigo_postal_envio_domicilio,direccion_envio_domicilio,discapacidad,en_proceso,envio_domicilio_diploma,fecha_venta,id_trinity,localidad_envio_domicilio,monto,pronvincia_envio_domicilio,rechazada,transaccion_id,transaccion_status, UUID*/
         const infoReserva=[
-            infoExamen.idReserva,
             uuidAlumno,
             `${(informacion.envioSi===true?(informacion.adicionDom===true?informacion.zipEnvioAd:informacion.zip):"")}`,
             `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.direccionEnvioAd +" "+ (informacion.direccion2EnvioAd ? informacion.direccion2EnvioAd:""):informacion.direccion+" "+(informacion.direccion2?informacion.direccion2:"")):"")}`,
@@ -303,14 +302,42 @@ exports.crearReserva = async(informacion,infoExamen)=>{
             `${(informacion.envioSi === true ? (informacion.adicionDom === true ? informacion.provinciaEnvioAd : informacion.prov) : "")}`,
              `${(informacion.resultado.paymentIntent.status==="success"?1:0)}`,
              `${informacion.resultado.paymentIntent.id}`,
-             `${informacion.resultado.paymentIntent.status}`
+             `${informacion.resultado.paymentIntent.status}`,
+            infoExamen.idReserva
         ]
-        console.log(infoAlumno)
-        console.log(infoReserva)
+        
+        const crearAlumnos = await crearAlumno(infoAlumno);
+        const actualizarReserva= await crearReserva(infoReserva);
+        console.log(crearAlumnos);
+        console.log(actualizarReserva);
         
     } catch (error) {
         console.log(error);
     }
+}
+
+async function crearAlumno(infoAlumno){
+    try {
+        const query = await queries.crearAlumno();
+        const insertarAlumno = await utils.queryAsync(query, infoAlumno);
+        console.log(insertarAlumno);
+        return  insertarAlumno;
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
+
+async function crearReserva(infoReserva){
+    try {
+        const query = await queries.actualizarReservaConfirmada();
+        const actualizarReserva = await utils.queryAsync(query, infoReserva);
+        console.log(actualizarReserva)
+        return actualizarReserva;
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 

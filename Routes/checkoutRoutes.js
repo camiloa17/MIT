@@ -235,7 +235,7 @@ router.post('/reserva/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             idReserva: req.query.idreserva,
             precio: datosExamenModalidad.precio
         }
-        const crearReserva= await controller.crearReserva(infoFormulario,informacionPagina);
+        const crearReserva= await controller.crearReservaYAlumno(infoFormulario,informacionPagina);
         
 
     } catch (error) {

@@ -195,3 +195,45 @@ where
   and (fecha_reserva + INTERVAL 10 MINUTE > now());`
 }
 
+exports.crearAlumno = async ()=>{
+  return `insert into alumno(
+    activo,
+    nombre,
+    apellido,
+    fecha_nac,
+    fecha_inscripcion,
+    documento,
+    genero,
+    email,
+    telefono_fijo,
+    movil,
+    provincia,
+    localidad,
+    domicilio,
+    codigo_postal,
+    candidate_number,
+    uuid
+  )
+values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+}
+
+exports.actualizarReservaConfirmada = async ()=>{
+  return `update reserva 
+set 
+alumno_uuid=?,
+codigo_postal_envio_domicilio=?,
+direccion_envio_domicilio=?,
+discapacidad=?,
+en_proceso=?,
+envio_domicilio_diploma=?,
+fecha_venta=?,
+id_trinity=?,
+localidad_envio_domicilio=?,
+monto=?,
+provincia_envio_domicilio=?,
+rechazada=?,
+transaccion_id=?,
+transaccion_status=?
+where uuid=UUID_TO_BIN(?);`
+}
+

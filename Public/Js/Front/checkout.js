@@ -231,7 +231,6 @@ async function submitPayment(formElements){
     } else {
       if (result.paymentIntent.status === 'succeeded') {
         information.resultado=result;
-
         fetch(url.replace(/step_\d/,"reserva"),{
           method:"post",
           headers:{
