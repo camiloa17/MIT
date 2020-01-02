@@ -1,0 +1,42 @@
+<%- include("partials/head") -%>
+<%- include("partials/upperMenuOnly") -%>
+
+
+<div id="progress-bar-outer">
+    <div id="progress-bar-inner">
+    </div>
+</div>
+<main>
+    
+        <section id="checkout_step2">
+            <%- include("partials/checkoutSteps") -%>
+            <div class="horario next" data-step="2">
+                <div class="confirmation-wrapper">
+                    <div class="wrapper-circle">
+                        <div class="circle">
+                            <div class="tick"> </div>
+                        </div>
+                    </div>
+                    <h1>Reserva Realizada</h1>
+                    <p class="paragraph-margin">Tienes fecha para tu próximo examen de</p>
+                    <h2><%=nivel%> - <%=modo.texto %></h2>
+                    <p>En el horario:</p>
+
+                    <div class="notice">
+                        <h3>IMPORTANTE</h3>
+                        <P><strong>Descarga las Normas si aún no lo has hecho</strong></P>
+                        <p>Tendrás que respetar nuestras normas para rendir, si no has cumplido con las normas perderás todo lo que hayas pagado
+                        por ello ya que en nuestras Condiciones están detalladas</p>
+                        <button>Descargar las Normas</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="button-wrap">
+            <a class="button-checkout" href="/">Regresar a Home</a>
+        </div>
+    
+</main>
+
+
+<%- include("partials/footer-privacidad") -%>

@@ -214,13 +214,36 @@ exports.crearAlumno = async ()=>{
     candidate_number,
     uuid
   )
-values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UUID_TO_BIN(?));`
+}
+
+exports.verExistenciaAlumno = async()=>{
+  return `select BIN_TO_UUID(uuid) as id from alumno where documento=?;`
+}
+
+exports.actualizarAlumno= async()=>{
+  return `update alumno 
+set 
+activo=1,
+nombre=?,
+apellido=?,
+documento=?,
+genero=?,
+email=?,
+telefono_fijo=?,
+movil=?,
+provincia=?,
+localidad = ?,
+domicilio = ?,
+codigo_postal=?,
+candidate_number=?
+where uuid = UUID_TO_BIN(?);`
 }
 
 exports.actualizarReservaConfirmada = async ()=>{
   return `update reserva 
 set 
-alumno_uuid=?,
+alumno_uuid=UUID_TO_BIN(?),
 codigo_postal_envio_domicilio=?,
 direccion_envio_domicilio=?,
 discapacidad=?,

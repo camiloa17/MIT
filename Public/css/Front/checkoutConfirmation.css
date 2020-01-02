@@ -1,0 +1,492 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;
+    color:#085796;
+}
+
+h1,
+h2,
+h3{
+    font-family: 'Roboto Slab', serif;
+}
+
+h1{
+    color:#0B9E11;
+    font-size: 30px;
+}
+p{
+    font-size: 18px;
+    text-align: center;
+}
+
+h2,
+p{
+    color:black;
+}
+
+
+.secondary-menu-list,
+.primary-menu-logo,
+.upper-part-header,
+.secondary-menu-logo,
+.primary-menu-list,
+.right-side-menu,
+#team-wrapper{
+    display: flex;
+}
+
+
+
+.brand-logo{
+    font-size: 40px;
+    line-height: 53px;
+    font-weight: bold;
+    color:#085796;
+    text-decoration: none;
+}
+.brand-logo.logo-lower-part{
+        display: none;
+}
+
+.upper-part-header{
+    justify-content: space-between;
+    padding-left:30px;
+    padding-right:42px;
+    margin-top:20px;
+}
+
+
+
+
+.lower-part-header{
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 118px;
+    left:0;
+    right:0;
+    width:251px;
+}
+
+
+/*Menu Secundario--------------------------------------------*/
+
+.right-side-menu{
+    width: 0;
+    height: 100%;
+    top:0;
+    position: fixed;
+    z-index: 100;
+    overflow-x: hidden;
+}
+
+.secondary-menu-list{
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+.secondary-menu-list a{
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.secondary-menu-logo{
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.secondary-menu-logo span{
+    font-weight: bold;
+    font-size: 20px;
+    margin-right:10%;
+    cursor: pointer;
+}
+
+/*Se agrega estilado al icono de hamburguesa*/
+.mobile-logo-ham i{
+    font-size: 40px;
+    font-weight: 200;
+    line-height: 60px;
+    color:#065494;
+}
+/*Se asigna la direccion derecha al side menu*/
+.right-side-menu{
+    background-color: #F7F7F7;
+    left:auto;
+    right:0;
+}
+
+/*Se agregan margen y la direccion del flex al menu secundario*/
+.secondary-menu-list{
+    width: 100%;
+    margin-top:22px;
+    margin-left: 28px;
+    padding:0;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+/*Se agrega el color a los textos del menu secundario*/
+.secondary-menu-list a{
+    color:#085796;  
+}
+
+/*Se agrega espacio al logo para separarlo del contenidon*/
+.secondary-menu-logo{
+    margin-bottom: 37px;
+}
+
+/*Se agrega espacio entre los items del menu secundario*/
+
+.secondary-menu-item{
+    margin-bottom: 23px;
+}
+
+/*Clase que  agrega el estilo de overflow cuando sale el menu*/
+.overflow-menu{
+    top:0;
+    background-color: rgba(0,0,0,0.5);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 99;
+}
+
+/*Clase para mostrar el menu*/
+.active{
+    width:294px;
+    transition: 0.2s;
+}
+
+/*Final Menu secundario*/
+
+/*Barra de progreso y pasos*/
+
+#progress-bar-outer{
+    width: 100%;
+    height: 7px;
+    margin-top:50px;
+}
+
+#progress-bar-inner{
+    width:100%;
+    height: 7px;
+    background-color: #72C6EF;
+}
+
+#steps{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top:28px;
+}
+#stepss ul{
+    width:400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#steps ul .step-number{
+    display: inline-block;
+    font-weight: 300;
+    font-size: 20px;
+    color:#BBBBBB;
+    list-style-type: none;
+    width:20px;
+}
+
+#steps ul .step-number.selected-step{
+    color:#262626;
+}
+
+
+
+
+.confirmation-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.wrapper-circle{
+  position:relative;
+  margin-top:35px;
+}
+
+.wrapper-circle,
+.circle{
+  width:40px;
+  height:40px;
+}
+
+.circle{
+  border:2px solid #0B9E11;
+  border-top:2px solid white;
+  border-radius:50%;
+  transform:rotate(40deg);
+}
+
+.tick{
+  position:absolute;
+  bottom:auto;
+  left:auto;
+  height:9px;
+  width:35px;
+  border-left:3px solid #0B9E11;
+  border-bottom:3px solid #0B9E11;
+  transform: rotate(-89deg);
+}
+
+.paragraph-margin{
+    margin-top: 30px;
+}
+
+.notice{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(8, 87, 150, 0.2);
+    padding:10px;
+    margin-top:30px;
+    width:300px;
+
+}
+.notice p{
+    color:#085796;
+}
+
+.notice button{
+    background-color: #E10000;
+    border:none;
+    color:#fff;
+    padding:5px;
+    margin-top: 20px;
+    height:40px;
+    width: 200px;
+}
+
+
+
+.button-checkout{
+    display: block;
+    border: 1px solid #085796;
+    width: 280px;
+    height: 50px;
+    margin:10px auto;
+    padding-top:10px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    background: #085796;
+    color:#ffffff;
+    font-weight: bold;
+}
+
+.button-checkout:hover{
+    background-color: #08497e;
+}
+
+.button-checkout:active{
+    background-color: #073f6d;
+}
+
+
+
+
+/*footer politicas*/
+ #lower-footer{
+     background-color:#000;
+     color: #FFFFFF;
+     display:flex;
+     flex-direction: column;
+     align-items: center;
+     padding:20px 0;
+     text-align: center;
+     font-size: 9px;
+ }
+
+ #lower-footer div{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+#lower-footer p{
+    width: 150px;
+}
+
+ #lower-footer ul{
+     list-style: none;
+ }
+ #lower-footer ul>li{
+     width: 150px;
+     margin-bottom: 5px;
+ }
+
+ #lower-footer a{
+     color: #FFFFFF;
+     text-decoration: none;
+ }
+
+
+/*Fin footer politicas*/
+
+
+@media only screen and (min-width:991px){
+
+     /*-----------------------Seccion menu desktop--------------------------------------------------*/
+    /*Se esconde el logo superior, los logos de el menu lateral*/
+    .mobile-logo-ham,
+    .secondary-menu-logo,
+    .brand-logo{
+        display:none;
+    }
+    /*Se quita el overflow en caso que se quede el side menu abierto y se agrande la pantalla*/
+    .overflow-menu{
+     background-color: transparent;
+    }
+
+    .brand-logo.logo-lower-part{
+        display: inline-block;
+        margin-left: 115px;
+    }
+
+    .lower-part-header{
+        position: relative;
+        width: 100%;
+        height:103px;
+        top:0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        /*-------------------------Menu Secundario Desktop---------------------------------------------*/
+
+     /*Se mueve agrega el color al header azul y se quita el margen superior de mobile*/
+    .upper-part-header{
+        background-color: #004E8F;
+        margin-top:0;
+    }
+
+     /*El area superior del header se vuelve del tamaño para desktop*/
+    .upper-part-header,
+    .right-side-menu{
+        height:41px;
+    }
+
+    /*se le da el mismo ancho al menu que su contenedor, se agregar la posicion relativa para incluirlo en el markup y se quita la transicion*/
+    .right-side-menu{
+        width: 100%;
+        position: relative;
+        margin-left:115px;
+        background-color: transparent;
+    }
+
+    /*Make the text go to the center of the row*/
+    .secondary-menu-list{
+        margin:0;
+        flex-direction: row;
+        align-items: center;
+    }
+    /*Makes the items of the menu move away from each other */
+    .secondary-menu-item{
+        margin:0;
+        margin-right:36px;
+    }
+    /*Gives the white color to the text*/
+    .right-side-menu li>a{
+        color:white;
+    }
+
+    /*-------------------------Fin de Menu Secundario Desktop---------------------------------------------*/
+
+    /*Checkout*/
+
+    #progress-bar-outer{
+        margin-top:0;
+    }
+    #steps ul .step-number{
+        margin-left:48px;
+    }
+
+    .notice{
+        width:500px;
+    }
+    
+    .button-wrap{
+    width: 900px;
+    margin: 10px auto;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .button-checkout{
+        display: inline-block;
+        margin:10px;
+    }
+
+    #button-horario{
+        padding-top:0;
+    }
+
+
+    .wrapper-circle{
+        margin-top:65px;
+    }
+    .wrapper-circle,
+    .circle{
+        width:60px;
+        height:60px;
+    }
+
+
+    .tick{
+        height:15px;
+        width:50px;
+    }
+   
+    
+
+    /*Lower footer- privacidad*/
+    
+     #lower-footer{
+        flex-direction: row;
+        justify-content: space-between;
+        padding:20px 0;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    #lower-footer div{
+        width: auto;
+    }
+    #lower-footer p{
+        margin-left:30px;
+        width:300px;
+    }
+
+    #lower-footer ul>li{
+        display: inline-block;
+    }
+
+    #lower-footer ul>li:nth-child(2){
+        border-left: 2px solid #fff;
+        border-right: 2px solid #fff;
+    }
+}
+

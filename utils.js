@@ -15,3 +15,7 @@ exports.queryAsync = (query, values)=> {
     })
     
 }
+
+exports.queryClose = async ()=>{
+    conexion.release();
+}

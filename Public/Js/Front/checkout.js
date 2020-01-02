@@ -237,6 +237,18 @@ async function submitPayment(formElements){
             'Content-Type': 'application/json'
           },
           body:JSON.stringify(information)
+        }).then((resultado)=>{
+          console.log(resultado);
+          if(resultado.status===200){
+            const step = url.match(/step_\d/)[0];
+            if (step==="step_3"){
+              window.location.href = url.replace(/step_\d/, "step_4")
+            }else{
+              window.location.href = url.replace(/step_\d/, "step_5")
+            }
+            
+          }
+          
         })
       }
     }

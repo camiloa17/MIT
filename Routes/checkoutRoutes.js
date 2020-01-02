@@ -122,11 +122,9 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 
             res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio, fechaFinalizacion: fechaFinalizacion[0].fecha, idPayment: paymentIntent.client_secret });
         } else {
-
+            informacionPagina.stylesheet = '/css/Front/checkoutConfirmation.css';
+            res.render('checkoutConfirmation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
         }
-
-
-
 
     } catch (err) {
         console.error(err)
@@ -134,6 +132,32 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     }
 })
 
+
+router.get('/step_5/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
+    try {
+        const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
+        const informacionPagina = {
+            stylesheet: '/css/Front/checkoutConfirmation.css',
+            step: 'step_5',
+            materia: datosExamenModalidad.materia,
+            tipo: datosExamenModalidad.tipo,
+            nivel: datosExamenModalidad.nivel,
+            modo: datosExamenModalidad.modalidad,
+            exrw: datosExamenModalidad.exrw,
+            exls: datosExamenModalidad.exls,
+            id: datosExamenModalidad.id,
+            horarioId: req.query.idhorario,
+            horarioLs: req.query.idhorarioL,
+            idReserva: req.query.idreserva,
+            precio: datosExamenModalidad.precio
+        }
+        res.render('checkoutConfirmation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio});
+
+        
+    } catch (error) {
+        console.error(error)
+    }
+});
 
 
 
@@ -184,6 +208,7 @@ router.get('/ver-fecha-fuera-de-termino/:modalidad', async (req, res) => {
             const verFueraTermino = await controller.verFechaFueraDeTermino({ exrw: datosExamenModalidad.exrw, exls: datosExamenModalidad.exls }, req.query.horario);
             res.json({ modalidad: { exrw: datosExamenModalidad.exrw, exls: datosExamenModalidad.exls }, rw: verFueraTermino.fecha })
         }
+
     } catch (err) {
         console.error(err)
     }
@@ -208,19 +233,12 @@ router.post('/adicionar-envio/:idSecret/:idReserva', async (req, res) => {
     }
 });
 
-router.get('/ver-horario/:idReserva', async (req, res) => {
-    try {
-        const fecha = await controller.verFechaFueraDeTermino()
-    } catch (error) {
 
-    }
-})
 
 router.post('/reserva/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
     try {
         const datosExamenModalidad = await controller.consultaExamenCheckout(req.query.id);
         const infoFormulario =req.body;
-        console.log(infoFormulario);
         const informacionPagina = {
             stylesheet: "",
             materia: datosExamenModalidad.materia,
@@ -236,10 +254,15 @@ router.post('/reserva/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             precio: datosExamenModalidad.precio
         }
         const crearReserva= await controller.crearReservaYAlumno(infoFormulario,informacionPagina);
-        
+
+        if(!crearReserva){
+            res.sendStatus('500')
+        }else{
+            res.json(`/checkout/step_5/${informacionPagina.materia}/${informacionPagina.tipo}/${informacionPagina.nivel}/${informacionPagina.modo}?id=${informacionPagina.id}&idhorario=${informacionPagina.horarioId}&idhorarioL=${informacionPagina.horarioLs}&idreserva=${informacionPagina.idReserva}`);
+        }
 
     } catch (error) {
-
+        	console.log(error);
     }
 
 
