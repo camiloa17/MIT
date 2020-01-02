@@ -260,3 +260,7 @@ transaccion_status=?
 where uuid=UUID_TO_BIN(?);`
 }
 
+exports.verSiSePago = async ()=>{
+  return `select transaccion_status from reserva where uuid = UUID_TO_BIN(?);`
+}
+

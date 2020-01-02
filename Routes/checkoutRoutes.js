@@ -122,8 +122,16 @@ router.get('/step_4/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
 
             res.render('checkoutInformation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio, fechaFinalizacion: fechaFinalizacion[0].fecha, idPayment: paymentIntent.client_secret });
         } else {
-            informacionPagina.stylesheet = '/css/Front/checkoutConfirmation.css';
-            res.render('checkoutConfirmation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
+            const pago = await controller.consultarSiPagoExitosamente(informacionPagina.idReserva);
+            
+            if(pago.transaccion_status==="succeeded"){
+                informacionPagina.stylesheet = '/css/Front/checkoutConfirmation.css';
+                res.render('checkoutConfirmation', { stylesheet: informacionPagina.stylesheet, step: informacionPagina.step, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, id: informacionPagina.id, horarioId: informacionPagina.horarioId, horarioLs: informacionPagina.horarioLs, idreserva: informacionPagina.idReserva, precio: informacionPagina.precio });
+
+            }else{
+                res.status(404).send('No se encontro la pagina')
+            }
+
         }
 
     } catch (err) {

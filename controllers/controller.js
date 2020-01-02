@@ -454,6 +454,17 @@ exports.consultaPrecio = async (id) => {
     }
 }
 
+exports.consultarSiPagoExitosamente= async(id)=>{
+    try {
+        const consulta = await queries.verSiSePago();
+        const corroborarPago = await utils.queryAsync(consulta,id);
+        return corroborarPago[0]
+        
+    } catch (error) {
+        
+    }
+}
+
 
 
 
