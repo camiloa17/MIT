@@ -1,8 +1,6 @@
 
 function openNav(item){
     const clickItems = item.target.classList;
-    console.log(item);
-    console.log(item.target.nextElementSibling)
     if(clickItems.contains('right-side')){
         document.querySelector('.right-side-menu').classList.add('active');
         document.querySelector('.overflow').classList.add('overflow-menu');
@@ -57,6 +55,13 @@ function closeMenuItem(item){
     item.target.nextElementSibling.style.height = `0px`;
 }
 
+function donwloadPrices(){
+
+   window.location.href="/download/tarifas"
+   
+
+}
+
 document.querySelector('.mobile-logo-ham').addEventListener('click',openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click',closeNav);
 //document.querySelector('#ingles-menu').addEventListener('click',openNav);
@@ -70,6 +75,8 @@ document.querySelectorAll('.primary-menu-logo span').forEach(element=>{
 document.querySelectorAll('.materia-tipo').forEach(element => {
     element.addEventListener('click',openMenuItem)
 });
+
+document.querySelector('#tarifas').addEventListener('click',donwloadPrices)
 
 
 

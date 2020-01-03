@@ -18,6 +18,8 @@ document.querySelectorAll('.faqs-preguntas').forEach(element=>{
     element.addEventListener('click',openText)
 })
 
+document.querySelector('#tarifas').addEventListener('click', donwloadPrices)
+
 
 
 function openNav(item) {
@@ -97,6 +99,11 @@ function openText(item){
     }
     
     
+}
+
+function donwloadPrices() {
+    window.location.href = "/download/tarifas"
+
 }
 
 

@@ -6,7 +6,7 @@ exports.adquirirMenu = async () => {
 
 
 exports.consultaExamenPrecioDescripcion = async () => {
-  return `select m.nombre as materia, t.nombre as tipo,n.nombre as nivel, n.descripcion as descripcion,BIN_TO_UUID(mo.uuid) as id, mo.nombre as modalidad, mo.precio as precio, mo.examen_RW as exrw, mo.examen_LS as exls from materia as m join tipo as t on t.materia_uuid = m.uuid join  nivel as n on n.tipo_uuid = t.uuid join modalidad as mo on n.uuid = mo.nivel_uuid where mo.uuid = UUID_TO_BIN(?);`
+  return `select m.nombre as materia, t.nombre as tipo,n.nombre as nivel, n.descripcion as descripcion,BIN_TO_UUID(mo.uuid) as id, mo.nombre as modalidad, mo.precio as precio, mo.examen_RW as exrw, mo.examen_LS as exls, mo.txt_img as img from materia as m join tipo as t on t.materia_uuid = m.uuid join  nivel as n on n.tipo_uuid = t.uuid join modalidad as mo on n.uuid = mo.nivel_uuid where mo.uuid = UUID_TO_BIN(?);`
 }
 
 

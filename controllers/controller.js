@@ -84,7 +84,8 @@ exports.consultaExamenCheckout = async (uuid) => {
             precio: respuesta[0].precio,
             id: respuesta[0].id,
             exrw: respuesta[0].exrw,
-            exls: respuesta[0].exls
+            exls: respuesta[0].exls,
+            img:respuesta[0].img
         };
     } catch (err) {
         console.error(err)

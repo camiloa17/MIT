@@ -3,9 +3,15 @@ document.querySelector('.mobile-logo-ham').addEventListener('click', openNav);
 document.querySelector('.secondary-menu-logo span').addEventListener('click', closeNav);
 
 /*step2 */
+/*
 document.getElementsByName('horario-selector').forEach(input => {
     input.addEventListener('change', validarHorario)
-})
+});*/
+
+const horariosTags = document.getElementsByName('horario-selector');
+for(horario of horariosTags){
+    horario.addEventListener('change', validarHorario)
+}
 
 const route = window.location.href;
 const idMod= route.match(/[\w|\d]{8}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{4}-[\w|\d]{12}/)[0];
@@ -108,6 +114,19 @@ async function getHorario() {
     try {
         let horarioSeleccionado;
         let horarioListening;
+        const horarios = document.getElementsByName('horario-selector');
+
+        for (let horario of horarios){
+            if(horario.checked){
+                if(horario.classList.length==2){
+                    horarioSeleccionado = (horario.classList[0]);
+                    horarioListening = (horario.classList[1])
+                }else{
+                    horarioSeleccionado = (horario.classList[0]);
+                }
+            }
+        }
+        /*
         document.getElementsByName('horario-selector').forEach(horario => {
             if (horario.checked) {
                 if (horario.classList.length == 2) {
@@ -118,11 +137,11 @@ async function getHorario() {
                 }
 
             }
-        });
+        });*/
         return { horarioSeleccionado: horarioSeleccionado, horarioListening: horarioListening }
         
     } catch (error) {
-        
+        console.error(error);
     }
     
 

@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const controller = require('../MIT/controllers/controller');
 const checkoutRoutes = require('./Routes/checkoutRoutes');
-const dashbordRoutes = require('./Routes/rutas_dashboard')
+const dashbordRoutes = require('./Routes/rutas_dashboard');
+const downloadRoutes = require('./Routes/downloadRoutes');
 const app = express();
 
 app.set("view engine", "ejs");
@@ -48,6 +49,8 @@ app.get('/faqs', asyncErrorWrap(async (req, res) => {
 
 
 app.use('/dashboard',asyncErrorWrap(dashbordRoutes));
+
+app.use('/download', asyncErrorWrap(downloadRoutes))
 
 
 

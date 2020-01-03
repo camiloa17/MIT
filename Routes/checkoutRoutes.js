@@ -23,10 +23,11 @@ router.get('/step_1/:materia/:tipo/:nivel/:modalidad', async (req, res) => {
             horarioLs: req.query.idhorarioL,
             idReserva: req.query.idreserva,
             precio: datosExamenModalidad.precio,
-            descripcion: datosExamenModalidad.descripcion
+            descripcion: datosExamenModalidad.descripcion,
+            imagen:datosExamenModalidad.img
         }
-
-        res.render('checkoutStep1', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, precio: informacionPagina.precio, descripcion: informacionPagina.descripcion, step: informacionPagina.step, id: informacionPagina.id });
+        
+        res.render('checkoutStep1', { stylesheet: informacionPagina.stylesheet, materia: informacionPagina.materia, tipo: informacionPagina.tipo, nivel: informacionPagina.nivel, modo: { texto: informacionPagina.modo, exrw: informacionPagina.exrw, exls: informacionPagina.exls }, precio: informacionPagina.precio, descripcion: informacionPagina.descripcion, step: informacionPagina.step, id: informacionPagina.id,imagen:informacionPagina.imagen });
     } catch (err) {
         console.error(err)
     }

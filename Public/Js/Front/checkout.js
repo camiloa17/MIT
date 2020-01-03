@@ -26,11 +26,11 @@ window.addEventListener("DOMContentLoaded", () => {
       if (distance<0) {
       clearInterval(intervalo)
       document.querySelector('#timer').innerText = `0 Mins:0 Segs`
-        /*
+        
       alert("se acabo el tiempo, vas a ser redireccionado a el segundo paso");
       
       window.location.href=window.location.pathname.replace(/step_4/,"step_2")+"?id="+idModalidad;
-      */
+      
     }
   }, 1000)
   
